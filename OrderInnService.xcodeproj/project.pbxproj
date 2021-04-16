@@ -3,23 +3,49 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 51;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		580506F526296723007CF39B /* RestaruantLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580506F426296723007CF39B /* RestaruantLogin.swift */; };
+		580509182629AB07007CF39B /* QrParsing.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580509172629AB07007CF39B /* QrParsing.swift */; };
 		582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D72628129400D3BCCA /* OrderInnServiceApp.swift */; };
-		582066DA2628129400D3BCCA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D92628129400D3BCCA /* ContentView.swift */; };
+		582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D92628129400D3BCCA /* QrScannerView.swift */; };
 		582066DC2628129400D3BCCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DB2628129400D3BCCA /* Assets.xcassets */; };
 		582066DF2628129400D3BCCA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DE2628129400D3BCCA /* Preview Assets.xcassets */; };
+		582066E92628166900D3BCCA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 582066E82628166900D3BCCA /* GoogleService-Info.plist */; };
+		582FD06F2628B66000B73C8C /* Zones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582FD06E2628B66000B73C8C /* Zones.swift */; };
+		58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA12628218400574D4F /* QrScannerViewController.swift */; };
+		58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA42628255200574D4F /* QrCodeScannerView.swift */; };
+		58F07AA92628274700574D4F /* AlertItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA82628274700574D4F /* AlertItem.swift */; };
+		58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AAB26282A0900574D4F /* QrCodeScannerWork.swift */; };
+		58F07AB026282FE200574D4F /* CutOutView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AAF26282FE200574D4F /* CutOutView.swift */; };
+		58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB2262830D400574D4F /* BlurEffect.swift */; };
+		58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB626284ED500574D4F /* HalfModalView.swift */; };
+		8D81E1853CD596EA1AD61F7F /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		580506F426296723007CF39B /* RestaruantLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaruantLogin.swift; sourceTree = "<group>"; };
+		580509172629AB07007CF39B /* QrParsing.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrParsing.swift; sourceTree = "<group>"; };
 		582066D42628129400D3BCCA /* OrderInnService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrderInnService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		582066D72628129400D3BCCA /* OrderInnServiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderInnServiceApp.swift; sourceTree = "<group>"; };
-		582066D92628129400D3BCCA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		582066D92628129400D3BCCA /* QrScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScannerView.swift; sourceTree = "<group>"; };
 		582066DB2628129400D3BCCA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		582066DE2628129400D3BCCA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		582066E02628129400D3BCCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		582066E82628166900D3BCCA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
+		582FD06E2628B66000B73C8C /* Zones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zones.swift; sourceTree = "<group>"; };
+		58F07AA12628218400574D4F /* QrScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScannerViewController.swift; sourceTree = "<group>"; };
+		58F07AA42628255200574D4F /* QrCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCodeScannerView.swift; sourceTree = "<group>"; };
+		58F07AA82628274700574D4F /* AlertItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertItem.swift; sourceTree = "<group>"; };
+		58F07AAB26282A0900574D4F /* QrCodeScannerWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCodeScannerWork.swift; sourceTree = "<group>"; };
+		58F07AAF26282FE200574D4F /* CutOutView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CutOutView.swift; sourceTree = "<group>"; };
+		58F07AB2262830D400574D4F /* BlurEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurEffect.swift; sourceTree = "<group>"; };
+		58F07AB626284ED500574D4F /* HalfModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalfModalView.swift; sourceTree = "<group>"; };
+		6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.debug.xcconfig"; sourceTree = "<group>"; };
+		B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.release.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.release.xcconfig"; sourceTree = "<group>"; };
+		CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -27,17 +53,44 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8D81E1853CD596EA1AD61F7F /* Pods_OrderInnService.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		2F1CF75E67091DDE4106CB3B /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		580506F32629670B007CF39B /* Models */ = {
+			isa = PBXGroup;
+			children = (
+				580506F426296723007CF39B /* RestaruantLogin.swift */,
+			);
+			path = Models;
+			sourceTree = "<group>";
+		};
+		580509162629AAEA007CF39B /* Common */ = {
+			isa = PBXGroup;
+			children = (
+				580509172629AB07007CF39B /* QrParsing.swift */,
+			);
+			path = Common;
+			sourceTree = "<group>";
+		};
 		582066CB2628129400D3BCCA = {
 			isa = PBXGroup;
 			children = (
 				582066D62628129400D3BCCA /* OrderInnService */,
 				582066D52628129400D3BCCA /* Products */,
+				63EFB55165DA9DC0E0B1E609 /* Pods */,
+				2F1CF75E67091DDE4106CB3B /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -53,9 +106,15 @@
 			isa = PBXGroup;
 			children = (
 				582066D72628129400D3BCCA /* OrderInnServiceApp.swift */,
-				582066D92628129400D3BCCA /* ContentView.swift */,
+				58F07AA72628273900574D4F /* AlertItems */,
+				5838DB2D262820A2001698D7 /* QrScannerView */,
+				582FD06D2628B63D00B73C8C /* ZoneSelection */,
+				580506F32629670B007CF39B /* Models */,
+				58F07AAE26282FC300574D4F /* Extensions */,
+				580509162629AAEA007CF39B /* Common */,
 				582066DB2628129400D3BCCA /* Assets.xcassets */,
 				582066E02628129400D3BCCA /* Info.plist */,
+				582066E82628166900D3BCCA /* GoogleService-Info.plist */,
 				582066DD2628129400D3BCCA /* Preview Content */,
 			);
 			path = OrderInnService;
@@ -69,6 +128,60 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
+		582FD06D2628B63D00B73C8C /* ZoneSelection */ = {
+			isa = PBXGroup;
+			children = (
+				582FD06E2628B66000B73C8C /* Zones.swift */,
+			);
+			path = ZoneSelection;
+			sourceTree = "<group>";
+		};
+		5838DB2D262820A2001698D7 /* QrScannerView */ = {
+			isa = PBXGroup;
+			children = (
+				58F07AA02628215100574D4F /* UIKit Components */,
+				582066D92628129400D3BCCA /* QrScannerView.swift */,
+				58F07AAB26282A0900574D4F /* QrCodeScannerWork.swift */,
+				58F07AB626284ED500574D4F /* HalfModalView.swift */,
+			);
+			path = QrScannerView;
+			sourceTree = "<group>";
+		};
+		58F07AA02628215100574D4F /* UIKit Components */ = {
+			isa = PBXGroup;
+			children = (
+				58F07AA12628218400574D4F /* QrScannerViewController.swift */,
+				58F07AA42628255200574D4F /* QrCodeScannerView.swift */,
+				58F07AB2262830D400574D4F /* BlurEffect.swift */,
+			);
+			path = "UIKit Components";
+			sourceTree = "<group>";
+		};
+		58F07AA72628273900574D4F /* AlertItems */ = {
+			isa = PBXGroup;
+			children = (
+				58F07AA82628274700574D4F /* AlertItem.swift */,
+			);
+			path = AlertItems;
+			sourceTree = "<group>";
+		};
+		58F07AAE26282FC300574D4F /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				58F07AAF26282FE200574D4F /* CutOutView.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
+		63EFB55165DA9DC0E0B1E609 /* Pods */ = {
+			isa = PBXGroup;
+			children = (
+				6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */,
+				B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */,
+			);
+			path = Pods;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -76,9 +189,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 582066E32628129400D3BCCA /* Build configuration list for PBXNativeTarget "OrderInnService" */;
 			buildPhases = (
+				9547EC8B8447574559AE224C /* [CP] Check Pods Manifest.lock */,
 				582066D02628129400D3BCCA /* Sources */,
 				582066D12628129400D3BCCA /* Frameworks */,
 				582066D22628129400D3BCCA /* Resources */,
+				6F8B05F345696D28FA8B7C3E /* [CP] Embed Pods Frameworks */,
 			);
 			buildRules = (
 			);
@@ -128,18 +243,71 @@
 			files = (
 				582066DF2628129400D3BCCA /* Preview Assets.xcassets in Resources */,
 				582066DC2628129400D3BCCA /* Assets.xcassets in Resources */,
+				582066E92628166900D3BCCA /* GoogleService-Info.plist in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		6F8B05F345696D28FA8B7C3E /* [CP] Embed Pods Frameworks */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-OrderInnService/Pods-OrderInnService-frameworks-${CONFIGURATION}-input-files.xcfilelist",
+			);
+			name = "[CP] Embed Pods Frameworks";
+			outputFileListPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-OrderInnService/Pods-OrderInnService-frameworks-${CONFIGURATION}-output-files.xcfilelist",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-OrderInnService/Pods-OrderInnService-frameworks.sh\"\n";
+			showEnvVarsInLog = 0;
+		};
+		9547EC8B8447574559AE224C /* [CP] Check Pods Manifest.lock */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
+				"${PODS_ROOT}/Manifest.lock",
+			);
+			name = "[CP] Check Pods Manifest.lock";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/Pods-OrderInnService-checkManifestLockResult.txt",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
+			showEnvVarsInLog = 0;
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		582066D02628129400D3BCCA /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				582066DA2628129400D3BCCA /* ContentView.swift in Sources */,
+				58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */,
+				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
+				580506F526296723007CF39B /* RestaruantLogin.swift in Sources */,
+				58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */,
+				582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */,
+				580509182629AB07007CF39B /* QrParsing.swift in Sources */,
+				58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */,
+				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
+				58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */,
+				582FD06F2628B66000B73C8C /* Zones.swift in Sources */,
 				582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */,
+				58F07AB026282FE200574D4F /* CutOutView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -264,6 +432,7 @@
 		};
 		582066E42628129400D3BCCA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -272,7 +441,7 @@
 				DEVELOPMENT_TEAM = DQ695RWXNF;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OrderInnService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -286,6 +455,7 @@
 		};
 		582066E52628129400D3BCCA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -294,7 +464,7 @@
 				DEVELOPMENT_TEAM = DQ695RWXNF;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = OrderInnService/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
