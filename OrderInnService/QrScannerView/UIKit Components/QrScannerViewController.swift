@@ -100,11 +100,11 @@ extension QrScannerViewController: AVCaptureMetadataOutputObjectsDelegate{
             return
         }
         session.stopRunning()
-        guard let qrUrl = QRURL.validateQrString(from: qrCode) else{
+        guard let result = QRURL.validateQrString(from: qrCode)else{
             scannerDelegate?.didSurface(error: .invalidQrCode)
             return
         }
         
-        scannerDelegate?.didFind(qrCode: qrUrl.restaurant)
+        scannerDelegate?.didFind(qrCode: result.restaurant)
     }
 }

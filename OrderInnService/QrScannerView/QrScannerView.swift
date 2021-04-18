@@ -9,11 +9,12 @@ import SwiftUI
 
 struct QrScannerView: View {
     @StateObject var scannerWork = QrCodeScannerWork()
+    @State var alertItem: AlertItem?
     
     var body: some View {
         NavigationView{
             ZStack{
-                QrCodeScannerView(qrCode: $scannerWork.qrCode, alertItem: $scannerWork.alertItem)
+                QrCodeScannerView(qrCode: $scannerWork.qrCode, alertItem: $alertItem)
                     .edgesIgnoringSafeArea(.all)
                 
                 BlurEffectView(effect: UIBlurEffect(style: .dark))
@@ -27,20 +28,23 @@ struct QrScannerView: View {
                     
                     Spacer()
                 }
-                
-//                HalfModalView(isShown: $scannerWork.displayHalfModalLogin, modalHeight: 400){
-//                    Text("\(scannerWork.restaurant?.name ?? "There is no restaurant")")
-//                        .foregroundColor(.blue)
-//                }.onReceive(scannerWork.objectWillChange, perform: {
-//                    scannerWork.retriveEmployes(withId: scannerWork.qrCode)
-//                })
             }
+            .overlay(
+                HalfModalView(isShown: $scannerWork.displayHalfModalLogin, modalHeight: 600){
+                    Text("\(scannerWork.restaurant?.name ?? "There is no restaurant")")
+                        .foregroundColor(.blue)
+                }
+            )
             .navigationBarHidden(true)
-            .alert(item: $scannerWork.alertItem){ alert in
+            .alert(item: $alertItem){ alert in
                 Alert(title: alert.title,
                       message: alert.message,
                       dismissButton: alert.dismissButton)
             }
+            .onReceive(scannerWork.objectWillChange, perform: {
+                scannerWork.retriveEmployes(with: scannerWork.qrCode!)
+                scannerWork.displayHalfModalLogin.toggle()
+            })
         }
     }
 }

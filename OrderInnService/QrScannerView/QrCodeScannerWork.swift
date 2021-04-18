@@ -11,19 +11,18 @@ import FirebaseFirestore
 
 class QrCodeScannerWork: ObservableObject{
     @Published var restaurant: Restaurant?
-    @Published var alertItem: AlertItem?
+    @Published var displayHalfModalLogin = false
     let objectWillChange = PassthroughSubject<Void, Never>()
     let databse = Firestore.firestore()
     
-    @Published var qrCode: String = ""{
+    @Published var qrCode: String?{
         didSet{
             objectWillChange.send()
         }
     }
     
-    func retriveEmployes(withId: String){
-        
-        databse.collection("Restaurants").document(qrCode).getDocument { (document, error) in
+    func retriveEmployes(with id: String){
+        databse.collection("Restaurants").document(id).getDocument { (document, error) in
             
             if let document = document, document.exists{
                 let dataDescription = document.data().map(String.init(describing: )) ?? nil
@@ -33,7 +32,6 @@ class QrCodeScannerWork: ObservableObject{
                 let name = document.data()!["name"] as? String ?? ""
                 
                 self.restaurant = Restaurant(id: id, name: name)
-                
             }else if error != nil{
                 print("There is no document")
             }
