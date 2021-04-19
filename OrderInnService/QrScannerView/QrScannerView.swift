@@ -63,7 +63,9 @@ struct EmployeeList: View{
                         ForEach(scannerWork.users, id:\.id){ user in
                             Button(action: {
                                 scannerWork.updateData(with: user)
+                                scannerWork.currentUser = user
                                 showZones.toggle()
+                                UserDefaults.standard.startScreen = true
                             }, label: {
                                 Text("\(user.name) \(user.lastName)")
                                     .foregroundColor(Color(UIColor.label))
@@ -73,7 +75,7 @@ struct EmployeeList: View{
                     }
                     .listStyle(InsetGroupedListStyle())
                     
-                    NavigationLink(destination: ZoneSelection(), isActive: $showZones) { EmptyView() }
+                    NavigationLink(destination: ZoneSelection(restaurant: scannerWork.restaurant), isActive: $showZones) { EmptyView() }
                     
                 }else{
                     Text("There are no pending users! Please contact your supervisor.")

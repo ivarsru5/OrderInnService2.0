@@ -14,7 +14,7 @@ struct OrderInnServiceApp: App {
     
     var body: some Scene {
         WindowGroup {
-            QrScannerView()
+            LounchScreen()
         }
     }
 }
