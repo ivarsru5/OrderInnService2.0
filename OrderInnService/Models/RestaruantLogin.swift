@@ -9,11 +9,12 @@ import SwiftUI
 
 struct Restaurant: Identifiable{
     var id = UUID().uuidString
-    let name: String
+    var name: String = ""
     
     struct RestaurantEmploye: Identifiable{
-        let id = UUID().uuidString
+        var id = UUID().uuidString
         let name: String
         let lastName: String
+        let isActive: Bool
     }
 }

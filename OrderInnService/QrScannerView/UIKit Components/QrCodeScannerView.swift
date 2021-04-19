@@ -10,13 +10,15 @@ import Combine
 import Firebase
 
 struct QrCodeScannerView: UIViewControllerRepresentable{
-    @Binding var qrCode: String?
+    @Binding var qrCode: String
     @Binding var alertItem: AlertItem?
     
     func makeUIViewController(context: Context) -> QrScannerViewController {
         QrScannerViewController(scannerDelegate: context.coordinator)
     }
     func updateUIViewController(_ uiViewController: QrScannerViewController, context: Context) {
+        
+        
         if alertItem != nil{
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
                 uiViewController.session.startRunning()
