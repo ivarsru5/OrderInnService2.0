@@ -41,8 +41,9 @@ class QrCodeScannerWork: ObservableObject{
                 
                 let id = document.documentID
                 let name = document.data()!["name"] as? String ?? ""
+                let subscription = document.data()!["subscriptionPaid"] as? Bool ?? true
                 
-                self.restaurant = Restaurant(id: id, name: name)
+                self.restaurant = Restaurant(id: id, name: name, subscriptionPaid: subscription)
                 
             }else if error != nil{
                 print("There is no document")

@@ -14,17 +14,24 @@ struct ZoneSelection: View {
     var body: some View {
         NavigationView{
             if !zoneWork.loadingQuery{
-                List{
-                    ForEach(zoneWork.zones, id: \.id){ zone in
-                        NavigationLink(destination: EmptyView()){
-                            Text("\(zone.location)")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
+                if qrScanner.restaurant.subscriptionPaid{
+                    List{
+                        ForEach(zoneWork.zones, id: \.id){ zone in
+                            NavigationLink(destination: EmptyView()){
+                                Text("\(zone.location)")
+                                    .bold()
+                                    .foregroundColor(Color(UIColor.label))
+                            }
                         }
                     }
+                    .navigationTitle(Text("Zone's"))
+                    .navigationBarBackButtonHidden(true)
+                }else{
+                    Text("Sorry for inconvenience! It seems that subscription paymant is due.")
+                        .bold()
+                        .multilineTextAlignment(.center)
+                        .foregroundColor(Color(UIColor.label))
                 }
-                .navigationTitle(Text("Zone's"))
-                .navigationBarBackButtonHidden(true)
             }else{
                 Spinner()
             }

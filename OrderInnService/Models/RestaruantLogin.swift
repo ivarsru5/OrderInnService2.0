@@ -11,6 +11,7 @@ import FirebaseFirestore
 struct Restaurant: Identifiable{
     var id = UUID().uuidString
     var name: String = ""
+    var subscriptionPaid = true
     
     struct RestaurantEmploye: Identifiable{
         var id = UUID().uuidString

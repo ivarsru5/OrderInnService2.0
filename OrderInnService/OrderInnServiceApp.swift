@@ -22,7 +22,6 @@ struct OrderInnServiceApp: App {
         WindowGroup {
             LounchScreen()
                 .environmentObject(qrScanner)
-            
         }
     }
 }
