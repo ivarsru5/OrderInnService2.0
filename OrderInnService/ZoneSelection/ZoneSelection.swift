@@ -8,28 +8,31 @@
 import SwiftUI
 
 struct ZoneSelection: View {
+    @EnvironmentObject var qrScanner: QrCodeScannerWork
     @StateObject var zoneWork = ZoneWork()
-    var restaurant: Restaurant
     
     var body: some View {
-        VStack{
-            List{
-                ForEach(zoneWork.zones, id: \.id){ zone in
-                    NavigationLink(destination: EmptyView()){
-                        Text("\(zone.location)")
-                            .bold()
-                            .foregroundColor(Color(UIColor.label))
+        NavigationView{
+            if !zoneWork.loadingQuery{
+                List{
+                    ForEach(zoneWork.zones, id: \.id){ zone in
+                        NavigationLink(destination: EmptyView()){
+                            Text("\(zone.location)")
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                        }
                     }
                 }
-            }
-            .onAppear{
-                guard let referance = restaurant.documentReferance else{
-                    return
-                }
-                zoneWork.getZones(with: referance)
+                .navigationTitle(Text("Zone's"))
+                .navigationBarBackButtonHidden(true)
+            }else{
+                Spinner()
             }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationTitle(Text("Zone's"))
+        .onAppear{
+            qrScanner.retriveRestaurant(with: UserDefaults.standard.qrStringKey)
+            zoneWork.getZones()
+            print(String(describing: UserDefaults.standard.currentUser))
+        }
     }
 }

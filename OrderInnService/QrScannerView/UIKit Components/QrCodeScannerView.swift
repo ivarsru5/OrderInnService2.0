@@ -7,7 +7,7 @@
 
 import SwiftUI
 import Combine
-import Firebase
+import AVFoundation
 
 struct QrCodeScannerView: UIViewControllerRepresentable{
     @Binding var qrCode: String
@@ -17,8 +17,6 @@ struct QrCodeScannerView: UIViewControllerRepresentable{
         QrScannerViewController(scannerDelegate: context.coordinator)
     }
     func updateUIViewController(_ uiViewController: QrScannerViewController, context: Context) {
-        
-        
         if alertItem != nil{
             DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
                 uiViewController.session.startRunning()

@@ -12,43 +12,46 @@ struct QrScannerView: View {
     @State var alertItem: AlertItem?
     
     var body: some View {
-        NavigationView{
-            ZStack{
-                QrCodeScannerView(qrCode: $scannerWork.qrCode, alertItem: $alertItem)
-                    .edgesIgnoringSafeArea(.all)
+        ZStack{
+            QrCodeScannerView(qrCode: $scannerWork.qrCode, alertItem: $alertItem)
+                .edgesIgnoringSafeArea(.all)
+            
+            BlurEffectView(effect: UIBlurEffect(style: .dark))
+                .inverseMask(Circle().padding())
+                .edgesIgnoringSafeArea(.all)
+            VStack{
+                Text("Please scan QR code.")
+                    .foregroundColor(.white)
+                    .font(.headline)
+                    .padding(.top, 60)
                 
-                BlurEffectView(effect: UIBlurEffect(style: .dark))
-                    .inverseMask(Circle().padding())
-                    .edgesIgnoringSafeArea(.all)
-                VStack{
-                    Text("Please scan QR code.")
-                        .foregroundColor(.white)
-                        .font(.headline)
-                        .padding(.top, 60)
-                    
-                    Spacer()
-                }
-                NavigationLink(destination: EmployeeList(scannerWork: scannerWork), isActive: $scannerWork.displayUsers){
-                    EmptyView()
-                }
-            }
-            .navigationBarHidden(true)
-            .onDisappear{
-                scannerWork.retriveRestaurant(with: scannerWork.qrCode)
-                scannerWork.getUsers(with: scannerWork.qrCode)
-            }
-            .alert(item: $alertItem){ alert in
-                Alert(title: alert.title,
-                      message: alert.message,
-                      dismissButton: alert.dismissButton)
+                Spacer()
             }
         }
+        .alert(item: $alertItem){ alert in
+            Alert(title: alert.title,
+                  message: alert.message,
+                  dismissButton: alert.dismissButton)
+            
+        }
+        .fullScreenCover(isPresented: $scannerWork.displayUsers){
+            EmployeeList(scannerWork: scannerWork)
+        }
+    }
+}
+
+enum FullScreenCover: Hashable, Identifiable{
+    case toZones
+    case toQrScanner
+    
+    var id: Int{
+        return self.hashValue
     }
 }
 
 struct EmployeeList: View{
     @ObservedObject var scannerWork: QrCodeScannerWork
-    @State var showZones = false
+    @State var presentFullScreenCover: FullScreenCover? = nil
     
     var body: some View{
         VStack{
@@ -64,7 +67,7 @@ struct EmployeeList: View{
                             Button(action: {
                                 scannerWork.updateData(with: user)
                                 scannerWork.currentUser = user
-                                showZones.toggle()
+                                self.presentFullScreenCover = .toZones
                                 UserDefaults.standard.startScreen = true
                             }, label: {
                                 Text("\(user.name) \(user.lastName)")
@@ -74,28 +77,37 @@ struct EmployeeList: View{
                         }
                     }
                     .listStyle(InsetGroupedListStyle())
-                    
-                    NavigationLink(destination: ZoneSelection(restaurant: scannerWork.restaurant), isActive: $showZones) { EmptyView() }
-                    
                 }else{
-                    Text("There are no pending users! Please contact your supervisor.")
-                        .bold()
-                        .foregroundColor(.white)
-                        .multilineTextAlignment(.center)
-                    
-//                    NavigationLink(destination: QrScannerView()){
-//                        Text("Retry Qr code scan")
-//                            .bold()
-//                            .frame(width: 100, height: 40, alignment: .center)
-//                            .foregroundColor(Color(UIColor.systemBackground))
-//                            .background(Color(UIColor.label))
-//                            .padding()
-//                    }
+                    VStack{
+                        Text("There are no pending users! Please contact your supervisor.")
+                            .bold()
+                            .foregroundColor(.white)
+                            .multilineTextAlignment(.center)
+                        
+                        Button(action: {
+                            self.presentFullScreenCover = .toQrScanner
+                        }, label: {
+                            Text("Retry Scan")
+                                .foregroundColor(.blue)
+                                .background(Color.white)
+                                .frame(width: 100, height: 80, alignment: .center)
+                        })
+                    }
                 }
             }else{
                 Spinner()
             }
         }
+        .onAppear{
+            scannerWork.retriveRestaurant(with: scannerWork.qrCode)
+        }
         .navigationBarHidden(true)
+        .fullScreenCover(item: $presentFullScreenCover) { item in
+            if item == .toZones{
+                ToZoneView()
+            }else if item == .toQrScanner{
+                ToQrScannerView()
+            }
+        }
     }
 }

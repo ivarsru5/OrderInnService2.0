@@ -10,18 +10,19 @@ import Firebase
 
 @main
 struct OrderInnServiceApp: App {
-    @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
+    @StateObject var qrScanner: QrCodeScannerWork
+    
+    init(){
+        FirebaseApp.configure()
+        let scanner = QrCodeScannerWork()
+        _qrScanner = StateObject(wrappedValue: scanner)
+    }
     
     var body: some Scene {
         WindowGroup {
             LounchScreen()
+                .environmentObject(qrScanner)
+            
         }
-    }
-}
-
-class AppDelegate: NSObject, UIApplicationDelegate{
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        FirebaseApp.configure()
-        return true
     }
 }

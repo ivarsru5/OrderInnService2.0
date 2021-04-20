@@ -15,6 +15,7 @@
 		5811F94E262DE84100050F2C /* ZoneWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F94D262DE84100050F2C /* ZoneWork.swift */; };
 		5818DF89262D5F4800352CE9 /* OnAppierExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5818DF88262D5F4800352CE9 /* OnAppierExtension.swift */; };
 		5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */; };
+		581D4114262F6C61005F9B4F /* FullScreenCovers.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581D4113262F6C61005F9B4F /* FullScreenCovers.swift */; };
 		582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D72628129400D3BCCA /* OrderInnServiceApp.swift */; };
 		582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D92628129400D3BCCA /* QrScannerView.swift */; };
 		582066DC2628129400D3BCCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DB2628129400D3BCCA /* Assets.xcassets */; };
@@ -40,6 +41,7 @@
 		5811F94D262DE84100050F2C /* ZoneWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneWork.swift; sourceTree = "<group>"; };
 		5818DF88262D5F4800352CE9 /* OnAppierExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnAppierExtension.swift; sourceTree = "<group>"; };
 		5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatior.swift; sourceTree = "<group>"; };
+		581D4113262F6C61005F9B4F /* FullScreenCovers.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FullScreenCovers.swift; sourceTree = "<group>"; };
 		582066D42628129400D3BCCA /* OrderInnService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrderInnService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		582066D72628129400D3BCCA /* OrderInnServiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderInnServiceApp.swift; sourceTree = "<group>"; };
 		582066D92628129400D3BCCA /* QrScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScannerView.swift; sourceTree = "<group>"; };
@@ -92,10 +94,11 @@
 		580509162629AAEA007CF39B /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				580509172629AB07007CF39B /* QrParsing.swift */,
 				58F07AB626284ED500574D4F /* HalfModalView.swift */,
 				58F07AB2262830D400574D4F /* BlurEffect.swift */,
-				580509172629AB07007CF39B /* QrParsing.swift */,
 				5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */,
+				581D4113262F6C61005F9B4F /* FullScreenCovers.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -148,8 +151,8 @@
 		582FD06D2628B63D00B73C8C /* ZoneSelection */ = {
 			isa = PBXGroup;
 			children = (
-				585231E4262DA90100826BBC /* ZoneSelection.swift */,
 				5811F94D262DE84100050F2C /* ZoneWork.swift */,
+				585231E4262DA90100826BBC /* ZoneSelection.swift */,
 			);
 			path = ZoneSelection;
 			sourceTree = "<group>";
@@ -325,6 +328,7 @@
 				582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */,
 				580509182629AB07007CF39B /* QrParsing.swift in Sources */,
 				5818DF89262D5F4800352CE9 /* OnAppierExtension.swift in Sources */,
+				581D4114262F6C61005F9B4F /* FullScreenCovers.swift in Sources */,
 				58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,
 				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
