@@ -18,5 +18,25 @@ struct Restaurant: Identifiable{
         let name: String
         let lastName: String
         let isActive: Bool
+        
+        init?(snapshot: QueryDocumentSnapshot){
+            let data = snapshot.data()
+            self.id = snapshot.documentID
+            
+            guard let name = data["name"] as? String else{
+                return nil
+            }
+            self.name = name
+            
+            guard let lastName = data["lastName"] as? String else{
+                return nil
+            }
+            self.lastName = lastName
+            
+            guard let isActive = data["isActive"] as? Bool else{
+                return nil
+            }
+            self.isActive = isActive
+        }
     }
 }

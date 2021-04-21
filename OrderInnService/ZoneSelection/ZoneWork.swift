@@ -10,9 +10,15 @@ import FirebaseFirestore
 
 class ZoneWork: ObservableObject{
     @Published var zones = [Zones]()
-    @Published var selectedZone: Zones?
     @Published var loadingQuery = true
+    @Published var goToTableView = false
     let databse = Firestore.firestore()
+    
+    @Published var selectedZone: Zones?{
+        didSet{
+            self.goToTableView.toggle()
+        }
+    }
     
     func getZones(){
         databse.collection("Restaurants").document(UserDefaults.standard.qrStringKey).collection("Zone").getDocuments { snapshot, error in
@@ -21,13 +27,8 @@ class ZoneWork: ObservableObject{
                 print("There is no zones")
                 return
             }
-            self.zones = snapshotDocument.map { zoneSnapshot -> Zones in
-                let data = zoneSnapshot.data()
-                
-                //let id = zoneSnapshot.documentID
-                let location = data["location"] as? String ?? ""
-                
-                return Zones(location: location)
+            self.zones = snapshotDocument.compactMap { zoneSnapshot -> Zones? in
+                return Zones(snapshot: zoneSnapshot)
             }
             self.loadingQuery = false
             

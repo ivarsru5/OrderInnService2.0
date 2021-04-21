@@ -22,6 +22,9 @@
 		582066DF2628129400D3BCCA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DE2628129400D3BCCA /* Preview Assets.xcassets */; };
 		582066E92628166900D3BCCA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 582066E82628166900D3BCCA /* GoogleService-Info.plist */; };
 		585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585231E4262DA90100826BBC /* ZoneSelection.swift */; };
+		58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B32630267E00FC9223 /* TableSelectionView.swift */; };
+		58B5D4B82630273800FC9223 /* Tables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B72630273800FC9223 /* Tables.swift */; };
+		58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4BA263027F400FC9223 /* TableSelectionWork.swift */; };
 		58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA12628218400574D4F /* QrScannerViewController.swift */; };
 		58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA42628255200574D4F /* QrCodeScannerView.swift */; };
 		58F07AA92628274700574D4F /* AlertItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA82628274700574D4F /* AlertItem.swift */; };
@@ -50,6 +53,9 @@
 		582066E02628129400D3BCCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		582066E82628166900D3BCCA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		585231E4262DA90100826BBC /* ZoneSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneSelection.swift; sourceTree = "<group>"; };
+		58B5D4B32630267E00FC9223 /* TableSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionView.swift; sourceTree = "<group>"; };
+		58B5D4B72630273800FC9223 /* Tables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tables.swift; sourceTree = "<group>"; };
+		58B5D4BA263027F400FC9223 /* TableSelectionWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionWork.swift; sourceTree = "<group>"; };
 		58F07AA12628218400574D4F /* QrScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScannerViewController.swift; sourceTree = "<group>"; };
 		58F07AA42628255200574D4F /* QrCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCodeScannerView.swift; sourceTree = "<group>"; };
 		58F07AA82628274700574D4F /* AlertItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertItem.swift; sourceTree = "<group>"; };
@@ -87,6 +93,7 @@
 			children = (
 				580506F426296723007CF39B /* RestaruantLogin.swift */,
 				5811F949262DE7A500050F2C /* Zones.swift */,
+				58B5D4B72630273800FC9223 /* Tables.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -129,6 +136,7 @@
 				580506F32629670B007CF39B /* Models */,
 				5838DB2D262820A2001698D7 /* QrScannerView */,
 				582FD06D2628B63D00B73C8C /* ZoneSelection */,
+				58B5D4B22630265A00FC9223 /* TableSelection */,
 				58F07AAE26282FC300574D4F /* Extensions */,
 				580509162629AAEA007CF39B /* Common */,
 				58F07AA72628273900574D4F /* AlertItems */,
@@ -165,6 +173,15 @@
 				582066D92628129400D3BCCA /* QrScannerView.swift */,
 			);
 			path = QrScannerView;
+			sourceTree = "<group>";
+		};
+		58B5D4B22630265A00FC9223 /* TableSelection */ = {
+			isa = PBXGroup;
+			children = (
+				58B5D4BA263027F400FC9223 /* TableSelectionWork.swift */,
+				58B5D4B32630267E00FC9223 /* TableSelectionView.swift */,
+			);
+			path = TableSelection;
 			sourceTree = "<group>";
 		};
 		58F07AA02628215100574D4F /* UIKit Components */ = {
@@ -319,6 +336,7 @@
 			files = (
 				5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */,
 				58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */,
+				58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
 				5811F946262DE53000050F2C /* LounchScreen.swift in Sources */,
@@ -329,9 +347,11 @@
 				580509182629AB07007CF39B /* QrParsing.swift in Sources */,
 				5818DF89262D5F4800352CE9 /* OnAppierExtension.swift in Sources */,
 				581D4114262F6C61005F9B4F /* FullScreenCovers.swift in Sources */,
+				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,
 				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
+				58B5D4B82630273800FC9223 /* Tables.swift in Sources */,
 				58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */,
 				5811F94A262DE7A500050F2C /* Zones.swift in Sources */,
 				582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */,

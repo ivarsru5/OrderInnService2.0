@@ -13,27 +13,35 @@ struct ZoneSelection: View {
     
     var body: some View {
         NavigationView{
-            if !zoneWork.loadingQuery{
-                if qrScanner.restaurant.subscriptionPaid{
-                    List{
-                        ForEach(zoneWork.zones, id: \.id){ zone in
-                            NavigationLink(destination: EmptyView()){
-                                Text("\(zone.location)")
-                                    .bold()
-                                    .foregroundColor(Color(UIColor.label))
+            ZStack{
+                if !zoneWork.loadingQuery{
+                    if qrScanner.restaurant.subscriptionPaid{
+                        List{
+                            ForEach(zoneWork.zones, id: \.id){ zone in
+                                Button(action: {
+                                    self.zoneWork.selectedZone = zone
+                                }, label: {
+                                    Text("\(zone.location)")
+                                        .bold()
+                                        .foregroundColor(Color(UIColor.label))
+                                })
                             }
                         }
+                        .listStyle(InsetGroupedListStyle())
+                        .navigationTitle(Text("Zone's"))
+                        .navigationBarBackButtonHidden(true)
+                    }else{
+                        Text("Sorry for inconvenience! It seems that subscription paymant is due.")
+                            .bold()
+                            .multilineTextAlignment(.center)
+                            .foregroundColor(Color(UIColor.label))
                     }
-                    .navigationTitle(Text("Zone's"))
-                    .navigationBarBackButtonHidden(true)
                 }else{
-                    Text("Sorry for inconvenience! It seems that subscription paymant is due.")
-                        .bold()
-                        .multilineTextAlignment(.center)
-                        .foregroundColor(Color(UIColor.label))
+                    Spinner()
                 }
-            }else{
-                Spinner()
+                NavigationLink(destination: TableSelectionView(zones: zoneWork), isActive: $zoneWork.goToTableView, label: {
+                    EmptyView()
+                })
             }
         }
         .onAppear{
@@ -41,5 +49,35 @@ struct ZoneSelection: View {
             zoneWork.getZones()
             print(String(describing: UserDefaults.standard.currentUser))
         }
+    }
+}
+
+struct NavigationButton<Destination: View, Label: View>: View {
+    var action: () -> Void = { }
+    var destination: () -> Destination
+    var label: () -> Label
+
+    @State private var isActive: Bool = false
+
+    var body: some View {
+        Button(action: {
+            self.action()
+            self.isActive.toggle()
+        }) {
+            self.label()
+              .background(
+                ScrollView {
+                    NavigationLink(destination: LazyDestination { self.destination() },
+                                                 isActive: self.$isActive) { EmptyView() }
+                }
+              )
+        }
+    }
+}
+
+struct LazyDestination<Destination: View>: View {
+    var destination: () -> Destination
+    var body: some View {
+        self.destination()
     }
 }

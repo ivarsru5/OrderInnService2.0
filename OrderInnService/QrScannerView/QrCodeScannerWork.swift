@@ -31,9 +31,7 @@ class QrCodeScannerWork: ObservableObject{
     
     func retriveRestaurant(with id: String){
         UserDefaults.standard.qrStringKey = id
-        let documentPath = databse.collection("Restaurants").document(id)
-        
-        documentPath.getDocument{ document, error in
+        databse.collection("Restaurants").document(id).getDocument{ document, error in
             
             if let document = document{
                 let dataDescription = document.data().map(String.init(describing: )) ?? nil
@@ -59,15 +57,8 @@ class QrCodeScannerWork: ObservableObject{
                 print("There is no documents")
                 return
             }
-            let collectedUsers = snapshotDocument.map { userSnapshot -> Restaurant.RestaurantEmploye in
-                let data = userSnapshot.data()
-                
-                let id = userSnapshot.documentID
-                let name = data["name"] as? String ?? ""
-                let lastName = data["lastName"] as? String ?? ""
-                let isActive = data["isActive"] as? Bool ?? true
-                
-                return Restaurant.RestaurantEmploye(id: id, name: name, lastName: lastName, isActive: isActive)
+            let collectedUsers = snapshotDocument.compactMap { userSnapshot -> Restaurant.RestaurantEmploye? in
+                return Restaurant.RestaurantEmploye(snapshot: userSnapshot)
             }
             self.users = collectedUsers.filter({ $0.isActive != false })
             self.loadingQuery = false
