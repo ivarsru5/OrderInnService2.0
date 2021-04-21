@@ -59,8 +59,9 @@ struct EmployeeList: View{
                 if !scannerWork.users.isEmpty{
                     Text("\(scannerWork.restaurant.name)")
                         .bold()
-                        .foregroundColor(.white)
-                        .padding(.all, 20)
+                        .foregroundColor(Color(UIColor.label))
+                        .padding(.top, 10)
+                        .font(.largeTitle)
                     
                     List{
                         ForEach(scannerWork.users, id:\.id){ user in
@@ -70,9 +71,16 @@ struct EmployeeList: View{
                                 self.presentFullScreenCover = .toZones
                                 UserDefaults.standard.startScreen = true
                             }, label: {
-                                Text("\(user.name) \(user.lastName)")
-                                    .foregroundColor(Color(UIColor.label))
-                                    .padding(.all, 10)
+                                HStack{
+                                    Image(systemName: "person.circle.fill")
+                                        .foregroundColor(Color(UIColor.label))
+                                        .font(.custom("SF Symbols", size: 20))
+                                        .padding(.all, 5)
+                                    
+                                    Text("\(user.name) \(user.lastName)")
+                                        .foregroundColor(Color(UIColor.label))
+                                        .padding(.all, 10)
+                                }
                             })
                         }
                     }
@@ -88,10 +96,12 @@ struct EmployeeList: View{
                             self.presentFullScreenCover = .toQrScanner
                         }, label: {
                             Text("Retry Scan")
+                                .frame(width: 250, height: 50, alignment: .center)
                                 .foregroundColor(.blue)
                                 .background(Color.white)
-                                .frame(width: 100, height: 80, alignment: .center)
+                                .cornerRadius(10)
                         })
+                        .padding()
                     }
                 }
             }else{
