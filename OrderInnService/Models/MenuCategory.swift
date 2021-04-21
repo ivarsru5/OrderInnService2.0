@@ -1,5 +1,5 @@
 //
-//  Tables.swift
+//  MenuCategory.swift
 //  OrderInnService
 //
 //  Created by Ivars Ruģelis on 21/04/2021.
@@ -8,17 +8,17 @@
 import Foundation
 import FirebaseFirestore
 
-struct Table: Identifiable{
+struct MenuCategory: Identifiable{
     var id = UUID().uuidString
-    var table: String
+    var name: String
     
     init?(snapshot: QueryDocumentSnapshot){
         let data = snapshot.data()
         self.id = snapshot.documentID
         
-        guard let table = data["table"] as? String else{
+        guard let name = data["name"] as? String else {
             return nil
         }
-        self.table = table
+        self.name = name
     }
 }

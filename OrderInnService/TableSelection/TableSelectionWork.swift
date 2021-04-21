@@ -10,23 +10,32 @@ import FirebaseFirestore
 
 class TableSelectionWork: ObservableObject{
     @Published var tables = [Table]()
-    @Published var selectedTabel: Table?
+    @Published var loadingQuery = false
+    @Published var goToMenu = false
     let database = Firestore.firestore()
     
-    func getTables(with zoneId: String){
+    @Published var selectedTabel: Table?{
+        didSet{
+            goToMenu.toggle()
+        }
+    }
+    
+    func getTables(with zoneId: Zones){
         database.collection("Restaurants")
             .document(UserDefaults.standard.qrStringKey)
+            .collection("Zone")
+            .document(zoneId.id)
             .collection("Tables")
-            .whereField("zone", isEqualTo: zoneId)
-            .getDocuments() { (snapshot, error) in
-                
-            guard let snapshotDocuments = snapshot?.documents else{
-                print("There is no tables")
-                return
+            .getDocuments { snapshot, error in
+                guard let snapshotDocument = snapshot?.documents else{
+                    print("There is no tables")
+                    return
+                }
+                let collectedTables = snapshotDocument.compactMap{ tableSnapshot -> Table? in
+                    return Table(snapshot: tableSnapshot)
             }
-            self.tables = snapshotDocuments.compactMap { tableSnapshot -> Table? in
-                return Table(snapshot: tableSnapshot)
-            }
+                self.tables = collectedTables.sorted{ $0.table < $1.table }
+                self.loadingQuery = false
         }
     }
 }

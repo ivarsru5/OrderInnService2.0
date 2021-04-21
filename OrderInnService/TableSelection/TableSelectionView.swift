@@ -12,16 +12,28 @@ struct TableSelectionView: View {
     @ObservedObject var zones: ZoneWork
     
     var body: some View {
-        List{
-            ForEach(tables.tables, id:\.id){ table in
-                Text("\(table.table)")
-                    .bold()
-                    .foregroundColor(Color(UIColor.label))
+        ZStack{
+            if !tables.loadingQuery{
+                List{
+                    ForEach(tables.tables, id:\.id){ table in
+                        Button(action: {
+                            self.tables.selectedTabel = table
+                        }, label: {
+                            Text("\(table.table)")
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                        })
+                    }
+                }
+                .navigationBarTitle(Text("\(zones.selectedZone!.location)"))
+                .listStyle(InsetGroupedListStyle())
+                .onAppear{
+                    tables.getTables(with: zones.selectedZone!)
+                }
+            }else{
+                Spinner()
             }
-        }
-        //.navigationBarTitle(Text("\(zones.selectedZone!.location)"))
-        .onAppear{
-            tables.getTables(with: zones.selectedZone!.id)
+            NavigationLink(destination: MenuView(table: tables), isActive: $tables.goToMenu){ EmptyView() }
         }
     }
 }
