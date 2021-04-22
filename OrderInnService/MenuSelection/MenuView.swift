@@ -41,20 +41,71 @@ struct MenuItemView: View {
     @ObservedObject var menuOverView: MenuOverViewWork
     
     var body: some View{
-        ZStack{
-            List{
+        VStack{
+            HStack{
+                Text(menuOverView.category!.name)
+                    .bold()
+                    .foregroundColor(Color(UIColor.label))
+                    .font(.subheadline)
+                    .padding(.all, 15)
+                
+                Spacer()
+            }
+            ScrollView{
                 ForEach(menuOverView.menuItems, id: \.id){ item in
-                    HStack{
-                    Text(item.name)
-                        .bold()
-                        .foregroundColor(.white)
-                    
-                    Text("\(item.price)")
-                        .bold()
-                        .foregroundColor(.white)
-                    }
+                    MenuItemCell(menuItem: item)
                 }
             }
         }
+    }
+}
+
+struct MenuItemCell: View{
+    var menuItem: MenuItem
+    
+    var body: some View{
+        ZStack{
+            Rectangle()
+                .frame(height: 70)
+                .foregroundColor(Color(UIColor.systemGray3))
+                .cornerRadius(20)
+            
+            HStack{
+                Image(systemName: "circle.fill")
+                    .font(.custom("SF Symbols", size: 10))
+                    .foregroundColor(Color(UIColor.label))
+                
+                Text(menuItem.name)
+                    .bold()
+                    .foregroundColor(Color(UIColor.label))
+                
+                Spacer()
+                
+                HStack{
+                    Button(action: {
+                        
+                    }, label: {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.custom("SF Symbols", size: 30))
+                            .foregroundColor(Color(UIColor.label))
+                    })
+                    
+                    Text("0")
+                        .foregroundColor(.secondary)
+                        .font(.headline)
+                    
+                    Button(action: {
+                        
+                    }, label: {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.custom("SF Symbols", size: 30))
+                            .foregroundColor(Color.white)
+                    })
+                }
+            }
+            .padding()
+        }
+        .padding(.leading, 15)
+        .padding(.trailing, 15)
     }
 }
