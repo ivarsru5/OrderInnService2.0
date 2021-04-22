@@ -27,7 +27,11 @@ class MenuOverViewWork: ObservableObject{
                 return
             }
             self.menuCategory = documentSnapshot.compactMap{ categorySnapshot -> MenuCategory? in
-                return MenuCategory(snapshot: categorySnapshot)
+                guard let collectedCategory = MenuCategory(snapshot: categorySnapshot) else{
+                    //TODO: Present Alert
+                    return nil
+                }
+                return collectedCategory
             }
         }
     }
@@ -44,7 +48,11 @@ class MenuOverViewWork: ObservableObject{
                     return
                 }
                 self.menuItems = documentSnapshot.compactMap{ menuItemSnapshot -> MenuItem? in
-                    return MenuItem(snapshot: menuItemSnapshot)
+                    guard let collectedItem = MenuItem(snapshot: menuItemSnapshot) else{
+                        //TODO: Present alert
+                        return nil
+                    }
+                    return collectedItem
                 }
             }
     }

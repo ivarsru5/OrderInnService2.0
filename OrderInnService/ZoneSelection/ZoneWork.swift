@@ -28,7 +28,11 @@ class ZoneWork: ObservableObject{
                 return
             }
             self.zones = snapshotDocument.compactMap { zoneSnapshot -> Zones? in
-                return Zones(snapshot: zoneSnapshot)
+                guard let collectdeZone = Zones(snapshot: zoneSnapshot) else{
+                    //TODO: display alert
+                    return nil
+                }
+                return collectdeZone
             }
             self.loadingQuery = false
             

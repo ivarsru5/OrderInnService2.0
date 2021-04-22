@@ -32,7 +32,11 @@ class TableSelectionWork: ObservableObject{
                     return
                 }
                 let collectedTables = snapshotDocument.compactMap{ tableSnapshot -> Table? in
-                    return Table(snapshot: tableSnapshot)
+                    guard let collectedTable = Table(snapshot: tableSnapshot) else{
+                        //TODO: Display alert
+                        return nil
+                    }
+                    return collectedTable
             }
                 self.tables = collectedTables.sorted{ $0.table < $1.table }
                 self.loadingQuery = false

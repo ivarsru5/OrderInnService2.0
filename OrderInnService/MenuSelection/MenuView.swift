@@ -19,7 +19,7 @@ struct MenuView: View {
                         self.menuOverview.category = category
                         self.menuOverview.getMenuItems(with: category)
                     }, label: {
-                        Text("\(category.name)")
+                        Text(category.name)
                             .bold()
                             .foregroundColor(Color(UIColor.label))
                     })
@@ -44,9 +44,15 @@ struct MenuItemView: View {
         ZStack{
             List{
                 ForEach(menuOverView.menuItems, id: \.id){ item in
-                    Text("\(item.name)")
+                    HStack{
+                    Text(item.name)
                         .bold()
                         .foregroundColor(.white)
+                    
+                    Text("\(item.price)")
+                        .bold()
+                        .foregroundColor(.white)
+                    }
                 }
             }
         }

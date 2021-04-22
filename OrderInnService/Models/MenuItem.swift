@@ -11,7 +11,7 @@ import FirebaseFirestore
 struct MenuItem: Identifiable{
     var id = UUID().uuidString
     var name: String
-    var price: Int
+    var price: Double
     
     init?(snapshot: QueryDocumentSnapshot){
         let data = snapshot.data()
@@ -22,7 +22,7 @@ struct MenuItem: Identifiable{
         }
         self.name = name
         
-        guard let price = data["price"] as? Int else{
+        guard let price = data["price"] as? Double else{
             return nil
         }
         self.price = price

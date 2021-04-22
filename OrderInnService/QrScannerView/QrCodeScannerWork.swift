@@ -58,7 +58,11 @@ class QrCodeScannerWork: ObservableObject{
                 return
             }
             let collectedUsers = snapshotDocument.compactMap { userSnapshot -> Restaurant.RestaurantEmploye? in
-                return Restaurant.RestaurantEmploye(snapshot: userSnapshot)
+                guard let collectedEmployee = Restaurant.RestaurantEmploye(snapshot: userSnapshot) else{
+                    //TODO: Display alert
+                    return nil
+                }
+                return collectedEmployee
             }
             self.users = collectedUsers.filter({ $0.isActive != false })
             self.loadingQuery = false
