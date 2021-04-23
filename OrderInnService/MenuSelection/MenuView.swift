@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct MenuView: View {
+    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var table: TableSelectionWork
     
@@ -34,21 +35,49 @@ struct MenuView: View {
         .sheet(isPresented: $menuOverview.presentMenu){
             MenuItemView(menuOverView: menuOverview)
         }
+        .toolbar{
+            ToolbarItem(placement: .navigationBarTrailing){
+                NavigationLink(destination: OrderCatView(), label: {
+                    HStack{
+                        Image(systemName: "cart")
+                            .font(.custom("SF Symbols", size: 20))
+                            .foregroundColor(.blue)
+                        
+                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
+                            .foregroundColor(.blue)
+                    }
+                })
+            }
+        }
     }
 }
 
 struct MenuItemView: View {
+    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverView: MenuOverViewWork
     
     var body: some View{
         VStack{
             HStack{
-                Text(menuOverView.category!.name)
-                    .bold()
-                    .foregroundColor(Color(UIColor.label))
-                    .font(.subheadline)
-                    .padding(.all, 15)
-                
+                VStack{
+                    HStack{
+                        Text(menuOverView.category!.name)
+                            .bold()
+                            .foregroundColor(Color(UIColor.label))
+                            .font(.subheadline)
+                            .padding(.all, 15)
+                    }
+                    
+                    HStack{
+                        Image(systemName: "cart")
+                            .font(.custom("SFSymbols", size: 20))
+                            .foregroundColor(.blue)
+                        
+                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
+                            .italic()
+                            .foregroundColor(.blue)
+                    }
+                }
                 Spacer()
             }
             ScrollView{
@@ -61,6 +90,7 @@ struct MenuItemView: View {
 }
 
 struct MenuItemCell: View{
+    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverview: MenuOverViewWork
     var menuItem: MenuItem
     
@@ -84,19 +114,19 @@ struct MenuItemCell: View{
                 
                 HStack{
                     Button(action: {
-                        menuOverview.itemAmount -= 1
+                        restaurantOrder.removeFromOrder(menuItem)
                     }, label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color(UIColor.label))
                     })
                     
-                    Text("\(menuOverview.itemAmount)")
+                    Text("\(restaurantOrder.itemAmount)")
                         .foregroundColor(.secondary)
                         .font(.headline)
                     
                     Button(action: {
-                        menuOverview.itemAmount += 1
+                        restaurantOrder.addToOrder(menuItem)
                     }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))

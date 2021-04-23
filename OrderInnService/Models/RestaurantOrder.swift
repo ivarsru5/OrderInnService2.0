@@ -9,6 +9,11 @@ import Foundation
 
 struct RestaurantOrder: Identifiable{
     var id = UUID().uuidString
-    var menuItems: [MenuItem] = []
-    var placedBy: String = ""
+    var menuItems: [MenuItem]
+    var placedBy: String
+    
+    init?(){
+        self.menuItems = []
+        self.placedBy = UserDefaults.standard.currentUser
+    }
 }
