@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ZoneSelection: View {
-    @EnvironmentObject var qrScanner: QrCodeScannerWork
+    @ObservedObject var qrScanner: QrCodeScannerWork
     @StateObject var zoneWork = ZoneWork()
     
     var body: some View {

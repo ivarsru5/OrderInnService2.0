@@ -12,6 +12,7 @@ class MenuOverViewWork: ObservableObject{
     @Published var menuCategory = [MenuCategory]()
     @Published var menuItems = [MenuItem]()
     @Published var presentMenu = false
+    @Published var itemAmount = 0
     let database = Firestore.firestore()
     
     @Published var category: MenuCategory?{

@@ -8,10 +8,11 @@
 import SwiftUI
 
 struct LounchScreen: View {
+    @StateObject var qrScaner = QrCodeScannerWork()
     
     var body: some View {
         if UserDefaults.standard.startScreen{
-            ZoneSelection()
+            ZoneSelection(qrScanner: qrScaner)
         }else{
             QrScannerView()
         }

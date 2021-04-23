@@ -53,7 +53,7 @@ struct MenuItemView: View {
             }
             ScrollView{
                 ForEach(menuOverView.menuItems, id: \.id){ item in
-                    MenuItemCell(menuItem: item)
+                    MenuItemCell(menuOverview: menuOverView, menuItem: item)
                 }
             }
         }
@@ -61,6 +61,7 @@ struct MenuItemView: View {
 }
 
 struct MenuItemCell: View{
+    @ObservedObject var menuOverview: MenuOverViewWork
     var menuItem: MenuItem
     
     var body: some View{
@@ -83,19 +84,19 @@ struct MenuItemCell: View{
                 
                 HStack{
                     Button(action: {
-                        
+                        menuOverview.itemAmount -= 1
                     }, label: {
                         Image(systemName: "minus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color(UIColor.label))
                     })
                     
-                    Text("0")
+                    Text("\(menuOverview.itemAmount)")
                         .foregroundColor(.secondary)
                         .font(.headline)
                     
                     Button(action: {
-                        
+                        menuOverview.itemAmount += 1
                     }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))

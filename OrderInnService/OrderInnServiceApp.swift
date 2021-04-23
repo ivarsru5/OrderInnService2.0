@@ -10,18 +10,15 @@ import Firebase
 
 @main
 struct OrderInnServiceApp: App {
-    @StateObject var qrScanner: QrCodeScannerWork
     
     init(){
         FirebaseApp.configure()
-        let scanner = QrCodeScannerWork()
-        _qrScanner = StateObject(wrappedValue: scanner)
+
     }
     
     var body: some Scene {
         WindowGroup {
             LounchScreen()
-                .environmentObject(qrScanner)
         }
     }
 }

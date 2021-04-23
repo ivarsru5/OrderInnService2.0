@@ -114,7 +114,7 @@ struct EmployeeList: View{
         .navigationBarHidden(true)
         .fullScreenCover(item: $presentFullScreenCover) { item in
             if item == .toZones{
-                ToZoneView()
+                ToZoneView(qrscanner: scannerWork)
             }else if item == .toQrScanner{
                 ToQrScannerView()
             }
