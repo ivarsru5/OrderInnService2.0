@@ -12,7 +12,7 @@ struct RestaurantOrder: Identifiable{
     var menuItems: [MenuItem]
     var placedBy: String
     
-    init?(){
+    init(){
         self.menuItems = []
         self.placedBy = UserDefaults.standard.currentUser
     }

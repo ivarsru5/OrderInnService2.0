@@ -11,9 +11,10 @@ struct MenuView: View {
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var table: TableSelectionWork
+    @State var emptyOrder = false
     
     var body: some View {
-        ZStack{
+        VStack{
             List{
                 ForEach(menuOverview.menuCategory, id:\.id){ category in
                     Button(action: {
@@ -27,6 +28,24 @@ struct MenuView: View {
                 }
             }
             .listStyle(InsetGroupedListStyle())
+            
+            Spacer()
+            
+            NavigationLink(destination: OrderCatView(), label: {
+                HStack{
+                    Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR - ")
+                        .bold()
+                        .foregroundColor(Color(UIColor.systemBackground))
+                    Text("Order Cart")
+                        .bold()
+                        .foregroundColor(Color(UIColor.systemBackground))
+                }
+                .padding()
+            })
+            .frame(width: 300, height: 50, alignment: .center)
+            .background(Color(UIColor.label))
+            .cornerRadius(15)
+            .padding()
         }
         .navigationTitle("\(table.selectedTabel!.table)")
         .onAppear{
@@ -34,20 +53,6 @@ struct MenuView: View {
         }
         .sheet(isPresented: $menuOverview.presentMenu){
             MenuItemView(menuOverView: menuOverview)
-        }
-        .toolbar{
-            ToolbarItem(placement: .navigationBarTrailing){
-                NavigationLink(destination: OrderCatView(), label: {
-                    HStack{
-                        Image(systemName: "cart")
-                            .font(.custom("SF Symbols", size: 20))
-                            .foregroundColor(.blue)
-                        
-                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
-                            .foregroundColor(.blue)
-                    }
-                })
-            }
         }
     }
 }
@@ -59,32 +64,31 @@ struct MenuItemView: View {
     var body: some View{
         VStack{
             HStack{
-                VStack{
-                    HStack{
-                        Text(menuOverView.category!.name)
-                            .bold()
-                            .foregroundColor(Color(UIColor.label))
-                            .font(.subheadline)
-                            .padding(.all, 15)
-                    }
-                    
+                HStack{
                     HStack{
                         Image(systemName: "cart")
                             .font(.custom("SFSymbols", size: 20))
                             .foregroundColor(.blue)
                         
-                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
+                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR")
                             .italic()
                             .foregroundColor(.blue)
                     }
+                    
+                        Text(menuOverView.category!.name)
+                            .bold()
+                            .foregroundColor(Color(UIColor.label))
+                            .font(.subheadline)
+                            .padding(.all, 15)
                 }
                 Spacer()
             }
-            ScrollView{
+            List{
                 ForEach(menuOverView.menuItems, id: \.id){ item in
                     MenuItemCell(menuOverview: menuOverView, menuItem: item)
                 }
             }
+            .listStyle(InsetGroupedListStyle())
         }
     }
 }
@@ -94,13 +98,12 @@ struct MenuItemCell: View{
     @ObservedObject var menuOverview: MenuOverViewWork
     var menuItem: MenuItem
     
+    var itemAmount: Int{
+        restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
+    }
+    
     var body: some View{
-        ZStack{
-            Rectangle()
-                .frame(height: 70)
-                .foregroundColor(Color(UIColor.systemGray3))
-                .cornerRadius(20)
-            
+        
             HStack{
                 Image(systemName: "circle.fill")
                     .font(.custom("SF Symbols", size: 10))
@@ -120,8 +123,9 @@ struct MenuItemCell: View{
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color(UIColor.label))
                     })
+                    .buttonStyle(PlainButtonStyle())
                     
-                    Text("\(restaurantOrder.itemAmount)")
+                    Text("\(itemAmount)")
                         .foregroundColor(.secondary)
                         .font(.headline)
                     
@@ -132,11 +136,31 @@ struct MenuItemCell: View{
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color.white)
                     })
+                    .buttonStyle(PlainButtonStyle())
                 }
             }
-            .padding()
+            .padding(.all, 5)
+    }
+}
+struct NavigatinButton: View{
+    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @State var presntOrderCart = false
+    
+    var body: some View{
+        ZStack{
+            Button(action: {
+                presntOrderCart.toggle()
+            }, label: {
+                Image(systemName: "cart")
+                    .font(.custom("SF Symbols", size: 20))
+                    .foregroundColor(.blue)
+                
+                Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
+                    .italic()
+                    .foregroundColor(.blue)
+            })
+            NavigationLink(destination: OrderCatView(), isActive: $presntOrderCart, label: { EmptyView() })
         }
-        .padding(.leading, 15)
-        .padding(.trailing, 15)
+        .frame(height: 96, alignment: .trailing)
     }
 }

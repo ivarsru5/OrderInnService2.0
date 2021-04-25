@@ -13,22 +13,66 @@ struct OrderCatView: View {
     var body: some View {
         VStack{
             List{
-                ForEach(restaurantOrder.restaurantOrder!.menuItems, id: \.id){ item in
-                    Text(item.name)
-                        .bold()
-                        .foregroundColor(.white)
-                    
-                    Text("\(item.price)")
-                        .bold()
-                        .foregroundColor(.white)
+                Section(header: Text("Client order")){
+                    ForEach(restaurantOrder.restaurantOrder.menuItems, id: \.id){ item in
+                        HStack{
+                            HStack{
+                                Image(systemName: "circle.fill")
+                                    .font(.custom("SF Symbols", size: 10))
+                                    .foregroundColor(Color(UIColor.label))
+                                
+                                Text(item.name)
+                                    .bold()
+                                    .foregroundColor(.white)
+                            }
+                            
+                            Spacer()
+                            
+                            HStack{
+                                Text("\(item.price, specifier: "%.2f")EUR")
+                                    .italic()
+                                    .foregroundColor(.white)
+                                
+                                Button(action: {
+                                    
+                                }, label: {
+                                    Image(systemName: "xmark.circle")
+                                        .font(.custom("SF Symbols", size: 20))
+                                        .foregroundColor(.blue)
+                                })
+                                .buttonStyle(PlainButtonStyle())
+                            }
+                        }
+                    }
                 }
             }
+            .listStyle(InsetGroupedListStyle())
+            .navigationTitle("Order")
+            
+            HStack{
+                Text("Total Order Amount")
+                    .foregroundColor(.secondary)
+                    .font(.subheadline)
+                
+                Spacer()
+                
+                Text("EUR\(restaurantOrder.totalPrice, specifier: "%.2f")")
+                    .bold()
+                    .foregroundColor(Color(UIColor.label))
+            }
+            .padding()
+            
+            Button(action: {
+                
+            }, label: {
+                Text("Send Order")
+                    .bold()
+                    .frame(width: 250, height: 50, alignment: .center)
+                    .foregroundColor(Color(UIColor.systemBackground))
+                    .background(Color(UIColor.label))
+                    .cornerRadius(15)
+            })
+            .padding()
         }
-    }
-}
-
-struct OrderCatView_Previews: PreviewProvider {
-    static var previews: some View {
-        OrderCatView()
     }
 }

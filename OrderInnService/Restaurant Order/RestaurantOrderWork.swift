@@ -12,25 +12,30 @@ class RestaurantOrderWork: ObservableObject{
     
     @Published var itemAmount: Int = 0{
         didSet{
-            let itemAmountState = restaurantOrder?.menuItems.filter() { $0.id == $0.id }
-            self.itemAmount = itemAmountState!.count
         }
     }
     
     var totalPrice: Double{
-        restaurantOrder?.menuItems.reduce(0) { $0 + $1.price } ?? 0.00
+        if !restaurantOrder.menuItems.isEmpty{
+            return restaurantOrder.menuItems.reduce(0) { $0 + $1.price }
+        }else{
+            return 0.00
+        }
     }
     
     func addToOrder(_ menuItem: MenuItem){
-        restaurantOrder?.menuItems.append(menuItem)
+        restaurantOrder.menuItems.append(menuItem)
     }
     
     func removeFromOrder(_ menuItem: MenuItem){
-        if let index = restaurantOrder?.menuItems.firstIndex(where: {$0.id == menuItem.id}){
-            restaurantOrder?.menuItems.remove(at: index)
+        if let index = restaurantOrder.menuItems.firstIndex(where: {$0.id == menuItem.id}){
+            restaurantOrder.menuItems.remove(at: index)
         }
-        if (restaurantOrder?.menuItems.count)! == 0{
-            self.restaurantOrder = nil
+        if restaurantOrder.menuItems.count == 0{
         }
+    }
+    
+    func getItemCount(from items: [MenuItem], forItem: MenuItem) -> Int{
+        return items.filter { $0 == forItem }.count
     }
 }
