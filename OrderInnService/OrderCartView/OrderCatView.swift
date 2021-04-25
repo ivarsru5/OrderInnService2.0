@@ -34,7 +34,9 @@ struct OrderCatView: View {
                                     .foregroundColor(.white)
                                 
                                 Button(action: {
-                                    
+                                    withAnimation(.easeOut(duration: 0.5)){
+                                        restaurantOrder.removeFromOrder(item)
+                                    }
                                 }, label: {
                                     Image(systemName: "xmark.circle")
                                         .font(.custom("SF Symbols", size: 20))

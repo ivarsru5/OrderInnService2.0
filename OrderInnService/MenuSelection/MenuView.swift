@@ -11,7 +11,8 @@ struct MenuView: View {
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var table: TableSelectionWork
-    @State var emptyOrder = false
+    @State var alertitem: AlertItem?
+    @State var showOrder = false
     
     var body: some View {
         VStack{
@@ -31,7 +32,13 @@ struct MenuView: View {
             
             Spacer()
             
-            NavigationLink(destination: OrderCatView(), label: {
+            Button(action: {
+                if !restaurantOrder.restaurantOrder.menuItems.isEmpty{
+                    showOrder.toggle()
+                }else{
+                    alertitem = UIAlerts.emptyOrder
+                }
+            }, label: {
                 HStack{
                     Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR - ")
                         .bold()
@@ -46,20 +53,26 @@ struct MenuView: View {
             .background(Color(UIColor.label))
             .cornerRadius(15)
             .padding()
+            
+            NavigationLink(destination: OrderCatView(), isActive: $showOrder){ EmptyView() }
         }
         .navigationTitle("\(table.selectedTabel!.table)")
         .onAppear{
             menuOverview.getMenuCategory()
         }
         .sheet(isPresented: $menuOverview.presentMenu){
-            MenuItemView(menuOverView: menuOverview)
+            MenuItemView(menuOverView: menuOverview, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)
+        }
+        .alert(item: $alertitem){ alert in
+            Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }
     }
 }
 
 struct MenuItemView: View {
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverView: MenuOverViewWork
+    @Binding var dismissMenu: Bool
+    var totalPrice: Double
     
     var body: some View{
         VStack{
@@ -70,25 +83,37 @@ struct MenuItemView: View {
                             .font(.custom("SFSymbols", size: 20))
                             .foregroundColor(.blue)
                         
-                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR")
+                        Text("\(totalPrice, specifier: "%.2f")EUR")
                             .italic()
                             .foregroundColor(.blue)
                     }
+                    Spacer()
                     
-                        Text(menuOverView.category!.name)
+                    Button(action: {
+                       dismissMenu.toggle()
+                    }, label: {
+                        Text("Done")
                             .bold()
-                            .foregroundColor(Color(UIColor.label))
-                            .font(.subheadline)
-                            .padding(.all, 15)
-                }
-                Spacer()
-            }
-            List{
-                ForEach(menuOverView.menuItems, id: \.id){ item in
-                    MenuItemCell(menuOverview: menuOverView, menuItem: item)
+                            .foregroundColor(.blue)
+                    })
+                    
                 }
             }
-            .listStyle(InsetGroupedListStyle())
+            .padding()
+            
+            VStack{
+                Text(menuOverView.category!.name)
+                    .bold()
+                    .foregroundColor(Color(UIColor.label))
+                    .font(.headline)
+                
+                List{
+                    ForEach(menuOverView.menuItems, id: \.id){ item in
+                        MenuItemCell(menuOverview: menuOverView, menuItem: item)
+                    }
+                }
+                .listStyle(InsetGroupedListStyle())
+            }
         }
     }
 }
@@ -104,35 +129,35 @@ struct MenuItemCell: View{
     
     var body: some View{
         
+        HStack{
+            Image(systemName: "circle.fill")
+                .font(.custom("SF Symbols", size: 10))
+                .foregroundColor(Color(UIColor.label))
+            
+            Text(menuItem.name)
+                .bold()
+                .foregroundColor(Color(UIColor.label))
+            
+            Spacer()
+            
             HStack{
-                Image(systemName: "circle.fill")
-                    .font(.custom("SF Symbols", size: 10))
-                    .foregroundColor(Color(UIColor.label))
+                Button(action: {
+                    restaurantOrder.removeFromOrder(menuItem)
+                }, label: {
+                    Image(systemName: "minus.rectangle.fill")
+                        .font(.custom("SF Symbols", size: 30))
+                        .foregroundColor(Color(UIColor.label))
+                })
+                .buttonStyle(PlainButtonStyle())
                 
-                Text(menuItem.name)
-                    .bold()
-                    .foregroundColor(Color(UIColor.label))
+                Text("\(itemAmount)")
+                    .foregroundColor(.secondary)
+                    .font(.headline)
                 
-                Spacer()
-                
-                HStack{
-                    Button(action: {
-                        restaurantOrder.removeFromOrder(menuItem)
-                    }, label: {
-                        Image(systemName: "minus.circle.fill")
-                            .font(.custom("SF Symbols", size: 30))
-                            .foregroundColor(Color(UIColor.label))
-                    })
-                    .buttonStyle(PlainButtonStyle())
-                    
-                    Text("\(itemAmount)")
-                        .foregroundColor(.secondary)
-                        .font(.headline)
-                    
-                    Button(action: {
-                        restaurantOrder.addToOrder(menuItem)
-                    }, label: {
-                        Image(systemName: "plus.circle.fill")
+                Button(action: {
+                    restaurantOrder.addToOrder(menuItem)
+                }, label: {
+                        Image(systemName: "plus.rectangle.fill")
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color.white)
                     })

@@ -28,3 +28,7 @@ struct AlertContext{
                                          message: Text("This does not look like OrderInn Service qr code. Please try again."),
                                          dismissButton: .default(Text("OK")))
 }
+
+struct UIAlerts{
+    static let emptyOrder = AlertItem(title: Text("Whoops..."), message: Text("Please add atleast one item to continue."), dismissButton: .default(Text("OK")))
+}
