@@ -94,9 +94,9 @@ struct OrderCatView: View {
             
             Button(action: {
                 restaurantOrder.sendOrder(with: restaurantOrder.restaurantOrder)
-                withAnimation(.easeOut(duration: 0.5)){
-                    _ = restaurantOrder.groupCourse(fromItems: restaurantOrder.restaurantOrder.menuItems)
-                }
+//                withAnimation(.easeOut(duration: 0.5)){
+//                    _ = restaurantOrder.groupCourse(fromItems: restaurantOrder.restaurantOrder.menuItems)
+//                }
             }, label: {
                 Text("Send Order")
                     .bold()

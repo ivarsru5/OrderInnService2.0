@@ -29,32 +29,23 @@ struct MenuView: View {
                 }
             }
             .listStyle(InsetGroupedListStyle())
-            
-            Spacer()
-            
-            Button(action: {
-                if !restaurantOrder.restaurantOrder.menuItems.isEmpty{
+            .navigationBarItems(trailing: HStack{
+                Button(action: {
                     showOrder.toggle()
-                }else{
-                    alertitem = UIAlerts.emptyOrder
-                }
-            }, label: {
-                HStack{
-                    Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR - ")
-                        .bold()
-                        .foregroundColor(Color(UIColor.systemBackground))
-                    Text("Order Cart")
-                        .bold()
-                        .foregroundColor(Color(UIColor.systemBackground))
-                }
-                .padding()
+                }, label: {
+                    HStack{
+                        Image(systemName: "cart")
+                            .font(.custom("SF Symbols", size: 20))
+                            .foregroundColor(.blue)
+                        
+                        Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR")
+                            .bold()
+                            .foregroundColor(Color.blue)
+                    }
+                })
             })
-            .frame(width: 300, height: 50, alignment: .center)
-            .background(Color(UIColor.label))
-            .cornerRadius(15)
-            .padding()
             
-            NavigationLink(destination: OrderCatView(), isActive: $showOrder){ EmptyView() }
+           NavigationLink(destination: OrderCatView(), isActive: $showOrder){ EmptyView() }
         }
         .navigationTitle("\(table.selectedTabel!.table)")
         .onAppear{
@@ -72,6 +63,7 @@ struct MenuView: View {
 struct MenuItemView: View {
     @ObservedObject var menuOverView: MenuOverViewWork
     @Binding var dismissMenu: Bool
+    //@Binding var showOrder: Bool
     var totalPrice: Double
     
     var body: some View{
@@ -115,6 +107,11 @@ struct MenuItemView: View {
                 .listStyle(InsetGroupedListStyle())
             }
         }
+//        .fullScreenCover(isPresented: $showOrder){
+//            NavigationView{
+//                OrderCatView()
+//            }
+//        }
     }
 }
 
@@ -122,7 +119,7 @@ struct MenuItemCell: View{
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverview: MenuOverViewWork
     var menuItem: MenuItem
-    
+   
     var itemAmount: Int{
         restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
     }
