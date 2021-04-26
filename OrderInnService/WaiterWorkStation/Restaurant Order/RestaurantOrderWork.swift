@@ -6,28 +6,30 @@
 //
 
 import Foundation
+import Combine
 import FirebaseFirestore
 
 class RestaurantOrderWork: ObservableObject{
     @Published var restaurantOrder = RestaurantOrder()
     @Published var courses = [RestaurantOrder.Course]()
+    @Published var totalPrice = 0.00
+    @Published var totalItemAmount = 0
     private var databse = Firestore.firestore()
     
-    var totalPrice: Double{
-        if !restaurantOrder.menuItems.isEmpty{
-            return restaurantOrder.menuItems.reduce(0) { $0 + $1.price }
-        }else{
-            return 0.00
-        }
+    func updatePrice(forItem: MenuItem){
+        self.totalPrice = restaurantOrder.menuItems.reduce(0) { $0 + $1.price }
+        totalItemAmount = restaurantOrder.menuItems.filter { $0 == forItem }.count
     }
     
     func addToOrder(_ menuItem: MenuItem){
         restaurantOrder.menuItems.append(menuItem)
+        updatePrice(forItem: menuItem)
     }
     
     func removeFromOrder(_ menuItem: MenuItem){
         if let index = restaurantOrder.menuItems.firstIndex(where: {$0.id == menuItem.id}){
             restaurantOrder.menuItems.remove(at: index)
+            updatePrice(forItem: menuItem)
         }
     }
     
@@ -37,12 +39,14 @@ class RestaurantOrderWork: ObservableObject{
     
     func sendOrder(with order: RestaurantOrder){        
         let itemName = order.menuItems.map{ item -> String in
-            return item.name
+            return "\(item.name)" + "/\(item.price)"
         }
         
         let documentData: [String: Any] = [
             "placedBy" : order.placedBy,
-            "orderItems" : itemName
+            "orderItems" : itemName,
+            "toatlOrderPrice": totalPrice,
+            "orderComplete": order.orderCompleted
         ]
         
         databse.collection("Restaurants")

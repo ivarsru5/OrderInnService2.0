@@ -6,6 +6,7 @@
 //
 
 import SwiftUI
+import Combine
 
 struct MenuView: View {
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
@@ -119,9 +120,9 @@ struct MenuItemCell: View{
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverview: MenuOverViewWork
     var menuItem: MenuItem
-   
+    
     var itemAmount: Int{
-        restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
+            restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
     }
     
     var body: some View{

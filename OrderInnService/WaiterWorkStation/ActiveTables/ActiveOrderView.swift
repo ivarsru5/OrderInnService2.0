@@ -8,8 +8,25 @@
 import SwiftUI
 
 struct ActiveOrderView: View {
+    @StateObject var activeOrders = ActiveTableWork()
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        VStack{
+            List{
+                Section(header: Text("Active Order")){
+                    ForEach(activeOrders.activeOrders, id: \.id){ order in
+                        HStack{
+                            Text(order.placedBy)
+                                .foregroundColor(.white)
+                        }
+                    }
+                }
+            }
+        }
+        .navigationTitle("Active Orders")
+        .onAppear{
+            activeOrders.retriveActiveOrders()
+        }
     }
 }
 

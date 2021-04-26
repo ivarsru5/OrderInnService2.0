@@ -10,17 +10,14 @@ import Firebase
 
 @main
 struct OrderInnServiceApp: App {
-    @StateObject var restaurantOrder: RestaurantOrderWork
+    
     init(){
         FirebaseApp.configure()
-        let order = RestaurantOrderWork()
-        _restaurantOrder = StateObject(wrappedValue: order)
     }
     
     var body: some Scene {
         WindowGroup {
             LounchScreen()
-                .environmentObject(restaurantOrder)
         }
     }
 }
