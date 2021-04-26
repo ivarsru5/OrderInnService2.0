@@ -13,12 +13,10 @@ class RestaurantOrderWork: ObservableObject{
     @Published var restaurantOrder = RestaurantOrder()
     @Published var courses = [RestaurantOrder.Course]()
     @Published var totalPrice = 0.00
-    @Published var totalItemAmount = 0
     private var databse = Firestore.firestore()
     
     func updatePrice(forItem: MenuItem){
         self.totalPrice = restaurantOrder.menuItems.reduce(0) { $0 + $1.price }
-        totalItemAmount = restaurantOrder.menuItems.filter { $0 == forItem }.count
     }
     
     func addToOrder(_ menuItem: MenuItem){
@@ -33,8 +31,8 @@ class RestaurantOrderWork: ObservableObject{
         }
     }
     
-    func getItemCount(from items: [MenuItem], forItem: MenuItem) -> Int{
-        return items.filter { $0 == forItem }.count
+    func getItemCount(forItem: MenuItem) -> Int{
+        return restaurantOrder.menuItems.filter { $0 == forItem }.count
     }
     
     func sendOrder(with order: RestaurantOrder){        

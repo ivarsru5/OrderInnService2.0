@@ -119,11 +119,12 @@ struct MenuItemView: View {
 struct MenuItemCell: View{
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverview: MenuOverViewWork
+    @State var itemAmount = 0
     var menuItem: MenuItem
     
-    var itemAmount: Int{
-            restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
-    }
+//    var itemAmount: Int{
+//            restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
+//    }
     
     var body: some View{
         
@@ -141,6 +142,7 @@ struct MenuItemCell: View{
             HStack{
                 Button(action: {
                     restaurantOrder.removeFromOrder(menuItem)
+                   self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
                 }, label: {
                     Image(systemName: "minus.rectangle.fill")
                         .font(.custom("SF Symbols", size: 30))
@@ -154,6 +156,7 @@ struct MenuItemCell: View{
                 
                 Button(action: {
                     restaurantOrder.addToOrder(menuItem)
+                   self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
                 }, label: {
                         Image(systemName: "plus.rectangle.fill")
                             .font(.custom("SF Symbols", size: 30))
