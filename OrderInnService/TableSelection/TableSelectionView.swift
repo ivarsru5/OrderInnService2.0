@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TableSelectionView: View {
+    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
     @StateObject var tables = TableSelectionWork()
     @ObservedObject var zones: ZoneWork
     
@@ -34,6 +35,9 @@ struct TableSelectionView: View {
                 Spinner()
             }
             NavigationLink(destination: MenuView(table: tables), isActive: $tables.goToMenu){ EmptyView() }
+        }
+        .onAppear{
+            restaurantOrder.restaurantOrder.menuItems.removeAll()
         }
     }
 }

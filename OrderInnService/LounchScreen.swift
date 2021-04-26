@@ -12,7 +12,7 @@ struct LounchScreen: View {
     
     var body: some View {
         if UserDefaults.standard.startScreen{
-            ZoneSelection(qrScanner: qrScaner)
+            OrderTabView(qrScanner: qrScaner)
         }else{
             QrScannerView()
         }

@@ -32,7 +32,6 @@ class QrCodeScannerWork: ObservableObject{
             UserDefaults.standard.currentUser = "\(name) \(lastName)"
         }
     }
-
     
     func retriveRestaurant(with id: String){
         UserDefaults.standard.qrStringKey = id

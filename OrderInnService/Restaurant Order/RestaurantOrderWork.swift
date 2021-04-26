@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 class RestaurantOrderWork: ObservableObject{
     @Published var restaurantOrder = RestaurantOrder()
+    @Published var courses = [RestaurantOrder.Course]()
     private var databse = Firestore.firestore()
     
     var totalPrice: Double{
@@ -53,7 +54,22 @@ class RestaurantOrderWork: ObservableObject{
                     print("Document did not create \(err)")
                 }else{
                     print("Document created!")
-                }
             }
+        }
+    }
+    
+    
+    func groupCourse(fromItems items: [MenuItem]) -> RestaurantOrder.Course{
+        
+        let menuItems = items.map{ item -> MenuItem in
+            let index = self.restaurantOrder.menuItems.firstIndex(where: { $0.id == item.id })!
+            let menuItem = self.restaurantOrder.menuItems[index]
+            self.restaurantOrder.menuItems.remove(at: index)
+            return menuItem
+        }
+        
+        let course = RestaurantOrder.Course(index: self.courses.count + 1, menuItems: menuItems)
+        self.courses.append(course)
+        return course
     }
 }

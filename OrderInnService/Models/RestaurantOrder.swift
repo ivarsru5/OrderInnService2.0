@@ -16,4 +16,9 @@ struct RestaurantOrder: Identifiable{
         self.menuItems = []
         self.placedBy = UserDefaults.standard.currentUser
     }
+    
+    struct Course{
+        let index: Int
+        let menuItems: [MenuItem]
+    }
 }

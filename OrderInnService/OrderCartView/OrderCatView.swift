@@ -47,6 +47,34 @@ struct OrderCatView: View {
                         }
                     }
                 }
+                
+                ForEach(restaurantOrder.courses, id: \.index){ course in
+                    Section(header: Text("Course \(course.index)")){
+                        ForEach(course.menuItems, id:\.id){ item in
+                            
+                            HStack{
+                                HStack{
+                                    Image(systemName: "circle.fill")
+                                        .font(.custom("SF Symbols", size: 10))
+                                        .foregroundColor(Color(UIColor.label))
+                                    
+                                    Text(item.name)
+                                        .bold()
+                                        .foregroundColor(.white)
+                                }
+                                
+                                Spacer()
+                                
+                                HStack{
+                                    Text("\(item.price, specifier: "%.2f")EUR")
+                                        .italic()
+                                        .foregroundColor(.white)
+                                    
+                                }
+                            }
+                        }
+                    }
+                }
             }
             .listStyle(InsetGroupedListStyle())
             .navigationTitle("Order")
@@ -66,6 +94,9 @@ struct OrderCatView: View {
             
             Button(action: {
                 restaurantOrder.sendOrder(with: restaurantOrder.restaurantOrder)
+                withAnimation(.easeOut(duration: 0.5)){
+                    _ = restaurantOrder.groupCourse(fromItems: restaurantOrder.restaurantOrder.menuItems)
+                }
             }, label: {
                 Text("Send Order")
                     .bold()
