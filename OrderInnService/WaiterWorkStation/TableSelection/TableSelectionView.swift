@@ -13,6 +13,7 @@ struct TableSelectionView: View {
     @ObservedObject var zones: ZoneWork
     
     var body: some View {
+        
         ZStack{
             if !tables.loadingQuery{
                 List{
@@ -38,6 +39,7 @@ struct TableSelectionView: View {
         }
         .onAppear{
             restaurantOrder.restaurantOrder.menuItems.removeAll()
+            restaurantOrder.totalPrice = 0.00
         }
     }
 }

@@ -44,14 +44,14 @@ class RestaurantOrderWork: ObservableObject{
             "placedBy" : order.placedBy,
             "orderItems" : itemName,
             "toatlOrderPrice": totalPrice,
-            "orderComplete": order.orderCompleted
+            "orderComplete": order.orderCompleted,
+            "forTable": order.forTable
         ]
         
         databse.collection("Restaurants")
             .document(UserDefaults.standard.qrStringKey)
             .collection("Order")
-            .document(order.id)
-            .setData(documentData, merge: true) { error in
+            .addDocument(data: documentData) { error in
                 if let err = error{
                     print("Document did not create \(err)")
                 }else{

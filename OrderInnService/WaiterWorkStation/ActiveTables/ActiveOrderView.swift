@@ -16,8 +16,15 @@ struct ActiveOrderView: View {
                 Section(header: Text("Active Order")){
                     ForEach(activeOrders.activeOrders, id: \.id){ order in
                         HStack{
-                            Text(order.placedBy)
-                                .foregroundColor(.white)
+                            Text(order.forTable)
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                            
+                            Spacer()
+                            
+                            Text("Total price: \(order.totalPrice, specifier: "%.2f")EUR")
+                                .bold()
+                                .foregroundColor(.secondary)
                         }
                     }
                 }

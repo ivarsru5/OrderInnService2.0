@@ -19,6 +19,7 @@ struct OrderTabView: View {
                     Text("Place Order")
                 }
                 .environmentObject(restaurantOrder)
+                .navigationBarHidden(false)
             
             ActiveOrderView()
                 .tabItem{

@@ -51,6 +51,7 @@ struct MenuView: View {
         .navigationTitle("\(table.selectedTabel!.table)")
         .onAppear{
             menuOverview.getMenuCategory()
+            restaurantOrder.restaurantOrder.forTable = table.selectedTabel!.table
         }
         .sheet(isPresented: $menuOverview.presentMenu){
             MenuItemView(menuOverView: menuOverview, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)
@@ -101,7 +102,7 @@ struct MenuItemView: View {
                     .font(.headline)
                 
                 List{
-                    ForEach(menuOverView.menuItems, id: \.id){ item in
+                    ForEach(menuOverView.menuItems, id: \.name){ item in
                         MenuItemCell(menuOverview: menuOverView, menuItem: item)
                     }
                 }
