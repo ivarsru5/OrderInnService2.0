@@ -167,25 +167,25 @@ struct MenuItemCell: View{
             .padding(.all, 5)
     }
 }
-struct NavigatinButton: View{
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
-    @State var presntOrderCart = false
-    
-    var body: some View{
-        ZStack{
-            Button(action: {
-                presntOrderCart.toggle()
-            }, label: {
-                Image(systemName: "cart")
-                    .font(.custom("SF Symbols", size: 20))
-                    .foregroundColor(.blue)
-                
-                Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
-                    .italic()
-                    .foregroundColor(.blue)
-            })
-            NavigationLink(destination: OrderCatView(), isActive: $presntOrderCart, label: { EmptyView() })
-        }
-        .frame(height: 96, alignment: .trailing)
-    }
-}
+//struct NavigatinButton: View{
+//    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+//    @State var presntOrderCart = false
+//
+//    var body: some View{
+//        ZStack{
+//            Button(action: {
+//                presntOrderCart.toggle()
+//            }, label: {
+//                Image(systemName: "cart")
+//                    .font(.custom("SF Symbols", size: 20))
+//                    .foregroundColor(.blue)
+//
+//                Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
+//                    .italic()
+//                    .foregroundColor(.blue)
+//            })
+//            NavigationLink(destination: OrderCatView(), isActive: $presntOrderCart, label: { EmptyView() })
+//        }
+//        .frame(height: 96, alignment: .trailing)
+//    }
+//}

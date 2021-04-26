@@ -23,8 +23,13 @@ class QrCodeScannerWork: ObservableObject{
     
     @Published var currentUser: Restaurant.RestaurantEmploye?{
         didSet{
-            let user = "\(String(describing: currentUser?.name)) " + "\(String(describing: currentUser?.lastName))"
-            UserDefaults.standard.currentUser = user
+            guard let name = currentUser?.name else{
+                return
+            }
+            guard let lastName = currentUser?.lastName else{
+                return
+            }
+            UserDefaults.standard.currentUser = "\(name) \(lastName)"
         }
     }
 

@@ -9,6 +9,5 @@ target 'OrderInnService' do
 
 pod 'Firebase/Analytics'
 pod 'Firebase/Firestore'
-pod 'Firebase/Database'
 
 end

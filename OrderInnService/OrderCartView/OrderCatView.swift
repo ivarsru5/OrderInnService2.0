@@ -65,7 +65,7 @@ struct OrderCatView: View {
             .padding()
             
             Button(action: {
-                
+                restaurantOrder.sendOrder(with: restaurantOrder.restaurantOrder)
             }, label: {
                 Text("Send Order")
                     .bold()
