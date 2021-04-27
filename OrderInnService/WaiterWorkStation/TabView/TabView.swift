@@ -13,19 +13,23 @@ struct OrderTabView: View {
     
     var body: some View {
         TabView{
-            ZoneSelection(qrScanner: qrScanner)
-                .tabItem{
-                    Image(systemName: "tray")
-                    Text("Place Order")
-                }
-                .environmentObject(restaurantOrder)
-                .navigationBarHidden(false)
-            
-            ActiveOrderView()
-                .tabItem{
-                    Image(systemName: "scroll")
-                    Text("Active Order's")
-                }
+            NavigationView{
+                ZoneSelection(qrScanner: qrScanner)
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem{
+                Image(systemName: "tray")
+                Text("Place Order")
+            }
+            .environmentObject(restaurantOrder)
+            NavigationView{
+                ActiveOrderView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem{
+                Image(systemName: "scroll")
+                Text("Active Order's")
+            }
         }
     }
 }
