@@ -5,14 +5,14 @@
 //  Created by Ivars Ruģelis on 23/04/2021.
 //
 
-import Foundation
-import Combine
+import SwiftUI
 import FirebaseFirestore
 
 class RestaurantOrderWork: ObservableObject{
     @Published var restaurantOrder = RestaurantOrder()
     @Published var courses = [RestaurantOrder.Course]()
     @Published var totalPrice = 0.00
+    @Published var sendingQuery = false
     private var databse = Firestore.firestore()
     
     func updatePrice(forItem: MenuItem){
@@ -35,17 +35,19 @@ class RestaurantOrderWork: ObservableObject{
         return restaurantOrder.menuItems.filter { $0 == forItem }.count
     }
     
-    func sendOrder(with order: RestaurantOrder){        
-        let itemName = order.menuItems.map{ item -> String in
+    func sendOrder(presentationMode: Binding<PresentationMode>){
+        sendingQuery = true
+        
+        let itemName = restaurantOrder.menuItems.map{ item -> String in
             return "\(item.name)" + "/\(item.price)"
         }
         
         let documentData: [String: Any] = [
-            "placedBy" : order.placedBy,
+            "placedBy" : restaurantOrder.placedBy,
             "orderItems" : itemName,
             "toatlOrderPrice": totalPrice,
-            "orderComplete": order.orderCompleted,
-            "forTable": order.forTable
+            "orderComplete": restaurantOrder.orderCompleted,
+            "forTable": restaurantOrder.forTable
         ]
         
         databse.collection("Restaurants")
@@ -56,6 +58,9 @@ class RestaurantOrderWork: ObservableObject{
                     print("Document did not create \(err)")
                 }else{
                     print("Document created!")
+                    self.restaurantOrder.menuItems.removeAll()
+                    presentationMode.wrappedValue.dismiss()
+                    self.sendingQuery = false
             }
         }
     }

@@ -32,7 +32,11 @@ struct MenuView: View {
             .listStyle(InsetGroupedListStyle())
             .navigationBarItems(trailing: HStack{
                 Button(action: {
-                    showOrder.toggle()
+                    if restaurantOrder.restaurantOrder.menuItems.isEmpty{
+                        self.alertitem = UIAlerts.emptyOrder
+                    }else{
+                        showOrder.toggle()
+                    }
                 }, label: {
                     HStack{
                         Image(systemName: "cart")
@@ -167,6 +171,9 @@ struct MenuItemCell: View{
                 }
             }
             .padding(.all, 5)
+        .onAppear{
+            self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
+        }
     }
 }
 //struct NavigatinButton: View{
