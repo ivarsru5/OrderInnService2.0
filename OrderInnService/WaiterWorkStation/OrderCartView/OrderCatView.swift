@@ -9,7 +9,7 @@ import SwiftUI
 
 struct OrderCatView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @ObservedObject var restaurantOrder: RestaurantOrderWork
     @Binding var dimsissCart: Bool
     
     var body: some View {
@@ -26,7 +26,7 @@ struct OrderCatView: View {
                                     
                                     Text(item.name)
                                         .bold()
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(UIColor.label))
                                 }
                                 
                                 Spacer()
@@ -34,7 +34,7 @@ struct OrderCatView: View {
                                 HStack{
                                     Text("\(item.price, specifier: "%.2f")EUR")
                                         .italic()
-                                        .foregroundColor(.white)
+                                        .foregroundColor(Color(UIColor.label))
                                     
                                     Button(action: {
                                         withAnimation(.easeOut(duration: 0.5)){

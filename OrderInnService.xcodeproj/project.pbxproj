@@ -143,14 +143,6 @@
 			path = Common;
 			sourceTree = "<group>";
 		};
-		5808DDE92632BA2800D0B0EC /* Restaurant Order */ = {
-			isa = PBXGroup;
-			children = (
-				5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */,
-			);
-			path = "Restaurant Order";
-			sourceTree = "<group>";
-		};
 		580E1E212636D59900A16228 /* TabView */ = {
 			isa = PBXGroup;
 			children = (
@@ -173,7 +165,6 @@
 			children = (
 				5811F945262DE53000050F2C /* LounchScreen.swift */,
 				580E1E212636D59900A16228 /* TabView */,
-				5808DDE92632BA2800D0B0EC /* Restaurant Order */,
 				580506F32629670B007CF39B /* Models */,
 				5838DB2D262820A2001698D7 /* QrScannerView */,
 				582FD06D2628B63D00B73C8C /* ZoneSelection */,
@@ -295,6 +286,7 @@
 		58F0D73F2632E4FF0093B6EA /* OrderCartView */ = {
 			isa = PBXGroup;
 			children = (
+				5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */,
 				58F0D7402632E51F0093B6EA /* OrderCatView.swift */,
 			);
 			path = OrderCartView;

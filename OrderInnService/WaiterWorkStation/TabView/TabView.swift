@@ -9,7 +9,6 @@ import SwiftUI
 
 struct OrderTabView: View {
     @ObservedObject var qrScanner: QrCodeScannerWork
-    @StateObject var restaurantOrder = RestaurantOrderWork()
     
     var body: some View {
         TabView{
@@ -21,7 +20,6 @@ struct OrderTabView: View {
                 Image(systemName: "tray")
                 Text("Place Order")
             }
-            .environmentObject(restaurantOrder)
             NavigationView{
                 ActiveOrderView()
             }

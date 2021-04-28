@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct TableSelectionView: View {
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @ObservedObject var restaurantOrder = RestaurantOrderWork()
     @StateObject var tables = TableSelectionWork()
     @ObservedObject var zones: ZoneWork
     

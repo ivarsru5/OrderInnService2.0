@@ -9,7 +9,7 @@ import SwiftUI
 import Combine
 
 struct MenuView: View {
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @StateObject var restaurantOrder = RestaurantOrderWork()
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var table: TableSelectionWork
     @State var alertitem: AlertItem?
@@ -51,7 +51,7 @@ struct MenuView: View {
                 })
                 .fullScreenCover(isPresented: $showOrderCart){
                     NavigationView{
-                        OrderCatView(dimsissCart: $showOrderCart)
+                        OrderCatView(restaurantOrder: restaurantOrder, dimsissCart: $showOrderCart)
                     }
                 }
             })
@@ -62,7 +62,7 @@ struct MenuView: View {
             restaurantOrder.restaurantOrder.forTable = table.selectedTabel!.table
         }
         .sheet(isPresented: $menuOverview.presentMenu){
-            MenuItemView(menuOverView: menuOverview, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)
+            MenuItemView(menuOverView: menuOverview, restaurantOrder: restaurantOrder, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)
         }
         .alert(item: $alertitem){ alert in
             Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
@@ -72,6 +72,7 @@ struct MenuView: View {
 
 struct MenuItemView: View {
     @ObservedObject var menuOverView: MenuOverViewWork
+    @ObservedObject var restaurantOrder: RestaurantOrderWork
     @Binding var dismissMenu: Bool
     var totalPrice: Double
     
@@ -79,25 +80,23 @@ struct MenuItemView: View {
         VStack{
             HStack{
                 HStack{
-                    HStack{
-                        Image(systemName: "cart")
-                            .font(.custom("SFSymbols", size: 20))
-                            .foregroundColor(.blue)
-                        
-                        Text("\(totalPrice, specifier: "%.2f")EUR")
-                            .italic()
-                            .foregroundColor(.blue)
-                    }
-                    Spacer()
+                    Image(systemName: "cart")
+                        .font(.custom("SFSymbols", size: 20))
+                        .foregroundColor(.blue)
                     
-                    Button(action: {
-                       dismissMenu.toggle()
-                    }, label: {
-                        Text("Done")
-                            .bold()
-                            .foregroundColor(.blue)
-                    })
+                    Text("\(totalPrice, specifier: "%.2f")EUR")
+                        .italic()
+                        .foregroundColor(.blue)
                 }
+                Spacer()
+                
+                Button(action: {
+                    dismissMenu.toggle()
+                }, label: {
+                    Text("Done")
+                        .bold()
+                        .foregroundColor(.blue)
+                })
             }
             .padding()
             
@@ -109,7 +108,7 @@ struct MenuItemView: View {
                 
                 List{
                     ForEach(menuOverView.menuItems, id: \.name){ item in
-                        MenuItemCell(menuOverview: menuOverView, menuItem: item)
+                        MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverView, menuItem: item)
                     }
                 }
                 .listStyle(InsetGroupedListStyle())
@@ -119,7 +118,7 @@ struct MenuItemView: View {
 }
 
 struct MenuItemCell: View{
-    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @ObservedObject var restaurantOrder: RestaurantOrderWork
     @ObservedObject var menuOverview: MenuOverViewWork
     @State var itemAmount = 0
     var menuItem: MenuItem
@@ -158,7 +157,7 @@ struct MenuItemCell: View{
                 }, label: {
                         Image(systemName: "plus.rectangle.fill")
                             .font(.custom("SF Symbols", size: 30))
-                            .foregroundColor(Color.white)
+                            .foregroundColor(Color(UIColor.label))
                     })
                     .buttonStyle(PlainButtonStyle())
                 }
