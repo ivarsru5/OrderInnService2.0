@@ -34,6 +34,7 @@ struct ZoneSelection: View {
                         .bold()
                         .multilineTextAlignment(.center)
                         .foregroundColor(Color(UIColor.label))
+                        .navigationBarHidden(true)
                 }
             }else{
                 Spinner()

@@ -35,6 +35,8 @@
 		58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B32630267E00FC9223 /* TableSelectionView.swift */; };
 		58B5D4B82630273800FC9223 /* Tables.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B72630273800FC9223 /* Tables.swift */; };
 		58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4BA263027F400FC9223 /* TableSelectionWork.swift */; };
+		58E6111B2638875700BE159D /* ActiveOrdersEntry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E6111A2638875700BE159D /* ActiveOrdersEntry.swift */; };
+		58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */; };
 		58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA12628218400574D4F /* QrScannerViewController.swift */; };
 		58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA42628255200574D4F /* QrCodeScannerView.swift */; };
 		58F07AA92628274700574D4F /* AlertItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA82628274700574D4F /* AlertItem.swift */; };
@@ -43,6 +45,7 @@
 		58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB2262830D400574D4F /* BlurEffect.swift */; };
 		58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB626284ED500574D4F /* HalfModalView.swift */; };
 		58F0D7412632E51F0093B6EA /* OrderCatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F0D7402632E51F0093B6EA /* OrderCatView.swift */; };
+		58F2895B26384E6200C973DB /* ActiveOrderOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */; };
 		8D81E1853CD596EA1AD61F7F /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */; };
 /* End PBXBuildFile section */
 
@@ -77,6 +80,8 @@
 		58B5D4B32630267E00FC9223 /* TableSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionView.swift; sourceTree = "<group>"; };
 		58B5D4B72630273800FC9223 /* Tables.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Tables.swift; sourceTree = "<group>"; };
 		58B5D4BA263027F400FC9223 /* TableSelectionWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionWork.swift; sourceTree = "<group>"; };
+		58E6111A2638875700BE159D /* ActiveOrdersEntry.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrdersEntry.swift; sourceTree = "<group>"; };
+		58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderOverviewWork.swift; sourceTree = "<group>"; };
 		58F07AA12628218400574D4F /* QrScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrScannerViewController.swift; sourceTree = "<group>"; };
 		58F07AA42628255200574D4F /* QrCodeScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QrCodeScannerView.swift; sourceTree = "<group>"; };
 		58F07AA82628274700574D4F /* AlertItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertItem.swift; sourceTree = "<group>"; };
@@ -85,6 +90,7 @@
 		58F07AB2262830D400574D4F /* BlurEffect.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BlurEffect.swift; sourceTree = "<group>"; };
 		58F07AB626284ED500574D4F /* HalfModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalfModalView.swift; sourceTree = "<group>"; };
 		58F0D7402632E51F0093B6EA /* OrderCatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCatView.swift; sourceTree = "<group>"; };
+		58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderOverview.swift; sourceTree = "<group>"; };
 		6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.debug.xcconfig"; sourceTree = "<group>"; };
 		B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.release.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.release.xcconfig"; sourceTree = "<group>"; };
 		CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -120,6 +126,7 @@
 				5813CC5826309EF200924ED9 /* MenuCategory.swift */,
 				5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */,
 				581DF41826371B3B00B426FC /* ActiveOrder.swift */,
+				58E6111A2638875700BE159D /* ActiveOrdersEntry.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -174,6 +181,7 @@
 				5813CC5426309E6D00924ED9 /* MenuSelection */,
 				58F0D73F2632E4FF0093B6EA /* OrderCartView */,
 				580E1E252636D5E400A16228 /* ActiveTables */,
+				58F2895926384E3C00C973DB /* ActiveOrderOverview */,
 				58F07AAE26282FC300574D4F /* Extensions */,
 				580509162629AAEA007CF39B /* Common */,
 				58F07AA72628273900574D4F /* AlertItems */,
@@ -290,6 +298,15 @@
 				58F0D7402632E51F0093B6EA /* OrderCatView.swift */,
 			);
 			path = OrderCartView;
+			sourceTree = "<group>";
+		};
+		58F2895926384E3C00C973DB /* ActiveOrderOverview */ = {
+			isa = PBXGroup;
+			children = (
+				58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */,
+				58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */,
+			);
+			path = ActiveOrderOverview;
 			sourceTree = "<group>";
 		};
 		63EFB55165DA9DC0E0B1E609 /* Pods */ = {
@@ -417,6 +434,7 @@
 			files = (
 				5813CC5626309EB700924ED9 /* MenuView.swift in Sources */,
 				580E1E232636D5AA00A16228 /* TabView.swift in Sources */,
+				58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */,
 				5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */,
 				58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */,
 				581DF41926371B3B00B426FC /* ActiveOrder.swift in Sources */,
@@ -425,6 +443,7 @@
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
 				5811F946262DE53000050F2C /* LounchScreen.swift in Sources */,
 				580506F526296723007CF39B /* RestaruantLogin.swift in Sources */,
+				58E6111B2638875700BE159D /* ActiveOrdersEntry.swift in Sources */,
 				5811F94E262DE84100050F2C /* ZoneWork.swift in Sources */,
 				58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */,
 				582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */,
@@ -440,6 +459,7 @@
 				58F0D7412632E51F0093B6EA /* OrderCatView.swift in Sources */,
 				58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */,
 				5813CC5926309EF200924ED9 /* MenuCategory.swift in Sources */,
+				58F2895B26384E6200C973DB /* ActiveOrderOverview.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,
 				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
 				58B5D4B82630273800FC9223 /* Tables.swift in Sources */,

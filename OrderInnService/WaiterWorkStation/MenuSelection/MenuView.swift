@@ -14,6 +14,7 @@ struct MenuView: View {
     @ObservedObject var table: TableSelectionWork
     @State var alertitem: AlertItem?
     @State var showOrder = false
+    @State var showOrderCart = false
     
     var body: some View {
         VStack{
@@ -35,7 +36,7 @@ struct MenuView: View {
                     if restaurantOrder.restaurantOrder.menuItems.isEmpty{
                         self.alertitem = UIAlerts.emptyOrder
                     }else{
-                        showOrder.toggle()
+                        showOrderCart.toggle()
                     }
                 }, label: {
                     HStack{
@@ -48,9 +49,12 @@ struct MenuView: View {
                             .foregroundColor(Color.blue)
                     }
                 })
+                .fullScreenCover(isPresented: $showOrderCart){
+                    NavigationView{
+                        OrderCatView(dimsissCart: $showOrderCart)
+                    }
+                }
             })
-            
-           NavigationLink(destination: OrderCatView(), isActive: $showOrder){ EmptyView() }
         }
         .navigationTitle("\(table.selectedTabel!.table)")
         .onAppear{
@@ -69,7 +73,6 @@ struct MenuView: View {
 struct MenuItemView: View {
     @ObservedObject var menuOverView: MenuOverViewWork
     @Binding var dismissMenu: Bool
-    //@Binding var showOrder: Bool
     var totalPrice: Double
     
     var body: some View{
@@ -94,7 +97,6 @@ struct MenuItemView: View {
                             .bold()
                             .foregroundColor(.blue)
                     })
-                    
                 }
             }
             .padding()
@@ -113,11 +115,6 @@ struct MenuItemView: View {
                 .listStyle(InsetGroupedListStyle())
             }
         }
-//        .fullScreenCover(isPresented: $showOrder){
-//            NavigationView{
-//                OrderCatView()
-//            }
-//        }
     }
 }
 
@@ -126,10 +123,6 @@ struct MenuItemCell: View{
     @ObservedObject var menuOverview: MenuOverViewWork
     @State var itemAmount = 0
     var menuItem: MenuItem
-    
-//    var itemAmount: Int{
-//            restaurantOrder.getItemCount(from: restaurantOrder.restaurantOrder.menuItems, forItem: menuItem)
-//    }
     
     var body: some View{
         
@@ -176,25 +169,3 @@ struct MenuItemCell: View{
         }
     }
 }
-//struct NavigatinButton: View{
-//    @EnvironmentObject var restaurantOrder: RestaurantOrderWork
-//    @State var presntOrderCart = false
-//
-//    var body: some View{
-//        ZStack{
-//            Button(action: {
-//                presntOrderCart.toggle()
-//            }, label: {
-//                Image(systemName: "cart")
-//                    .font(.custom("SF Symbols", size: 20))
-//                    .foregroundColor(.blue)
-//
-//                Text("\(restaurantOrder.totalPrice, specifier: "%.2f")")
-//                    .italic()
-//                    .foregroundColor(.blue)
-//            })
-//            NavigationLink(destination: OrderCatView(), isActive: $presntOrderCart, label: { EmptyView() })
-//        }
-//        .frame(height: 96, alignment: .trailing)
-//    }
-//}

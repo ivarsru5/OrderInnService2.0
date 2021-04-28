@@ -15,7 +15,7 @@ class TableSelectionWork: ObservableObject{
     let database = Firestore.firestore()
     
     @Published var selectedTabel: Table?{
-        didSet{
+        willSet{
             goToMenu.toggle()
         }
     }

@@ -11,21 +11,25 @@ struct ActiveOrderView: View {
     @StateObject var activeOrders = ActiveTableWork()
     
     var body: some View {
-        VStack{
+        ZStack{
             List{
                 Section(header: Text("Active Order")){
                     ForEach(activeOrders.activeOrders, id: \.id){ order in
-                        HStack{
-                            Text(order.forTable)
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                            
-                            Spacer()
-                            
-                            Text("Total price: \(order.totalPrice, specifier: "%.2f")EUR")
-                                .bold()
-                                .foregroundColor(.secondary)
-                        }
+                        Button(action: {
+                            self.activeOrders.selectedOrder = order
+                        }, label: {
+                            HStack{
+                                Text(order.forTable)
+                                    .bold()
+                                    .foregroundColor(Color(UIColor.label))
+                                
+                                Spacer()
+                                
+                                Text("Total price: \(order.totalPrice, specifier: "%.2f")EUR")
+                                    .bold()
+                                    .foregroundColor(.secondary)
+                            }
+                        })
                     }
                 }
             }
@@ -33,6 +37,11 @@ struct ActiveOrderView: View {
         .navigationTitle("Active Orders")
         .onAppear{
             activeOrders.retriveActiveOrders()
+        }
+        .fullScreenCover(isPresented: $activeOrders.showActiveOrder){
+            NavigationView{
+                ActiveOrderOverview(activeOrder: activeOrders)
+            }
         }
     }
 }

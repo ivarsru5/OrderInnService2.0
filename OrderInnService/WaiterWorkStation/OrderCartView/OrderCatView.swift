@@ -10,12 +10,13 @@ import SwiftUI
 struct OrderCatView: View {
     @Environment(\.presentationMode) var presentationMode: Binding<PresentationMode>
     @EnvironmentObject var restaurantOrder: RestaurantOrderWork
+    @Binding var dimsissCart: Bool
     
     var body: some View {
         if !restaurantOrder.sendingQuery{
             VStack{
                 List{
-                    Section(header: Text("Client order")){
+                    Section(header: Text("Selected items's")){
                         ForEach(restaurantOrder.restaurantOrder.menuItems, id: \.id){ item in
                             HStack{
                                 HStack{
@@ -80,6 +81,14 @@ struct OrderCatView: View {
                 }
                 .listStyle(InsetGroupedListStyle())
                 .navigationTitle("Order")
+                .navigationBarItems(trailing: HStack{
+                    Button(action: {
+                        dimsissCart.toggle()
+                    }, label: {
+                        Text("Return")
+                            .foregroundColor(.red)
+                    })
+                })
                 
                 HStack{
                     Text("Total Order Amount")

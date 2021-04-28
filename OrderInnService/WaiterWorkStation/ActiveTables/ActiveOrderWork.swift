@@ -10,7 +10,14 @@ import FirebaseFirestore
 
 class ActiveTableWork: ObservableObject{
     @Published var activeOrders = [ActiveOrder]()
+    @Published var showActiveOrder = false
     let databse = Firestore.firestore()
+    
+    @Published var selectedOrder: ActiveOrder?{
+        didSet{
+            self.showActiveOrder.toggle()
+        }
+    }
     
     func retriveActiveOrders(){
         databse.collection("Restaurants").document(UserDefaults.standard.qrStringKey).collection("Order").getDocuments { snapshot, error in

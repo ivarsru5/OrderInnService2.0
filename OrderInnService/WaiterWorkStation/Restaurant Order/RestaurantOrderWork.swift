@@ -60,6 +60,7 @@ class RestaurantOrderWork: ObservableObject{
                     print("Document created!")
                     self.restaurantOrder.menuItems.removeAll()
                     presentationMode.wrappedValue.dismiss()
+                    self.totalPrice = 0.00
                     self.sendingQuery = false
             }
         }
