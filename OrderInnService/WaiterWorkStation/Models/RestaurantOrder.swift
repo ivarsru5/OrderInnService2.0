@@ -21,11 +21,6 @@ struct RestaurantOrder: Identifiable{
         self.forTable = ""
     }
     
-    struct ExtraOrder: Identifiable{
-        var id = UUID().uuidString
-        var menuItems: [MenuItem] = []
-    }
-    
     struct Course{
         let index: Int
         let menuItems: [MenuItem]

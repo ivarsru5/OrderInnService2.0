@@ -11,7 +11,6 @@ import FirebaseFirestore
 class RestaurantOrderWork: ObservableObject{
     @Published var restaurantOrder = RestaurantOrder()
     @Published var courses = [RestaurantOrder.Course]()
-    @Published var extraOrder = RestaurantOrder.ExtraOrder()
     @Published var totalPrice = 0.00
     @Published var sendingQuery = false
     private var databse = Firestore.firestore()
@@ -25,22 +24,10 @@ class RestaurantOrderWork: ObservableObject{
         updatePrice(forItem: menuItem)
     }
     
-    func addExtraOrder(_ menuItem: MenuItem){
-        extraOrder.menuItems.append(menuItem)
-        self.totalPrice = extraOrder.menuItems.reduce(0) { $0 + $1.price }
-    }
-    
     func removeFromOrder(_ menuItem: MenuItem){
         if let index = restaurantOrder.menuItems.firstIndex(where: {$0.id == menuItem.id}){
             restaurantOrder.menuItems.remove(at: index)
             updatePrice(forItem: menuItem)
-        }
-    }
-    
-    func removeFromExtraOrder(_ menuItem: MenuItem){
-        if let index = extraOrder.menuItems.firstIndex(where: {$0.id == menuItem.id}){
-            restaurantOrder.menuItems.remove(at: index)
-            self.totalPrice = extraOrder.menuItems.reduce(0) { $0 + $1.price }
         }
     }
     

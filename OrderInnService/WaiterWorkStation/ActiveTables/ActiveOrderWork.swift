@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-class ActiveTableWork: ObservableObject{
+class ActiveOrderWork: ObservableObject{
     @Published var activeOrders = [ActiveOrder]()
     @Published var showActiveOrder = false
     let databse = Firestore.firestore()

@@ -107,7 +107,7 @@ struct MenuItemView: View {
                     .font(.headline)
                 
                 List{
-                    ForEach(menuOverView.menuItems, id: \.name){ item in
+                    ForEach(menuOverView.menuItems, id: \.id){ item in
                         MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverView, menuItem: item)
                     }
                 }

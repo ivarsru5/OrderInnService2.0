@@ -14,6 +14,12 @@ struct OrderOverView: Identifiable{
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var withItems: [OrderOverviewEntry] = []
+    var extraOrderComponents: [ExtraOrder] = []
+    
+    struct ExtraOrder{
+        var index: Int = 0
+        var menuItems: [MenuItem] = []
+    }
     
     struct OrderOverviewEntry: Identifiable{
         var id = UUID().uuidString

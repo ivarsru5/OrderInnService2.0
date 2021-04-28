@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ActiveOrderView: View {
-    @StateObject var activeOrders = ActiveTableWork()
+    @StateObject var activeOrders = ActiveOrderWork()
     
     var body: some View {
         ZStack{
