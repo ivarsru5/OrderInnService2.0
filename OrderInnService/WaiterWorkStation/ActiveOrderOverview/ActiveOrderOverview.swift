@@ -112,7 +112,7 @@ struct ActiveOrderOverview: View {
                 if !orderOverview.menuItems.isEmpty{
                     Button(action: {
                         withAnimation(.easeOut(duration: 0.5)){
-                            _ = self.orderOverview.addExtraItems()
+                            _ = orderOverview.addExtraItems()
                         }
                     }, label: {
                         Text("Submit extra order")

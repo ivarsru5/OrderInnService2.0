@@ -6,12 +6,15 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 class ActiveOrderOverviewWork: ObservableObject{
     @Published var submitedOrder = OrderOverView()
     @Published var submitedItems = [OrderOverView.OrderOverviewEntry]()
+    @Published var extraComponent = OrderOverView.ExtraOrder()
     @Published var extraOrderComponents = [OrderOverView.ExtraOrder]()
     @Published var extraOrderTotalPrice = 0.00
+    let databse = Firestore.firestore()
     
     var menuItems = [MenuItem]()
     
@@ -49,6 +52,32 @@ class ActiveOrderOverviewWork: ObservableObject{
         return extraOrder
     }
     
+    func submitExtraOrder(){
+        let itemName = extraComponent.menuItems.map{ item -> String in
+            return "\(item.name)" + "/\(item.price)"
+        }
+        
+        let documentData: [String: Any] = [
+            "placedBy" : submitedOrder.placedBy,
+            "additionalOrder_\(extraComponent.index)" : itemName,
+            "toatlOrderPrice" : submitedOrder.totalPrice + extraOrderTotalPrice,
+            
+        ]
+        
+        databse.collection("Restaurants")
+            .document(UserDefaults.standard.qrStringKey)
+            .collection("Order")
+            .document(submitedOrder.id)
+            .setData(documentData) { error in
+                if let error = error{
+                    //TODO: add alert
+                    print("Order did not update \(error)")
+                }else{
+                    print("Urder updated!")
+                }
+            }
+    }
+    
     func retreveSubmitedIttems(from items: ActiveOrder){
         self.submitedItems = items.orderItems.map{ item -> OrderOverView.OrderOverviewEntry in
             let seperator = "/"
@@ -60,6 +89,6 @@ class ActiveOrderOverviewWork: ObservableObject{
             return collectedItems
         }
         
-        self.submitedOrder = OrderOverView(placedBy: items.placedBy, orderClosed: items.orderCompleted, totalPrice: items.totalPrice, forTable: items.forTable, withItems: self.submitedItems)
+        self.submitedOrder = OrderOverView(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
     }
 }

@@ -44,10 +44,11 @@ class RestaurantOrderWork: ObservableObject{
         
         let documentData: [String: Any] = [
             "placedBy" : restaurantOrder.placedBy,
+            "forTable": restaurantOrder.forTable,
             "orderItems" : itemName,
             "toatlOrderPrice": totalPrice,
             "orderComplete": restaurantOrder.orderCompleted,
-            "forTable": restaurantOrder.forTable
+            "orderClosed" : restaurantOrder.orderClosed
         ]
         
         databse.collection("Restaurants")

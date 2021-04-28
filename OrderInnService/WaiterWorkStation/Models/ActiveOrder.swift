@@ -13,6 +13,7 @@ struct ActiveOrder: Identifiable {
     var orderItems: [String]
     var placedBy: String
     var orderCompleted: Bool
+    var orderClosed: Bool
     var totalPrice: Double
     var forTable: String
     
@@ -44,5 +45,10 @@ struct ActiveOrder: Identifiable {
             return nil
         }
         self.forTable = forTable
+        
+        guard let orderClosed = data["orderClosed"] as? Bool else{
+            return nil
+        }
+        self.orderClosed = orderClosed
     }
 }

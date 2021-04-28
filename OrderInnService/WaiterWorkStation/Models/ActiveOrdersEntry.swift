@@ -8,13 +8,13 @@
 import Foundation
 
 struct OrderOverView: Identifiable{
-    let id = UUID().uuidString
+    var id = UUID().uuidString
     var placedBy: String = ""
+    var orderCompleted = false
     var orderClosed: Bool = false
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var withItems: [OrderOverviewEntry] = []
-    var extraOrderComponents: [ExtraOrder] = []
     
     struct ExtraOrder{
         var index: Int = 0
