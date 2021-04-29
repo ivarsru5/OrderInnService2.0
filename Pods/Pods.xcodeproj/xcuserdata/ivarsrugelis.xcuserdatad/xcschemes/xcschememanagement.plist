@@ -39,11 +39,6 @@
 			<key>orderHint</key>
 			<integer>5</integer>
 		</dict>
-		<key>FirebaseDatabase.xcscheme</key>
-		<dict>
-			<key>orderHint</key>
-			<integer>18</integer>
-		</dict>
 		<key>FirebaseFirestore.xcscheme</key>
 		<dict>
 			<key>isShown</key>

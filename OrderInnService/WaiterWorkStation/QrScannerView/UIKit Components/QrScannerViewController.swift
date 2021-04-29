@@ -14,7 +14,7 @@ enum CameraError: String{
     case invalidQrCode
 }
 
-protocol ScannerVCDelegate: class {
+protocol ScannerVCDelegate: AnyObject {
     func didFind(qrCode: String)
     func didSurface(error: CameraError)
 }
@@ -100,7 +100,17 @@ extension QrScannerViewController: AVCaptureMetadataOutputObjectsDelegate{
             return
         }
         session.stopRunning()
-        guard let result = QRURL.validateQrString(from: qrCode)else{
+        
+//        if let result = QRURL.validateWaiter(from: qrCode){
+//            scannerDelegate?.didFind(qrCode: result.restaurant)
+//        }else if let result = QRURL.validateKitchen(from: qrCode){
+//            scannerDelegate?.didFind(qrCode: result.restaurant + result.kitchen!)
+//            print(result)
+//        }else{
+//            scannerDelegate?.didSurface(error: .invalidQrCode)
+//        }
+        
+        guard let result = QRURL.validateWaiter(from: qrCode)else{
             scannerDelegate?.didSurface(error: .invalidQrCode)
             return
         }

@@ -21,6 +21,11 @@ struct OrderOverView: Identifiable{
         var menuItems: [MenuItem] = []
     }
     
+    struct SubmitedExtraOrder{
+        var index: Int = 0
+        var submitedItems = [MenuItem]()
+    }
+    
     struct OrderOverviewEntry: Identifiable{
         var id = UUID().uuidString
         var itemName: String = ""

@@ -59,7 +59,7 @@ struct ActiveOrderOverview: View {
                 }
                 
                     ForEach(orderOverview.extraOrderComponents, id:\.index){ extra in
-                        Section(header: Text("Submited extra order : \(extra.index)")){
+                        Section(header: Text("Submited extra order: \(extra.index)")){
                             ForEach(extra.menuItems, id: \.id){ item in
                                 HStack{
                                     Text(item.name)
@@ -91,8 +91,9 @@ struct ActiveOrderOverview: View {
                             }
                         }
                     }
-                }
-                
+            }
+            .listStyle(InsetGroupedListStyle())
+            
             HStack{
                 Text("Total Order Amount")
                     .foregroundColor(.secondary)
@@ -112,7 +113,7 @@ struct ActiveOrderOverview: View {
                 if !orderOverview.menuItems.isEmpty{
                     Button(action: {
                         withAnimation(.easeOut(duration: 0.5)){
-                            _ = orderOverview.addExtraItems()
+                            orderOverview.submitExtraOrder()
                         }
                     }, label: {
                         Text("Submit extra order")

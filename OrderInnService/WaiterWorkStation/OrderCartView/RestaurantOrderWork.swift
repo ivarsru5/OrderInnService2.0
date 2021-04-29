@@ -43,9 +43,9 @@ class RestaurantOrderWork: ObservableObject{
         }
         
         let documentData: [String: Any] = [
+            "orderItems" : itemName,
             "placedBy" : restaurantOrder.placedBy,
             "forTable": restaurantOrder.forTable,
-            "orderItems" : itemName,
             "toatlOrderPrice": totalPrice,
             "orderComplete": restaurantOrder.orderCompleted,
             "orderClosed" : restaurantOrder.orderClosed

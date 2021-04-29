@@ -53,22 +53,28 @@ class ActiveOrderOverviewWork: ObservableObject{
     }
     
     func submitExtraOrder(){
-        let itemName = extraComponent.menuItems.map{ item -> String in
-            return "\(item.name)" + "/\(item.price)"
+        _ = addExtraItems()
+        
+        var itemName = [String]()
+        var additionalOrderIndex = 0
+        
+        for order in extraOrderComponents{
+            for item in order.menuItems{
+                let orderItem = item.name + "/\(item.price)"
+                additionalOrderIndex = order.index
+                itemName.append(orderItem)
+            }
         }
         
         let documentData: [String: Any] = [
-            "placedBy" : submitedOrder.placedBy,
-            "additionalOrder_\(extraComponent.index)" : itemName,
-            "toatlOrderPrice" : submitedOrder.totalPrice + extraOrderTotalPrice,
-            
+            "additionalOrder_\(additionalOrderIndex)" : itemName
         ]
         
         databse.collection("Restaurants")
             .document(UserDefaults.standard.qrStringKey)
             .collection("Order")
             .document(submitedOrder.id)
-            .setData(documentData) { error in
+            .setData(documentData, merge: true) { error in
                 if let error = error{
                     //TODO: add alert
                     print("Order did not update \(error)")
@@ -76,6 +82,7 @@ class ActiveOrderOverviewWork: ObservableObject{
                     print("Urder updated!")
                 }
             }
+        itemName.removeAll(keepingCapacity: true)
     }
     
     func retreveSubmitedIttems(from items: ActiveOrder){
