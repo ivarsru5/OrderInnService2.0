@@ -26,73 +26,34 @@ struct ActiveOrderOverview: View {
             }
             .padding()
             
-            List{
-                if !orderOverview.menuItems.isEmpty{
-                    Section(header: Text("Selected extra item's")){
-                        ForEach(orderOverview.menuItems, id:\.id){ item in
-                            HStack{
-                                Text(item.name)
-                                    .bold()
-                                    .foregroundColor(Color(UIColor.label))
-                                
-                                Spacer()
-                                HStack{
-                                    Text("\(item.price,specifier: "%.2f")EUR")
-                                        .italic()
-                                        .foregroundColor(Color(UIColor.label))
-                                    
-                                    Button(action: {
-                                        withAnimation(.easeOut(duration: 0.5)){
-                                            orderOverview.removeExtraItem(item)
-                                        }
-                                    }, label: {
-                                        Image(systemName: "xmark.circle")
-                                            .font(.custom("SF Symbols", size: 20))
-                                            .foregroundColor(.blue)
-                                    })
-                                }
+            VStack{
+                List{
+                    if !orderOverview.menuItems.isEmpty{
+                        Section(header: Text("Selected extra item's")){
+                            ForEach(orderOverview.menuItems, id:\.id){ item in
+                                AddedExtraItemsCell(orderOverview: orderOverview, item: item)
                             }
                         }
+                    }else{
+                        EmptyView()
                     }
-                }else{
-                    EmptyView()
-                }
-                
-                    ForEach(orderOverview.extraOrderComponents, id:\.index){ extra in
+                    
+                    ForEach(orderOverview.submittedExtraOrder, id:\.index){ extra in
                         Section(header: Text("Submited extra order: \(extra.index)")){
-                            ForEach(extra.menuItems, id: \.id){ item in
-                                HStack{
-                                    Text(item.name)
-                                        .bold()
-                                        .foregroundColor(Color(UIColor.label))
-                                    
-                                    Spacer()
-                                    
-                                    Text("\(item.price,specifier: "%.2f")EUR")
-                                        .italic()
-                                        .foregroundColor(Color(UIColor.label))
-                                }
+                            ForEach(extra.submitedItems, id: \.id){ item in
+                                SubmittedExtraOrderCell(item: item)
                             }
                         }
                     }
                     
                     Section(header: Text("Submited item's")){
                         ForEach(orderOverview.submitedOrder.withItems, id: \.id){ item in
-                            HStack{
-                                Text(item.itemName)
-                                    .bold()
-                                    .foregroundColor(Color(UIColor.label))
-                                
-                                Spacer()
-                                
-                                Text("\(item.itemPrice,specifier: "%.2f")EUR")
-                                    .italic()
-                                    .foregroundColor(Color(UIColor.label))
-                            }
+                            SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice)
                         }
                     }
+                }
+                .listStyle(InsetGroupedListStyle())
             }
-            .listStyle(InsetGroupedListStyle())
             
             HStack{
                 Text("Total Order Amount")
@@ -156,6 +117,74 @@ struct ActiveOrderOverview: View {
                                 })
         .onAppear{
             orderOverview.retreveSubmitedIttems(from: activeOrder.selectedOrder!)
+        }
+    }
+}
+
+
+struct SubmittedOrderCell: View{
+    var itemName: String
+    var itemPrice: Double
+    
+    var body: some View{
+        HStack{
+            Text(verbatim: itemName)
+                .bold()
+                .foregroundColor(Color(UIColor.label))
+            
+            Spacer()
+            
+            Text("\(itemPrice,specifier: "%.2f")EUR")
+                .italic()
+                .foregroundColor(Color(UIColor.label))
+        }
+    }
+}
+
+struct AddedExtraItemsCell: View{
+    @ObservedObject var orderOverview: ActiveOrderOverviewWork
+    var item: MenuItem
+    
+    var body: some View{
+        HStack{
+            Text(item.name)
+                .bold()
+                .foregroundColor(Color(UIColor.label))
+            
+            Spacer()
+            HStack{
+                Text("\(item.price,specifier: "%.2f")EUR")
+                    .italic()
+                    .foregroundColor(Color(UIColor.label))
+                
+                Button(action: {
+                    withAnimation(.easeOut(duration: 0.5)){
+                        orderOverview.removeExtraItem(item)
+                    }
+                }, label: {
+                    Image(systemName: "xmark.circle")
+                        .font(.custom("SF Symbols", size: 20))
+                        .foregroundColor(.blue)
+                })
+            }
+        }
+    }
+}
+
+struct SubmittedExtraOrderCell: View{
+    var item: MenuItem
+    
+    var body: some View{
+        HStack{
+            Text(item.name)
+                .bold()
+                .foregroundColor(Color(UIColor.label))
+            
+            Spacer()
+            
+            Text("\(item.price,specifier: "%.2f")EUR")
+                .italic()
+                .foregroundColor(Color(UIColor.label))
         }
     }
 }

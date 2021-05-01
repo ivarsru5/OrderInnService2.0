@@ -11,12 +11,14 @@ import FirebaseFirestore
 class ActiveOrderOverviewWork: ObservableObject{
     @Published var submitedOrder = OrderOverView()
     @Published var submitedItems = [OrderOverView.OrderOverviewEntry]()
-    @Published var extraComponent = OrderOverView.ExtraOrder()
-    @Published var extraOrderComponents = [OrderOverView.ExtraOrder]()
+    //@Published var extraComponent = OrderOverView.ExtraOrder()
+    @Published var submittedExtraOrder = [OrderOverView.SubmitedExtraOrder]()
     @Published var extraOrderTotalPrice = 0.00
+    var postableItems: [String] = []
     let databse = Firestore.firestore()
     
     var menuItems = [MenuItem]()
+    var extraOrderComponents = [OrderOverView.ExtraOrder]()
     
     func updatePrice(fromItems: MenuItem){
         self.extraOrderTotalPrice = menuItems.reduce(0) { $0 + $1.price }
@@ -55,7 +57,7 @@ class ActiveOrderOverviewWork: ObservableObject{
     func submitExtraOrder(){
         _ = addExtraItems()
         
-        var itemName = [String]()
+        var itemName: [String] = []
         var additionalOrderIndex = 0
         
         for order in extraOrderComponents{
@@ -67,22 +69,32 @@ class ActiveOrderOverviewWork: ObservableObject{
         }
         
         let documentData: [String: Any] = [
-            "additionalOrder_\(additionalOrderIndex)" : itemName
+            "forOrder": submitedOrder.id,
+            "additionalOrder_\(additionalOrderIndex)" : itemName,
+            "extraPrice" : extraOrderTotalPrice
         ]
+        itemName.removeAll()
         
         databse.collection("Restaurants")
             .document(UserDefaults.standard.qrStringKey)
-            .collection("Order")
-            .document(submitedOrder.id)
-            .setData(documentData, merge: true) { error in
+            .collection("ExtraOrder")
+            .addDocument(data: documentData){ error in
                 if let error = error{
                     //TODO: add alert
                     print("Order did not update \(error)")
                 }else{
                     print("Urder updated!")
+                    self.saveSubmittedExtraOrder()
+                    self.extraOrderComponents.removeAll()
                 }
             }
-        itemName.removeAll(keepingCapacity: true)
+    }
+    
+    func saveSubmittedExtraOrder(){
+        self.submittedExtraOrder = self.extraOrderComponents.map { order -> OrderOverView.SubmitedExtraOrder in
+            let order = OrderOverView.SubmitedExtraOrder(index: order.index, submitedItems: order.menuItems)
+            return order
+        }
     }
     
     func retreveSubmitedIttems(from items: ActiveOrder){
