@@ -52,3 +52,36 @@ struct ActiveOrder: Identifiable {
         self.orderClosed = orderClosed
     }
 }
+
+struct ActiveExtraOrder: Identifiable{
+    var id = UUID().uuidString
+    var extraItems: [String]
+    var orderId: String
+    var extraOrderPart: Int
+    var extraOrderPrice: Double
+    
+    init?(snapshot: QueryDocumentSnapshot){
+        let data = snapshot.data()
+        self.id = snapshot.documentID
+        
+        guard let extraitems = data["additionalOrder"] as? [String] else{
+            return nil
+        }
+        self.extraItems = extraitems
+        
+        guard let orderId = data["forOrder"] as? String else{
+            return nil
+        }
+        self.orderId = orderId
+        
+        guard let extraOrderPart = data["extraPart"] as? Int else{
+            return nil
+        }
+        self.extraOrderPart = extraOrderPart
+        
+        guard let extraOrderPrice = data["extraPrice"] as? Double else{
+            return nil
+        }
+        self.extraOrderPrice = extraOrderPrice
+    }
+}

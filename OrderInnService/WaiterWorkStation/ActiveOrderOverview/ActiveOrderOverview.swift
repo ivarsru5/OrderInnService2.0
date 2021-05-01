@@ -38,12 +38,16 @@ struct ActiveOrderOverview: View {
                         EmptyView()
                     }
                     
-                    ForEach(orderOverview.submittedExtraOrder, id:\.index){ extra in
-                        Section(header: Text("Submited extra order: \(extra.index)")){
-                            ForEach(extra.submitedItems, id: \.id){ item in
-                                SubmittedExtraOrderCell(item: item)
-                            }
-                        }
+//                    ForEach(orderOverview.extraOrders, id:\.index){ extra in
+//                        Section(header: Text("Submited extra order: \(extra.index)")){
+//                            ForEach(extra.submitedItems, id: \.id){ item in
+//                                SubmittedExtraOrderCell(item: item)
+//                            }
+//                        }
+//                    }
+                    
+                    ForEach(orderOverview.activeExtraOrders, id: \.id){ order in
+                        Text(order.id)
                     }
                     
                     Section(header: Text("Submited item's")){

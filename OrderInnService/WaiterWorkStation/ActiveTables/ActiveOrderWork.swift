@@ -27,7 +27,7 @@ class ActiveOrderWork: ObservableObject{
                 return
             }
             
-            self.activeOrders = snapshotDocument.compactMap { activeOrderSnapshot in
+            self.activeOrders = snapshotDocument.compactMap { activeOrderSnapshot -> ActiveOrder? in
                 guard let collectedOrder = ActiveOrder(snapshot: activeOrderSnapshot) else{
                     return nil
                 }

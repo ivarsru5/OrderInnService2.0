@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct OrderOverView: Identifiable{
+struct OrderOverview: Identifiable{
     var id = UUID().uuidString
     var placedBy: String = ""
     var orderCompleted = false
@@ -17,7 +17,6 @@ struct OrderOverView: Identifiable{
     var withItems: [OrderOverviewEntry] = []
     
     struct ExtraOrder{
-        var index: Int = 0
         var menuItems: [MenuItem] = []
     }
     
@@ -27,6 +26,20 @@ struct OrderOverView: Identifiable{
     }
     
     struct OrderOverviewEntry: Identifiable{
+        var id = UUID().uuidString
+        var itemName: String = ""
+        var itemPrice: Double = 0.00
+    }
+}
+
+struct ExtraOrderOverview: Identifiable{
+    var id = UUID().uuidString
+    var extraOrderPart: Int?
+    var extraPrice: Double = 0.00
+    var forOrder: String = ""
+    var withItems: [ExtraOrderEntry] = []
+    
+    struct ExtraOrderEntry:Identifiable{
         var id = UUID().uuidString
         var itemName: String = ""
         var itemPrice: Double = 0.00
