@@ -15,6 +15,7 @@ struct OrderOverview: Identifiable{
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var withItems: [OrderOverviewEntry] = []
+    var extraOrder: [ExtraOrderOverview]?
     
     struct ExtraOrder{
         var menuItems: [MenuItem] = []
@@ -40,7 +41,7 @@ struct ExtraOrderOverview: Identifiable{
     var withItems: [ExtraOrderEntry] = []
     
     struct ExtraOrderEntry:Identifiable{
-        var id = UUID().uuidString
+        let id = UUID().uuidString
         var itemName: String = ""
         var itemPrice: Double = 0.00
     }

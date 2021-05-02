@@ -12,13 +12,13 @@ class ActiveOrderOverviewWork: ObservableObject{
     @Published var submitedOrder = OrderOverview()
     @Published var submitedItems = [OrderOverview.OrderOverviewEntry]()
     @Published var extraOrders = [OrderOverview.SubmitedExtraOrder]()
-    @Published var submittedExtraOrder = ExtraOrderOverview()
-    @Published var activeExtraOrders = [ActiveExtraOrder]()
+    @Published var menuItems = [MenuItem]()
     @Published var extraOrderTotalPrice = 0.00
-    let databse = Firestore.firestore()
     
-    var menuItems = [MenuItem]()
+    let databse = Firestore.firestore()
     var extraOrderComponents = [OrderOverview.ExtraOrder]()
+    
+    @Published var submittedExtraOrder = [ExtraOrderOverview]()
     
     func updatePrice(fromItems: MenuItem){
         self.extraOrderTotalPrice = menuItems.reduce(0) { $0 + $1.price }
@@ -57,8 +57,8 @@ class ActiveOrderOverviewWork: ObservableObject{
         let menuItems = self.extraOrderComponents.compactMap{ item -> MenuItem? in
             var addedItem: MenuItem?
             
-            for this in item.menuItems{
-                addedItem = this
+            for items in item.menuItems{
+                addedItem = items
             }
             guard let collectedItem = addedItem else{
                 return nil
@@ -111,7 +111,7 @@ class ActiveOrderOverviewWork: ObservableObject{
             }
     }
     
-    func retreveSubmitedIttems(from items: ActiveOrder){
+    func retreveSubmitedItems(from items: ActiveOrder){
         self.submitedItems = items.orderItems.map{ item -> OrderOverview.OrderOverviewEntry in
             let seperator = "/"
             let partParts = item.components(separatedBy: seperator)
@@ -122,7 +122,7 @@ class ActiveOrderOverviewWork: ObservableObject{
             return collectedItems
         }
         
-        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
+        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems, extraOrder: self.submittedExtraOrder)
         
         getExtraOrders(from: items)
     }
@@ -138,16 +138,30 @@ class ActiveOrderOverviewWork: ObservableObject{
                     return
                 }
                 
-                self.activeExtraOrders = snapshotDocument.compactMap{ activeExtras -> ActiveExtraOrder? in
+                let activeExtraOrders = snapshotDocument.compactMap{ activeExtras -> ActiveExtraOrder? in
                     guard let collectedExtras = ActiveExtraOrder(snapshot: activeExtras) else{
                         return nil
                     }
                     return collectedExtras
                 }
+                
+                self.submittedExtraOrder = activeExtraOrders.map{ order -> ExtraOrderOverview in
+                    var extraOrderEntry = [ExtraOrderOverview.ExtraOrderEntry]()
+                    
+                    extraOrderEntry = order.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
+                        let seperator = "/"
+                        let partParts = item.components(separatedBy: seperator)
+                        let itemName = partParts[0]
+                        let itemPrice = Double(partParts[1])!
+                        
+                        let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
+                        return collectedItem
+                    }
+                    
+                    let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
+                    
+                    return collectedOrder
             }
         }
-    
-    func retriveExtraOrders(){
-        
     }
 }

@@ -46,8 +46,22 @@ struct ActiveOrderOverview: View {
 //                        }
 //                    }
                     
-                    ForEach(orderOverview.activeExtraOrders, id: \.id){ order in
-                        Text(order.id)
+                    ForEach(orderOverview.submittedExtraOrder, id: \.id){ order in
+                        Section(header: Text("Extra order: \(order.extraOrderPart!)")){
+                            ForEach(order.withItems, id: \.id){ item in
+                                HStack{
+                                    Text(item.itemName)
+                                        .bold()
+                                        .foregroundColor(Color(UIColor.label))
+
+                                    Spacer()
+
+                                    Text("\(item.itemPrice, specifier: "%.2f")EUR")
+                                        .italic()
+                                        .foregroundColor(Color(UIColor.label))
+                                }
+                            }
+                        }
                     }
                     
                     Section(header: Text("Submited item's")){
@@ -120,7 +134,7 @@ struct ActiveOrderOverview: View {
                                     })
                                 })
         .onAppear{
-            orderOverview.retreveSubmitedIttems(from: activeOrder.selectedOrder!)
+            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
         }
     }
 }
