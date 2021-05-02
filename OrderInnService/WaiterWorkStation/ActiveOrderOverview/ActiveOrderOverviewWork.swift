@@ -10,13 +10,12 @@ import FirebaseFirestore
 
 class ActiveOrderOverviewWork: ObservableObject{
     @Published var submitedOrder = OrderOverview()
-    @Published var submitedItems = [OrderOverview.OrderOverviewEntry]()
-    @Published var extraOrders = [OrderOverview.SubmitedExtraOrder]()
+    @Published var extraOrder = ExtraOrderOverview()
     @Published var menuItems = [MenuItem]()
     @Published var extraOrderTotalPrice = 0.00
+    @Published var sendingQuery = false
     
     let databse = Firestore.firestore()
-    var extraOrderComponents = [OrderOverview.ExtraOrder]()
     
     @Published var submittedExtraOrder = [ExtraOrderOverview]()
     
@@ -39,54 +38,23 @@ class ActiveOrderOverviewWork: ObservableObject{
             updatePrice(fromItems: menuItem)
         }
     }
+
     
-    func addExtraItems() -> OrderOverview.ExtraOrder{
-        let menuItems = self.menuItems.map { item -> MenuItem in
-            let index = self.menuItems.firstIndex(where: { $0.id == item.id })!
-            let menuItem = self.menuItems[index]
-            self.menuItems.remove(at: index)
-            return menuItem
-        }
+    func submitExtraOrder(from items: ActiveOrder){
+        self.sendingQuery = true
         
-        let extraOrder = OrderOverview.ExtraOrder(menuItems: menuItems)
-        self.extraOrderComponents.append(extraOrder)
-        return extraOrder
-    }
-    
-    func saveSubmittedExtraOrder() -> OrderOverview.SubmitedExtraOrder?{
-        let menuItems = self.extraOrderComponents.compactMap{ item -> MenuItem? in
-            var addedItem: MenuItem?
-            
-            for items in item.menuItems{
-                addedItem = items
-            }
-            guard let collectedItem = addedItem else{
-                return nil
-            }
-            return collectedItem
-        }
-        
-        let savedOrder = OrderOverview.SubmitedExtraOrder(index: self.extraOrders.count + 1, submitedItems: menuItems)
-        self.extraOrders.append(savedOrder)
-        return savedOrder
-    }
-    
-    func submitExtraOrder(){
-        _ = addExtraItems()
-        _ = self.saveSubmittedExtraOrder()
-        
-        var itemName: [String] = []
         var additionalOrderIndex = 0
         
-        for index in extraOrders{
-            additionalOrderIndex = index.index
+        for index in submittedExtraOrder{
+            if index.extraOrderPart == nil{
+                additionalOrderIndex += 1
+            }else{
+                additionalOrderIndex = index.extraOrderPart! + 1
+            }
         }
         
-        for order in extraOrderComponents{
-            for item in order.menuItems{
-                let orderItem = item.name + "/\(item.price)"
-                itemName.append(orderItem)
-            }
+        var itemName = self.menuItems.map{ item -> String in
+            return "\(item.name)" + "/\(item.price)"
         }
         
         let documentData: [String: Any] = [
@@ -106,13 +74,14 @@ class ActiveOrderOverviewWork: ObservableObject{
                     print("Order did not update \(error)")
                 }else{
                     print("Urder updated!")
-                    self.extraOrderComponents.removeAll()
+                    self.menuItems.removeAll()
+                    self.getExtraOrders(from: items)
                 }
             }
     }
     
     func retreveSubmitedItems(from items: ActiveOrder){
-        self.submitedItems = items.orderItems.map{ item -> OrderOverview.OrderOverviewEntry in
+        let submitedItems = items.orderItems.map{ item -> OrderOverview.OrderOverviewEntry in
             let seperator = "/"
             let partParts = item.components(separatedBy: seperator)
             let itemName = partParts[0]
@@ -122,7 +91,7 @@ class ActiveOrderOverviewWork: ObservableObject{
             return collectedItems
         }
         
-        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems, extraOrder: self.submittedExtraOrder)
+        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
         
         getExtraOrders(from: items)
     }
@@ -160,8 +129,11 @@ class ActiveOrderOverviewWork: ObservableObject{
                     
                     let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
                     
+                    self.extraOrder = collectedOrder
+                    
                     return collectedOrder
             }
         }
+        self.sendingQuery = false
     }
 }

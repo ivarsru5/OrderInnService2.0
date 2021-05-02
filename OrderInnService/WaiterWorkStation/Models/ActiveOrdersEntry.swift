@@ -15,17 +15,7 @@ struct OrderOverview: Identifiable{
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var withItems: [OrderOverviewEntry] = []
-    var extraOrder: [ExtraOrderOverview]?
-    
-    struct ExtraOrder{
-        var menuItems: [MenuItem] = []
-    }
-    
-    struct SubmitedExtraOrder{
-        var index: Int = 0
-        var submitedItems = [MenuItem]()
-    }
-    
+        
     struct OrderOverviewEntry: Identifiable{
         var id = UUID().uuidString
         var itemName: String = ""

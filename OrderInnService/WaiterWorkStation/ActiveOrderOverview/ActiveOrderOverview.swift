@@ -13,113 +13,111 @@ struct ActiveOrderOverview: View {
     @State var showMenu = false
     
     var body: some View {
-        VStack{
-            HStack{
-                HStack{
-                    Text("Table: ")
-                        .bold()
-                    
-                    Text(activeOrder.selectedOrder!.forTable)
-                        .foregroundColor(.white)
-                }
-                Spacer()
-            }
-            .padding()
-            
-            VStack{
-                List{
-                    if !orderOverview.menuItems.isEmpty{
-                        Section(header: Text("Selected extra item's")){
-                            ForEach(orderOverview.menuItems, id:\.id){ item in
-                                AddedExtraItemsCell(orderOverview: orderOverview, item: item)
-                            }
+        ZStack{
+            if !orderOverview.sendingQuery{
+                VStack{
+                    HStack{
+                        HStack{
+                            Text("Table: ")
+                                .bold()
+                            
+                            Text(activeOrder.selectedOrder!.forTable)
+                                .foregroundColor(.white)
                         }
-                    }else{
-                        EmptyView()
+                        Spacer()
                     }
+                    .padding()
                     
-//                    ForEach(orderOverview.extraOrders, id:\.index){ extra in
-//                        Section(header: Text("Submited extra order: \(extra.index)")){
-//                            ForEach(extra.submitedItems, id: \.id){ item in
-//                                SubmittedExtraOrderCell(item: item)
-//                            }
-//                        }
-//                    }
-                    
-                    ForEach(orderOverview.submittedExtraOrder, id: \.id){ order in
-                        Section(header: Text("Extra order: \(order.extraOrderPart!)")){
-                            ForEach(order.withItems, id: \.id){ item in
-                                HStack{
-                                    Text(item.itemName)
-                                        .bold()
-                                        .foregroundColor(Color(UIColor.label))
-
-                                    Spacer()
-
-                                    Text("\(item.itemPrice, specifier: "%.2f")EUR")
-                                        .italic()
-                                        .foregroundColor(Color(UIColor.label))
+                    VStack{
+                        List{
+                            if !orderOverview.menuItems.isEmpty{
+                                Section(header: Text("Selected extra item's")){
+                                    ForEach(orderOverview.menuItems, id:\.id){ item in
+                                        AddedExtraItemsCell(orderOverview: orderOverview, item: item)
+                                    }
+                                }
+                            }else{
+                                EmptyView()
+                            }
+                            
+                            ForEach(orderOverview.submittedExtraOrder, id: \.id){ order in
+                                Section(header: Text("Extra order: \(order.extraOrderPart!)")){
+                                    ForEach(order.withItems, id: \.id){ item in
+                                        HStack{
+                                            Text(item.itemName)
+                                                .bold()
+                                                .foregroundColor(Color(UIColor.label))
+                                            
+                                            Spacer()
+                                            
+                                            Text("\(item.itemPrice, specifier: "%.2f")EUR")
+                                                .italic()
+                                                .foregroundColor(Color(UIColor.label))
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            Section(header: Text("Submited item's")){
+                                ForEach(orderOverview.submitedOrder.withItems, id: \.id){ item in
+                                    SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice)
                                 }
                             }
                         }
+                        .listStyle(InsetGroupedListStyle())
                     }
                     
-                    Section(header: Text("Submited item's")){
-                        ForEach(orderOverview.submitedOrder.withItems, id: \.id){ item in
-                            SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice)
+                    HStack{
+                        Text("Total Order Amount")
+                            .foregroundColor(.secondary)
+                            .font(.subheadline)
+                        
+                        Spacer()
+                        
+                        Text("EUR\(orderOverview.submitedOrder.totalPrice + orderOverview.extraOrder.extraPrice, specifier: "%.2f")")
+                            .bold()
+                            .foregroundColor(Color(UIColor.label))
+                    }
+                    .padding()
+                    
+                    NavigationLink(destination: ExtraItemCategoryView(activeOrderOverview: orderOverview, activeOrder: activeOrder), isActive: $showMenu) { EmptyView() }
+                    
+                    HStack{
+                        if !orderOverview.menuItems.isEmpty{
+                            Button(action: {
+                                withAnimation(.easeOut(duration: 0.5)){
+                                    orderOverview.submitExtraOrder(from: activeOrder.selectedOrder!)
+                                }
+                            }, label: {
+                                Text("Submit extra order")
+                                    .bold()
+                                    .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
+                                           minHeight: 0, idealHeight: 32, maxHeight: 54,
+                                           alignment: .center)
+                                    .foregroundColor(Color(UIColor.systemBackground))
+                                    .background(Color(UIColor.label))
+                                    .cornerRadius(15)
+                            })
+                            .padding()
                         }
+                        
+                        Button(action: {
+                            self.showMenu.toggle()
+                        }, label: {
+                            Text("Add items to Order")
+                                .bold()
+                                .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
+                                       minHeight: 0, idealHeight: 32, maxHeight: 54,
+                                       alignment: .center)
+                                .foregroundColor(Color(UIColor.systemBackground))
+                                .background(Color(UIColor.label))
+                                .cornerRadius(15)
+                        })
+                        .padding()
                     }
                 }
-                .listStyle(InsetGroupedListStyle())
-            }
-            
-            HStack{
-                Text("Total Order Amount")
-                    .foregroundColor(.secondary)
-                    .font(.subheadline)
-                
-                Spacer()
-                
-                Text("EUR\(orderOverview.submitedOrder.totalPrice + orderOverview.extraOrderTotalPrice, specifier: "%.2f")")
-                    .bold()
-                    .foregroundColor(Color(UIColor.label))
-            }
-            .padding()
-            
-            NavigationLink(destination: ExtraItemCategoryView(activeOrderOverview: orderOverview, activeOrder: activeOrder), isActive: $showMenu) { EmptyView() }
-            
-            HStack{
-                if !orderOverview.menuItems.isEmpty{
-                    Button(action: {
-                        withAnimation(.easeOut(duration: 0.5)){
-                            orderOverview.submitExtraOrder()
-                        }
-                    }, label: {
-                        Text("Submit extra order")
-                            .bold()
-                            .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
-                                   minHeight: 0, idealHeight: 32, maxHeight: 54,
-                                   alignment: .center)
-                            .foregroundColor(Color(UIColor.systemBackground))
-                            .background(Color(UIColor.label))
-                            .cornerRadius(15)
-                    })
-                    .padding()
-                }
-                
-                Button(action: {
-                    self.showMenu.toggle()
-                }, label: {
-                    Text("Add items to Order")
-                        .bold()
-                        .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
-                               minHeight: 0, idealHeight: 32, maxHeight: 54,
-                               alignment: .center)
-                        .foregroundColor(Color(UIColor.systemBackground))
-                        .background(Color(UIColor.label))
-                        .cornerRadius(15)
-                })
-                .padding()
+            }else{
+                Spinner()
             }
         }
         .navigationTitle("SelectedZone")
