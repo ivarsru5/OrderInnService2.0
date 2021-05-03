@@ -11,7 +11,6 @@ import FirebaseFirestore
 class ActiveOrderOverviewWork: ObservableObject{
     @Published var collectedOrder = ClientSubmittedOrder()
     @Published var submitedOrder = OrderOverview()
-    @Published var extraOrder = ExtraOrderOverview()
     @Published var menuItems = [MenuItem]()
     @Published var extraOrderTotalPrice = 0.00
     @Published var totalCollectedOrderPrice = 0.00
@@ -84,7 +83,7 @@ class ActiveOrderOverviewWork: ObservableObject{
                     return collectedExtras
                 }
                 
-                self.submittedExtraOrder = activeExtraOrders.map{ order -> ExtraOrderOverview in
+                let extraOrder = activeExtraOrders.map{ order -> ExtraOrderOverview in
                     var extraOrderEntry = [ExtraOrderOverview.ExtraOrderEntry]()
                     
                     extraOrderEntry = order.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
@@ -98,10 +97,9 @@ class ActiveOrderOverviewWork: ObservableObject{
                     }
                     
                     let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
-                    
-                    self.extraOrder = collectedOrder
                     return collectedOrder
             }
+                self.submittedExtraOrder = extraOrder.sorted { $0.extraOrderPart! > $1.extraOrderPart! }
                 self.collectAllOrderParts(withExtras: self.submittedExtraOrder)
         }
         DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
@@ -114,12 +112,10 @@ class ActiveOrderOverviewWork: ObservableObject{
         
         var additionalOrderIndex = 0
         
-        for index in submittedExtraOrder{
-            if index.extraOrderPart == nil{
-                additionalOrderIndex += 1
-            }else{
-                additionalOrderIndex = index.extraOrderPart! + 1
-            }
+        if submittedExtraOrder.isEmpty{
+            additionalOrderIndex = 1
+        }else{
+            additionalOrderIndex = self.submittedExtraOrder.count + 1
         }
         
         var itemName = self.menuItems.map{ item -> String in
