@@ -35,7 +35,7 @@ struct TableSelectionView: View {
             }else{
                 Spinner()
             }
-            NavigationLink(destination: MenuView(table: tables), isActive: $tables.goToMenu){ EmptyView() }
+            NavigationLink(destination: MenuView(table: tables, zone: zones), isActive: $tables.goToMenu){ EmptyView() }
         }
         .onAppear{
             restaurantOrder.restaurantOrder.menuItems.removeAll()

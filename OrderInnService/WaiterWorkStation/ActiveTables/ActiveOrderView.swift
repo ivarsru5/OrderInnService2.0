@@ -19,15 +19,27 @@ struct ActiveOrderView: View {
                             self.activeOrders.selectedOrder = order
                         }, label: {
                             HStack{
-                                Text(order.forTable)
-                                    .bold()
-                                    .foregroundColor(Color(UIColor.label))
+                                HStack{
+                                    Text("In Zone: ")
+                                        .bold()
+                                        .foregroundColor(Color(UIColor.label))
+                                    
+                                    Text(order.forZone)
+                                        .bold()
+                                        .foregroundColor(Color(UIColor.label))
+                                }
                                 
                                 Spacer()
                                 
-                                Text("Total price: \(order.totalPrice, specifier: "%.2f")EUR")
-                                    .bold()
-                                    .foregroundColor(.secondary)
+                                HStack{
+                                    Text("Table: ")
+                                        .bold()
+                                        .foregroundColor(.secondary)
+                                    
+                                    Text(order.forTable)
+                                        .bold()
+                                        .foregroundColor(.secondary)
+                                }
                             }
                         })
                     }

@@ -16,6 +16,7 @@ struct ActiveOrder: Identifiable {
     var orderClosed: Bool
     var totalPrice: Double
     var forTable: String
+    var forZone: String
     
     init?(snapshot: QueryDocumentSnapshot){
         let data = snapshot.data()
@@ -50,6 +51,11 @@ struct ActiveOrder: Identifiable {
             return nil
         }
         self.orderClosed = orderClosed
+        
+        guard let forZone = data["inZone"] as? String else{
+            return nil
+        }
+        self.forZone = forZone
     }
 }
 

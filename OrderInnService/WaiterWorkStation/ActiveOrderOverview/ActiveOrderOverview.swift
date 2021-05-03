@@ -120,7 +120,7 @@ struct ActiveOrderOverview: View {
                 Spinner()
             }
         }
-        .navigationTitle("SelectedZone")
+        .navigationTitle(activeOrder.selectedOrder!.forZone)
         .navigationBarItems(trailing:
                                 HStack{
                                     Button(action: {

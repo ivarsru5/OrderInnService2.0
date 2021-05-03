@@ -12,6 +12,7 @@ struct MenuView: View {
     @StateObject var restaurantOrder = RestaurantOrderWork()
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var table: TableSelectionWork
+    @ObservedObject var zone: ZoneWork
     @State var alertitem: AlertItem?
     @State var showOrder = false
     @State var showOrderCart = false
@@ -60,6 +61,7 @@ struct MenuView: View {
         .onAppear{
             menuOverview.getMenuCategory()
             restaurantOrder.restaurantOrder.forTable = table.selectedTabel!.table
+            restaurantOrder.restaurantOrder.forZone = zone.selectedZone!.location
         }
         .sheet(isPresented: $menuOverview.presentMenu){
             MenuItemView(menuOverView: menuOverview, restaurantOrder: restaurantOrder, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)

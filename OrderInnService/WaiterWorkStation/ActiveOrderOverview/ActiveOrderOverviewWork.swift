@@ -104,7 +104,9 @@ class ActiveOrderOverviewWork: ObservableObject{
             }
                 self.collectAllOrderParts(withExtras: self.submittedExtraOrder)
         }
-        self.sendingQuery = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+            self.sendingQuery = false
+        })
     }
     
     func submitExtraOrder(from items: ActiveOrder){
