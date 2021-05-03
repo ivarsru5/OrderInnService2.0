@@ -12,38 +12,46 @@ struct ActiveOrderView: View {
     
     var body: some View {
         ZStack{
-            List{
-                Section(header: Text("Active Order")){
-                    ForEach(activeOrders.activeOrders, id: \.id){ order in
-                        Button(action: {
-                            self.activeOrders.selectedOrder = order
-                        }, label: {
-                            HStack{
+            if !activeOrders.activeOrders.isEmpty{
+                List{
+                    Section(header: Text("Active Order")){
+                        ForEach(activeOrders.activeOrders, id: \.id){ order in
+                            Button(action: {
+                                self.activeOrders.selectedOrder = order
+                            }, label: {
                                 HStack{
-                                    Text("In Zone: ")
-                                        .bold()
-                                        .foregroundColor(Color(UIColor.label))
+                                    HStack{
+                                        Text("In Zone: ")
+                                            .bold()
+                                            .foregroundColor(Color(UIColor.label))
+                                        
+                                        Text(order.forZone)
+                                            .bold()
+                                            .foregroundColor(Color(UIColor.label))
+                                    }
                                     
-                                    Text(order.forZone)
-                                        .bold()
-                                        .foregroundColor(Color(UIColor.label))
-                                }
-                                
-                                Spacer()
-                                
-                                HStack{
-                                    Text("Table: ")
-                                        .bold()
-                                        .foregroundColor(.secondary)
+                                    Spacer()
                                     
-                                    Text(order.forTable)
-                                        .bold()
-                                        .foregroundColor(.secondary)
+                                    HStack{
+                                        Text("Table: ")
+                                            .bold()
+                                            .foregroundColor(.secondary)
+                                        
+                                        Text(order.forTable)
+                                            .bold()
+                                            .foregroundColor(.secondary)
+                                    }
                                 }
-                            }
-                        })
+                            })
+                        }
                     }
                 }
+            }else{
+                Text("There is no active orders. Please make one to view activity.")
+                    .font(.headline)
+                    .foregroundColor(Color(UIColor.label))
+                    .multilineTextAlignment(.center)
+                    .padding()
             }
         }
         .navigationTitle("Active Orders")
