@@ -40,7 +40,7 @@ struct ActiveOrderOverview: View {
                                 EmptyView()
                             }
                             
-                            ForEach(orderOverview.submittedExtraOrder, id: \.id){ order in
+                            ForEach(orderOverview.collectedOrder.withExtraItems, id: \.id){ order in
                                 Section(header: Text("Extra order: \(order.extraOrderPart!)")){
                                     ForEach(order.withItems, id: \.id){ item in
                                         HStack{
@@ -59,7 +59,7 @@ struct ActiveOrderOverview: View {
                             }
                             
                             Section(header: Text("Submited item's")){
-                                ForEach(orderOverview.submitedOrder.withItems, id: \.id){ item in
+                                ForEach(orderOverview.collectedOrder.withItems, id: \.id){ item in
                                     SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice)
                                 }
                             }
@@ -74,7 +74,7 @@ struct ActiveOrderOverview: View {
                         
                         Spacer()
                         
-                        Text("EUR\(orderOverview.submitedOrder.totalPrice + orderOverview.extraOrder.extraPrice, specifier: "%.2f")")
+                        Text("EUR\(orderOverview.totalCollectedOrderPrice, specifier: "%.2f")")
                             .bold()
                             .foregroundColor(Color(UIColor.label))
                     }

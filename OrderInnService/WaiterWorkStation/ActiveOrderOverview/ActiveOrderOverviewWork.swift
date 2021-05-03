@@ -9,10 +9,12 @@ import Foundation
 import FirebaseFirestore
 
 class ActiveOrderOverviewWork: ObservableObject{
+    @Published var collectedOrder = ClientSubmittedOrder()
     @Published var submitedOrder = OrderOverview()
     @Published var extraOrder = ExtraOrderOverview()
     @Published var menuItems = [MenuItem]()
     @Published var extraOrderTotalPrice = 0.00
+    @Published var totalCollectedOrderPrice = 0.00
     @Published var sendingQuery = false
     
     let databse = Firestore.firestore()
@@ -38,46 +40,14 @@ class ActiveOrderOverviewWork: ObservableObject{
             updatePrice(fromItems: menuItem)
         }
     }
-
     
-    func submitExtraOrder(from items: ActiveOrder){
-        self.sendingQuery = true
+    func collectAllOrderParts(withExtras: [ExtraOrderOverview]){
+        let extraPrice = withExtras.map{ $0.extraPrice }
+        let extraOrderPrice = extraPrice.reduce(0, +)
+        let totalOrderPrice = extraOrderPrice + submitedOrder.totalPrice
+        self.totalCollectedOrderPrice = totalOrderPrice
         
-        var additionalOrderIndex = 0
-        
-        for index in submittedExtraOrder{
-            if index.extraOrderPart == nil{
-                additionalOrderIndex += 1
-            }else{
-                additionalOrderIndex = index.extraOrderPart! + 1
-            }
-        }
-        
-        var itemName = self.menuItems.map{ item -> String in
-            return "\(item.name)" + "/\(item.price)"
-        }
-        
-        let documentData: [String: Any] = [
-            "extraPart": additionalOrderIndex,
-            "forOrder": submitedOrder.id,
-            "additionalOrder" : itemName,
-            "extraPrice" : extraOrderTotalPrice
-        ]
-        itemName.removeAll()
-        
-        databse.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
-            .collection("ExtraOrder")
-            .addDocument(data: documentData){ error in
-                if let error = error{
-                    //TODO: add alert
-                    print("Order did not update \(error)")
-                }else{
-                    print("Urder updated!")
-                    self.menuItems.removeAll()
-                    self.getExtraOrders(from: items)
-                }
-            }
+        self.collectedOrder = ClientSubmittedOrder(id: submitedOrder.id, placedBy: submitedOrder.placedBy, orderCompleted: submitedOrder.orderCompleted, orderClosed: submitedOrder.orderClosed, totalPrice: totalOrderPrice, forTable: submitedOrder.forTable, withItems: submitedOrder.withItems, withExtraItems: withExtras)
     }
     
     func retreveSubmitedItems(from items: ActiveOrder){
@@ -130,10 +100,50 @@ class ActiveOrderOverviewWork: ObservableObject{
                     let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
                     
                     self.extraOrder = collectedOrder
-                    
                     return collectedOrder
             }
+                self.collectAllOrderParts(withExtras: self.submittedExtraOrder)
         }
         self.sendingQuery = false
+    }
+    
+    func submitExtraOrder(from items: ActiveOrder){
+        self.sendingQuery = true
+        
+        var additionalOrderIndex = 0
+        
+        for index in submittedExtraOrder{
+            if index.extraOrderPart == nil{
+                additionalOrderIndex += 1
+            }else{
+                additionalOrderIndex = index.extraOrderPart! + 1
+            }
+        }
+        
+        var itemName = self.menuItems.map{ item -> String in
+            return "\(item.name)" + "/\(item.price)"
+        }
+        
+        let documentData: [String: Any] = [
+            "extraPart": additionalOrderIndex,
+            "forOrder": submitedOrder.id,
+            "additionalOrder" : itemName,
+            "extraPrice" : extraOrderTotalPrice
+        ]
+        itemName.removeAll()
+        
+        databse.collection("Restaurants")
+            .document(UserDefaults.standard.qrStringKey)
+            .collection("ExtraOrder")
+            .addDocument(data: documentData){ error in
+                if let error = error{
+                    //TODO: add alert
+                    print("Order did not update \(error)")
+                }else{
+                    print("Urder updated!")
+                    self.menuItems.removeAll()
+                    self.getExtraOrders(from: items)
+                }
+            }
     }
 }

@@ -37,3 +37,14 @@ struct ExtraOrderOverview: Identifiable{
     }
 }
 
+struct ClientSubmittedOrder: Identifiable{
+    var id = UUID().uuidString
+    var placedBy: String = ""
+    var orderCompleted = false
+    var orderClosed: Bool = false
+    var totalPrice: Double = 0.00
+    var forTable: String = ""
+    var withItems: [OrderOverview.OrderOverviewEntry] = []
+    var withExtraItems: [ExtraOrderOverview] = []
+}
+
