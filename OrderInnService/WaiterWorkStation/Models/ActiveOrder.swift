@@ -10,7 +10,8 @@ import FirebaseFirestore
 
 struct ActiveOrder: Identifiable {
     var id = UUID().uuidString
-    var orderItems: [String]
+    var kitchenItems: [String]
+    var barItems: [String]
     var placedBy: String
     var orderCompleted: Bool
     var orderClosed: Bool
@@ -22,10 +23,15 @@ struct ActiveOrder: Identifiable {
         let data = snapshot.data()
         self.id = snapshot.documentID
         
-        guard let orderItems = data["orderItems"] as? [String] else{
+        guard let kitchenItems = data["kitchenItems"] as? [String] else{
             return nil
         }
-        self.orderItems = orderItems
+        self.kitchenItems = kitchenItems
+        
+        guard let barItems = data["barItems"] as? [String] else{
+            return nil
+        }
+        self.barItems = barItems
         
         guard let placedBy = data["placedBy"] as? String else{
             return nil
@@ -62,6 +68,7 @@ struct ActiveOrder: Identifiable {
 struct ActiveExtraOrder: Identifiable{
     var id = UUID().uuidString
     var extraItems: [String]
+    var extraBarItems: [String]
     var orderId: String
     var extraOrderPart: Int
     var extraOrderPrice: Double
@@ -70,10 +77,15 @@ struct ActiveExtraOrder: Identifiable{
         let data = snapshot.data()
         self.id = snapshot.documentID
         
-        guard let extraitems = data["additionalOrder"] as? [String] else{
+        guard let extraitems = data["extraKitchenItems"] as? [String] else{
             return nil
         }
         self.extraItems = extraitems
+        
+        guard let extraBarItems = data["extraDrinks"] as? [String] else{
+            return nil
+        }
+        self.extraBarItems = extraBarItems
         
         guard let orderId = data["forOrder"] as? String else{
             return nil

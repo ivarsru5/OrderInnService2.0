@@ -12,6 +12,7 @@ struct MenuItem: Identifiable, Hashable{
     var id = UUID().uuidString
     var name: String
     var price: Double
+    var destination: String
     
     init?(snapshot: QueryDocumentSnapshot){
         let data = snapshot.data()
@@ -26,5 +27,10 @@ struct MenuItem: Identifiable, Hashable{
             return nil
         }
         self.price = price
+        
+        guard let destination = data["destination"] as? String else{
+            return nil
+        }
+        self.destination = destination
     }
 }

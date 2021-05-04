@@ -50,7 +50,17 @@ class ActiveOrderOverviewWork: ObservableObject{
     }
     
     func retreveSubmitedItems(from items: ActiveOrder){
-        let submitedItems = items.orderItems.map{ item -> OrderOverview.OrderOverviewEntry in
+        let submittedDrinks = items.barItems.map{ item -> OrderOverview.OrderOverviewEntry in
+            let seperator = "/"
+            let partParts = item.components(separatedBy: seperator)
+            let itemName = partParts[0]
+            let itemPrice = Double(partParts[1])!
+            
+            let collectedDrinks = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: itemPrice)
+            return collectedDrinks
+        }
+        
+        var submitedItems = items.kitchenItems.map{ item -> OrderOverview.OrderOverviewEntry in
             let seperator = "/"
             let partParts = item.components(separatedBy: seperator)
             let itemName = partParts[0]
@@ -59,6 +69,8 @@ class ActiveOrderOverviewWork: ObservableObject{
             let collectedItems = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: itemPrice!)
             return collectedItems
         }
+        
+        submitedItems.append(contentsOf: submittedDrinks)
         
         self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
         
@@ -86,7 +98,7 @@ class ActiveOrderOverviewWork: ObservableObject{
                 let extraOrder = activeExtraOrders.map{ order -> ExtraOrderOverview in
                     var extraOrderEntry = [ExtraOrderOverview.ExtraOrderEntry]()
                     
-                    extraOrderEntry = order.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
+                    let kitchenItems = order.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
                         let seperator = "/"
                         let partParts = item.components(separatedBy: seperator)
                         let itemName = partParts[0]
@@ -95,6 +107,20 @@ class ActiveOrderOverviewWork: ObservableObject{
                         let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
                         return collectedItem
                     }
+                    
+                    extraOrderEntry.append(contentsOf: kitchenItems)
+                    
+                    let barItems = order.extraBarItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
+                        let seperator = "/"
+                        let partParts = item.components(separatedBy: seperator)
+                        let itemName = partParts[0]
+                        let itemPrice = Double(partParts[1])!
+                        
+                        let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
+                        return collectedItem
+                    }
+                    
+                    extraOrderEntry.append(contentsOf: barItems)
                     
                     let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
                     return collectedOrder
@@ -118,17 +144,26 @@ class ActiveOrderOverviewWork: ObservableObject{
             additionalOrderIndex = self.submittedExtraOrder.count + 1
         }
         
-        var itemName = self.menuItems.map{ item -> String in
+        let kitchenItems = self.menuItems.filter { $0.destination == "kitchen" }
+        let barItems = self.menuItems.filter { $0.destination == "bar" }
+        
+        var itemName = kitchenItems.map{ item -> String in
+            return "\(item.name)" + "/\(item.price)"
+        }
+        
+        var drinkName = barItems.map{ item -> String in
             return "\(item.name)" + "/\(item.price)"
         }
         
         let documentData: [String: Any] = [
             "extraPart": additionalOrderIndex,
             "forOrder": submitedOrder.id,
-            "additionalOrder" : itemName,
+            "extraKitchenItems" : itemName,
+            "extraDrinks": drinkName,
             "extraPrice" : extraOrderTotalPrice
         ]
         itemName.removeAll()
+        drinkName.removeAll()
         
         databse.collection("Restaurants")
             .document(UserDefaults.standard.qrStringKey)

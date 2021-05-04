@@ -38,12 +38,20 @@ class RestaurantOrderWork: ObservableObject{
     func sendOrder(presentationMode: Binding<PresentationMode>){
         sendingQuery = true
         
-        let itemName = restaurantOrder.menuItems.map{ item -> String in
+        let kitchenItems = restaurantOrder.menuItems.filter { $0.destination == "kitchen" }
+        let barItems = restaurantOrder.menuItems.filter { $0.destination == "bar" }
+        
+        let itemName = kitchenItems.map{ item -> String in
+            return "\(item.name)" + "/\(item.price)"
+        }
+        
+        let drinkName = barItems.map { item -> String in
             return "\(item.name)" + "/\(item.price)"
         }
         
         let documentData: [String: Any] = [
-            "orderItems" : itemName,
+            "kitchenItems" : itemName,
+            "barItems": drinkName,
             "placedBy" : restaurantOrder.placedBy,
             "forTable": restaurantOrder.forTable,
             "inZone": restaurantOrder.forZone,
