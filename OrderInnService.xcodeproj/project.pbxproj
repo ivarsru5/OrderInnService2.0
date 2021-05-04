@@ -175,8 +175,6 @@
 				58F0D73F2632E4FF0093B6EA /* OrderCartView */,
 				580E1E252636D5E400A16228 /* ActiveTables */,
 				58F2895926384E3C00C973DB /* ActiveOrderOverview */,
-				58F07AAE26282FC300574D4F /* Extensions */,
-				580509162629AAEA007CF39B /* Common */,
 				58F07AA72628273900574D4F /* AlertItems */,
 			);
 			path = WaiterWorkStation;
@@ -214,6 +212,8 @@
 			children = (
 				582066D72628129400D3BCCA /* OrderInnServiceApp.swift */,
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
+				58F07AAE26282FC300574D4F /* Extensions */,
+				580509162629AAEA007CF39B /* Common */,
 				582066DB2628129400D3BCCA /* Assets.xcassets */,
 				582066E02628129400D3BCCA /* Info.plist */,
 				582066E82628166900D3BCCA /* GoogleService-Info.plist */,
