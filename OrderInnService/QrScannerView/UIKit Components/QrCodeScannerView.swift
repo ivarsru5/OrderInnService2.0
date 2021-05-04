@@ -10,7 +10,8 @@ import Combine
 import AVFoundation
 
 struct QrCodeScannerView: UIViewControllerRepresentable{
-    @Binding var qrCode: String
+    @Binding var restaurant: String
+    @Binding var kitchen: String?
     @Binding var alertItem: AlertItem?
     
     func makeUIViewController(context: Context) -> QrScannerViewController {
@@ -35,8 +36,9 @@ struct QrCodeScannerView: UIViewControllerRepresentable{
             self.qrScannerView = qrScannerView
         }
         
-        func didFind(qrCode: String) {
-            qrScannerView.qrCode = qrCode
+        func didFind(qrCode: QRURL) {
+            qrScannerView.restaurant = qrCode.restaurant
+            qrScannerView.kitchen = qrCode.kitchen
         }
         
         func didSurface(error: CameraError) {

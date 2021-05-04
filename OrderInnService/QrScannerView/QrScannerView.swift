@@ -13,7 +13,7 @@ struct QrScannerView: View {
     
     var body: some View {
         ZStack{
-            QrCodeScannerView(qrCode: $scannerWork.qrCode, alertItem: $alertItem)
+            QrCodeScannerView(restaurant: $scannerWork.restaurantQrCode, kitchen: $scannerWork.kitchen, alertItem: $alertItem)
                 .edgesIgnoringSafeArea(.all)
             
             BlurEffectView(effect: UIBlurEffect(style: .dark))
@@ -35,7 +35,11 @@ struct QrScannerView: View {
             
         }
         .fullScreenCover(isPresented: $scannerWork.displayUsers){
-            EmployeeList(scannerWork: scannerWork)
+            if scannerWork.kitchen == nil{
+                EmployeeList(scannerWork: scannerWork)
+            }else{
+                KitchenView()
+            }
         }
     }
 }
@@ -109,7 +113,7 @@ struct EmployeeList: View{
             }
         }
         .onAppear{
-            scannerWork.retriveRestaurant(with: scannerWork.qrCode)
+            scannerWork.retriveRestaurant(with: scannerWork.restaurantQrCode)
         }
         .navigationBarHidden(true)
         .fullScreenCover(item: $presentFullScreenCover) { item in

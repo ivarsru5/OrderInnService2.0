@@ -23,7 +23,7 @@ struct QRURL{
         guard let url = URL.init(string: input) else { return nil }
         guard url.scheme == "orderInnService" && url.host == "qr1" else{ return nil }
         let pathParts = url.path.split(separator: "/")
-        guard pathParts.count == 1 else { return nil }
+        guard pathParts.count == 2 else { return nil }
         return QRURL.init(restaurant: String.init(pathParts[0]), kitchen: String.init(pathParts[1]))
     }
 }

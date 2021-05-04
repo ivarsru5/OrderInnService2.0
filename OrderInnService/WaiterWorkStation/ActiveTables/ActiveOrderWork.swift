@@ -27,12 +27,13 @@ class ActiveOrderWork: ObservableObject{
                 return
             }
             
-            self.activeOrders = snapshotDocument.compactMap { activeOrderSnapshot -> ActiveOrder? in
+            let collectdeTables = snapshotDocument.compactMap { activeOrderSnapshot -> ActiveOrder? in
                 guard let collectedOrder = ActiveOrder(snapshot: activeOrderSnapshot) else{
                     return nil
                 }
                 return collectedOrder
             }
+            self.activeOrders = collectdeTables.filter{ $0.placedBy == UserDefaults.standard.currentUser }
         }
     }
 }

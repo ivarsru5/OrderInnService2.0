@@ -13,9 +13,10 @@ class QrCodeScannerWork: ObservableObject{
     @Published var users = [Restaurant.RestaurantEmploye]()
     @Published var displayUsers = false
     @Published var loadingQuery = true
+    @Published var kitchen: String?
     let databse = Firestore.firestore()
     
-    @Published var qrCode: String = ""{
+    @Published var restaurantQrCode: String = ""{
         didSet{
             self.displayUsers.toggle()
         }
@@ -74,7 +75,7 @@ class QrCodeScannerWork: ObservableObject{
     }
     
     func updateData(with userId: Restaurant.RestaurantEmploye){
-        databse.collection("Restaurants").document(qrCode).collection("Users").document(userId.id).updateData([
+        databse.collection("Restaurants").document(restaurantQrCode).collection("Users").document(userId.id).updateData([
             "isActive" : false
         ]) { (error) in
             if let err = error{
