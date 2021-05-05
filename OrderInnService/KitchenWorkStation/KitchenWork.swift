@@ -24,31 +24,32 @@ class KitchenWork: ObservableObject{
                     return
                 }
                 
-                self.activeKitchenOrders = snapshotDodument.compactMap { activeOrderSnapshot -> ActiveOrder? in
+                let kitchenItems = snapshotDodument.compactMap { activeOrderSnapshot -> ActiveOrder? in
                     guard let collectedOrder = ActiveOrder(snapshot: activeOrderSnapshot) else{
                         return nil
                     }
                     return collectedOrder
                 }
-            }
-        
-        retriveKitchenOrder()
-    }
-    
-    func retriveKitchenOrder(){
-        self.activeOrder = activeKitchenOrders.map { order -> OrderOverview in
-            let menuItems = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
-                let seperator = "/"
-                let partParts = item.components(separatedBy: seperator)
-                let itemName = partParts[0]
                 
-                let collectedItems = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: nil)
-                return collectedItems
+                let activeKitchenItems = kitchenItems.map{ order -> OrderOverview in
+                    var items = [OrderOverview.OrderOverviewEntry]()
+                    
+                    let orderItems = order.kitchenItems.map{ item -> OrderOverview.OrderOverviewEntry in
+                        let seperator = "/"
+                        let partParts = item.components(separatedBy: seperator)
+                        let itemName = partParts[0]
+                        
+                        let collectedItem = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: nil)
+                        return collectedItem
+                    }
+                    items.append(contentsOf: orderItems)
+                    
+                    let collectedOrder = OrderOverview(id: order.id, placedBy: order.placedBy, orderCompleted: order.orderCompleted, orderClosed: order.orderClosed, totalPrice: order.totalPrice, forTable: order.forTable, inZone: order.forZone, withItems: items)
+                    return collectedOrder
+                }
+                self.activeOrder = activeKitchenItems
             }
-            let collectedOrder = OrderOverview(id: order.id, placedBy: order.placedBy, orderCompleted: order.orderCompleted, orderClosed: order.orderClosed, totalPrice: order.totalPrice, forTable: order.forTable, inZone: order.forZone, withItems: menuItems)
-            return collectedOrder
         }
-    }
     
     func getRestaurantName(fromQrString: String) -> String{
         let seperator = "-"
