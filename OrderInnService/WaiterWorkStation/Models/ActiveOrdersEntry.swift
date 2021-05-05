@@ -14,12 +14,13 @@ struct OrderOverview: Identifiable{
     var orderClosed: Bool = false
     var totalPrice: Double = 0.00
     var forTable: String = ""
+    var inZone: String = ""
     var withItems: [OrderOverviewEntry] = []
         
     struct OrderOverviewEntry: Identifiable{
         var id = UUID().uuidString
         var itemName: String = ""
-        var itemPrice: Double = 0.00
+        var itemPrice: Double?
     }
 }
 

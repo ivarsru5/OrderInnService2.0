@@ -61,7 +61,7 @@ class RestaurantOrderWork: ObservableObject{
         ]
         
         databse.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
+            .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("Order")
             .addDocument(data: documentData) { error in
                 if let err = error{

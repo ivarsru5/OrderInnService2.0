@@ -18,14 +18,24 @@ extension UserDefaults{
         }
     }
     
-    var qrStringKey: String{
+    var wiaterQrStringKey: String{
         get{
-            return(UserDefaults.standard.value(forKey: "qr_scanner_string") as? String ?? "")
+            return(UserDefaults.standard.value(forKey: "wiater_Qr_String_Key") as? String ?? "")
         }
         set{
-            UserDefaults.standard.setValue(newValue, forKey: "qr_scanner_string")
+            UserDefaults.standard.setValue(newValue, forKey: "wiater_Qr_String_Key")
         }
     }
+    
+    var kitchenQrStringKey: String{
+        get{
+            return(UserDefaults.standard.value(forKey: "kitchen_Qr_String_Key") as? String ?? "")
+        }
+        set{
+            UserDefaults.standard.setValue(newValue, forKey: "kitchen_Qr_String_Key")
+        }
+    }
+    
     var currentUser: String{
         get{
             return (UserDefaults.standard.value(forKey: "current_user") as? String ?? "")

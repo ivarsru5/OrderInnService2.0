@@ -35,7 +35,7 @@ class QrCodeScannerWork: ObservableObject{
     }
     
     func retriveRestaurant(with id: String){
-        UserDefaults.standard.qrStringKey = id
+        UserDefaults.standard.wiaterQrStringKey = id
         databse.collection("Restaurants").document(id).getDocument{ document, error in
             
             if let document = document{

@@ -21,7 +21,7 @@ class MenuOverViewWork: ObservableObject{
     }
     
     func getMenuCategory(){
-        database.collection("Restaurants").document(UserDefaults.standard.qrStringKey).collection("MenuCategory").getDocuments { snapshot, error in
+        database.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("MenuCategory").getDocuments { snapshot, error in
             guard let documentSnapshot = snapshot?.documents else {
                 print("There is no categorys")
                 return
@@ -38,7 +38,7 @@ class MenuOverViewWork: ObservableObject{
     
     func getMenuItems(with categoryID: MenuCategory){
         database.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
+            .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("MenuCategory")
             .document(categoryID.id)
             .collection("Menu")

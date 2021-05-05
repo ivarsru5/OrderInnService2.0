@@ -60,7 +60,7 @@ struct ActiveOrderOverview: View {
                             
                             Section(header: Text("Submited item's")){
                                 ForEach(orderOverview.collectedOrder.withItems, id: \.id){ item in
-                                    SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice)
+                                    SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice!)
                                 }
                             }
                         }

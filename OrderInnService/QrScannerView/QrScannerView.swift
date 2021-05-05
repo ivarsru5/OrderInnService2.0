@@ -38,7 +38,9 @@ struct QrScannerView: View {
             if scannerWork.kitchen == nil{
                 EmployeeList(scannerWork: scannerWork)
             }else{
-                KitchenView()
+                NavigationView{
+                    KitchenView(qrScanner: scannerWork)
+                }
             }
         }
     }

@@ -22,7 +22,7 @@ class TableSelectionWork: ObservableObject{
     
     func getTables(with zoneId: Zones){
         database.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
+            .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("Zone")
             .document(zoneId.id)
             .collection("Tables")

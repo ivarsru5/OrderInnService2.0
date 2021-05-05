@@ -79,7 +79,7 @@ class ActiveOrderOverviewWork: ObservableObject{
     
     func getExtraOrders(from order: ActiveOrder){
         databse.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
+            .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("ExtraOrder").whereField("forOrder", isEqualTo: order.id)
             .getDocuments { snapshot, error in
                 
@@ -166,7 +166,7 @@ class ActiveOrderOverviewWork: ObservableObject{
         drinkName.removeAll()
         
         databse.collection("Restaurants")
-            .document(UserDefaults.standard.qrStringKey)
+            .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("ExtraOrder")
             .addDocument(data: documentData){ error in
                 if let error = error{

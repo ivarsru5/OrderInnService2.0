@@ -20,7 +20,7 @@ class ActiveOrderWork: ObservableObject{
     }
     
     func retriveActiveOrders(){
-        databse.collection("Restaurants").document(UserDefaults.standard.qrStringKey).collection("Order").getDocuments { snapshot, error in
+        databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Order").getDocuments { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no documents")

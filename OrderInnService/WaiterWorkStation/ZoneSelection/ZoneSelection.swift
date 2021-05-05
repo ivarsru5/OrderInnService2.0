@@ -44,7 +44,7 @@ struct ZoneSelection: View {
             })
         }
         .onAppear{
-            qrScanner.retriveRestaurant(with: UserDefaults.standard.qrStringKey)
+            qrScanner.retriveRestaurant(with: UserDefaults.standard.wiaterQrStringKey)
             zoneWork.getZones()
             print(UserDefaults.standard.currentUser)
         }

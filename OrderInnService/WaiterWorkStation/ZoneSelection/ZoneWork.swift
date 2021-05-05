@@ -21,7 +21,7 @@ class ZoneWork: ObservableObject{
     }
     
     func getZones(){
-        databse.collection("Restaurants").document(UserDefaults.standard.qrStringKey).collection("Zone").getDocuments { snapshot, error in
+        databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Zone").getDocuments { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no zones")

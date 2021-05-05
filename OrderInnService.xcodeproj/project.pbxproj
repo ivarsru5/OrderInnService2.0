@@ -14,6 +14,7 @@
 		580E1E2D2636D61300A16228 /* ActiveOrderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E1E2C2636D61300A16228 /* ActiveOrderView.swift */; };
 		580F92B52639D30E00E710A0 /* ExtraItemCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */; };
 		580FEE3D26412C07006ED835 /* KitchenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580FEE3C26412C07006ED835 /* KitchenView.swift */; };
+		580FEE3F2642314A006ED835 /* KitchenWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580FEE3E2642314A006ED835 /* KitchenWork.swift */; };
 		5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F942262DE4EA00050F2C /* UserDefaultsExtension.swift */; };
 		5811F946262DE53000050F2C /* LounchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F945262DE53000050F2C /* LounchScreen.swift */; };
 		5811F94A262DE7A500050F2C /* Zones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F949262DE7A500050F2C /* Zones.swift */; };
@@ -59,6 +60,7 @@
 		580E1E2C2636D61300A16228 /* ActiveOrderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderView.swift; sourceTree = "<group>"; };
 		580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraItemCategoryView.swift; sourceTree = "<group>"; };
 		580FEE3C26412C07006ED835 /* KitchenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenView.swift; sourceTree = "<group>"; };
+		580FEE3E2642314A006ED835 /* KitchenWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenWork.swift; sourceTree = "<group>"; };
 		5811F942262DE4EA00050F2C /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
 		5811F945262DE53000050F2C /* LounchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LounchScreen.swift; sourceTree = "<group>"; };
 		5811F949262DE7A500050F2C /* Zones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zones.swift; sourceTree = "<group>"; };
@@ -184,6 +186,7 @@
 		580FEE3B26412BF3006ED835 /* KitchenWorkStation */ = {
 			isa = PBXGroup;
 			children = (
+				580FEE3E2642314A006ED835 /* KitchenWork.swift */,
 				580FEE3C26412C07006ED835 /* KitchenView.swift */,
 			);
 			path = KitchenWorkStation;
@@ -468,6 +471,7 @@
 				58F2895B26384E6200C973DB /* ActiveOrderOverview.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,
 				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
+				580FEE3F2642314A006ED835 /* KitchenWork.swift in Sources */,
 				58B5D4B82630273800FC9223 /* Tables.swift in Sources */,
 				580F92B52639D30E00E710A0 /* ExtraItemCategoryView.swift in Sources */,
 				5813CC5F26309FF700924ED9 /* MenuWork.swift in Sources */,
