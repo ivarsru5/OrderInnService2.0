@@ -19,6 +19,8 @@
 		5811F946262DE53000050F2C /* LounchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F945262DE53000050F2C /* LounchScreen.swift */; };
 		5811F94A262DE7A500050F2C /* Zones.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F949262DE7A500050F2C /* Zones.swift */; };
 		5811F94E262DE84100050F2C /* ZoneWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F94D262DE84100050F2C /* ZoneWork.swift */; };
+		581340C72645213C003E9BC6 /* OrderOverViewWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581340C62645213C003E9BC6 /* OrderOverViewWork.swift */; };
+		581340C926452152003E9BC6 /* KitchenOrderOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581340C826452152003E9BC6 /* KitchenOrderOverView.swift */; };
 		5813CC5626309EB700924ED9 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5813CC5526309EB700924ED9 /* MenuView.swift */; };
 		5813CC5926309EF200924ED9 /* MenuCategory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5813CC5826309EF200924ED9 /* MenuCategory.swift */; };
 		5813CC5C26309EFB00924ED9 /* MenuItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5813CC5B26309EFB00924ED9 /* MenuItem.swift */; };
@@ -65,6 +67,8 @@
 		5811F945262DE53000050F2C /* LounchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LounchScreen.swift; sourceTree = "<group>"; };
 		5811F949262DE7A500050F2C /* Zones.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Zones.swift; sourceTree = "<group>"; };
 		5811F94D262DE84100050F2C /* ZoneWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneWork.swift; sourceTree = "<group>"; };
+		581340C62645213C003E9BC6 /* OrderOverViewWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderOverViewWork.swift; sourceTree = "<group>"; };
+		581340C826452152003E9BC6 /* KitchenOrderOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenOrderOverView.swift; sourceTree = "<group>"; };
 		5813CC5526309EB700924ED9 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		5813CC5826309EF200924ED9 /* MenuCategory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuCategory.swift; sourceTree = "<group>"; };
 		5813CC5B26309EFB00924ED9 /* MenuItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuItem.swift; sourceTree = "<group>"; };
@@ -183,13 +187,39 @@
 			path = WaiterWorkStation;
 			sourceTree = "<group>";
 		};
-		580FEE3B26412BF3006ED835 /* KitchenWorkStation */ = {
+		580FEE3B26412BF3006ED835 /* OrderPreparation */ = {
+			isa = PBXGroup;
+			children = (
+				581340C2264520D6003E9BC6 /* Kitchen */,
+			);
+			path = OrderPreparation;
+			sourceTree = "<group>";
+		};
+		581340C2264520D6003E9BC6 /* Kitchen */ = {
+			isa = PBXGroup;
+			children = (
+				581340C526452112003E9BC6 /* KitchenOrderOverView */,
+				581340C3264520F9003E9BC6 /* KitchenOrders */,
+			);
+			path = Kitchen;
+			sourceTree = "<group>";
+		};
+		581340C3264520F9003E9BC6 /* KitchenOrders */ = {
 			isa = PBXGroup;
 			children = (
 				580FEE3E2642314A006ED835 /* KitchenWork.swift */,
 				580FEE3C26412C07006ED835 /* KitchenView.swift */,
 			);
-			path = KitchenWorkStation;
+			path = KitchenOrders;
+			sourceTree = "<group>";
+		};
+		581340C526452112003E9BC6 /* KitchenOrderOverView */ = {
+			isa = PBXGroup;
+			children = (
+				581340C62645213C003E9BC6 /* OrderOverViewWork.swift */,
+				581340C826452152003E9BC6 /* KitchenOrderOverView.swift */,
+			);
+			path = KitchenOrderOverView;
 			sourceTree = "<group>";
 		};
 		5813CC5426309E6D00924ED9 /* MenuSelection */ = {
@@ -223,7 +253,7 @@
 			isa = PBXGroup;
 			children = (
 				582066D72628129400D3BCCA /* OrderInnServiceApp.swift */,
-				580FEE3B26412BF3006ED835 /* KitchenWorkStation */,
+				580FEE3B26412BF3006ED835 /* OrderPreparation */,
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
 				5838DB2D262820A2001698D7 /* QrScannerView */,
 				58F07AAE26282FC300574D4F /* Extensions */,
@@ -448,6 +478,7 @@
 				58F07AA22628218400574D4F /* QrScannerViewController.swift in Sources */,
 				581DF41926371B3B00B426FC /* ActiveOrder.swift in Sources */,
 				58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */,
+				581340C926452152003E9BC6 /* KitchenOrderOverView.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
 				5811F946262DE53000050F2C /* LounchScreen.swift in Sources */,
@@ -457,6 +488,7 @@
 				58F07AA52628255200574D4F /* QrCodeScannerView.swift in Sources */,
 				582066DA2628129400D3BCCA /* QrScannerView.swift in Sources */,
 				580509182629AB07007CF39B /* QrParsing.swift in Sources */,
+				581340C72645213C003E9BC6 /* OrderOverViewWork.swift in Sources */,
 				5808DDEC2632BD6800D0B0EC /* RestaurantOrderWork.swift in Sources */,
 				580E1E2D2636D61300A16228 /* ActiveOrderView.swift in Sources */,
 				5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */,

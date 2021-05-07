@@ -187,20 +187,20 @@ struct AddedExtraItemsCell: View{
     }
 }
 
-struct SubmittedExtraOrderCell: View{
-    var item: MenuItem
-    
-    var body: some View{
-        HStack{
-            Text(item.name)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-            
-            Spacer()
-            
-            Text("\(item.price,specifier: "%.2f")EUR")
-                .italic()
-                .foregroundColor(Color(UIColor.label))
-        }
-    }
-}
+//struct SubmittedExtraOrderCell: View{
+//    var item: MenuItem
+//    
+//    var body: some View{
+//        HStack{
+//            Text(item.name)
+//                .bold()
+//                .foregroundColor(Color(UIColor.label))
+//            
+//            Spacer()
+//            
+//            Text("\(item.price,specifier: "%.2f")EUR")
+//                .italic()
+//                .foregroundColor(Color(UIColor.label))
+//        }
+//    }
+//}
