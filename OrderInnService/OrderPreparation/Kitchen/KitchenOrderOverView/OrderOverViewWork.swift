@@ -14,8 +14,6 @@ class KitchenOrderWork: ObservableObject{
     
     let databse = Firestore.firestore()
     
-    @Published var submittedExtraOrder = [ExtraOrderOverview]()
-    
     func collectAllOrderParts(withExtras: [ExtraOrderOverview]){
         let extraPrice = withExtras.map{ $0.extraPrice }
         let extraOrderPrice = extraPrice.reduce(0, +)
@@ -24,7 +22,7 @@ class KitchenOrderWork: ObservableObject{
         self.collectedOrder = ClientSubmittedOrder(id: submitedOrder.id, placedBy: submitedOrder.placedBy, orderCompleted: submitedOrder.orderCompleted, orderClosed: submitedOrder.orderClosed, totalPrice: totalOrderPrice, forTable: submitedOrder.forTable, withItems: submitedOrder.withItems, withExtraItems: withExtras)
     }
     
-    func retreveSubmitedItems(from items: ActiveOrder){
+    func retreveSubmitedItems(from items: ActiveOrder, withItems: [ExtraOrderOverview]){
         let submittedDrinks = items.barItems.map{ item -> OrderOverview.OrderOverviewEntry in
             let seperator = "/"
             let partParts = item.components(separatedBy: seperator)
@@ -48,60 +46,37 @@ class KitchenOrderWork: ObservableObject{
         submitedItems.append(contentsOf: submittedDrinks)
         
         self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
-        
-        getExtraOrders(from: items)
+        self.collectAllOrderParts(withExtras: withItems)
     }
     
-    func getExtraOrders(from order: ActiveOrder){
+    func deleteOrder(fromOrder: ActiveOrder, withExtras: [ExtraOrderOverview]){
         databse.collection("Restaurants")
-            .document(UserDefaults.standard.wiaterQrStringKey)
-            .collection("ExtraOrder").whereField("forOrder", isEqualTo: order.id)
-            .addSnapshotListener { snapshot, error in
-                
-                guard let snapshotDocument = snapshot?.documents else{
-                    print("There is no documents")
-                    return
-                }
-                
-                let activeExtraOrders = snapshotDocument.compactMap{ activeExtras -> ActiveExtraOrder? in
-                    guard let collectedExtras = ActiveExtraOrder(snapshot: activeExtras) else{
-                        return nil
-                    }
-                    return collectedExtras
-                }
-                
-                let extraOrder = activeExtraOrders.map{ order -> ExtraOrderOverview in
-                    var extraOrderEntry = [ExtraOrderOverview.ExtraOrderEntry]()
-                    
-                    let kitchenItems = order.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
-                        let seperator = "/"
-                        let partParts = item.components(separatedBy: seperator)
-                        let itemName = partParts[0]
-                        let itemPrice = Double(partParts[1])!
+            .document(UserDefaults.standard.kitchenQrStringKey)
+            .collection("Order")
+            .document(fromOrder.id)
+            .delete(){ error in
+                if let error = error{
+                    print("Document was not deleted \(error)")
+                }else{
+                    print("Extra Orders deleted.")
+                    for order in withExtras{
+                        let orderID = order.forOrder
                         
-                        let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
-                        return collectedItem
+                        if orderID == fromOrder.id{
+                            self.databse.collection("Restaurants")
+                                .document(UserDefaults.standard.kitchenQrStringKey)
+                                .collection("ExtraOrder")
+                                .document(order.id)
+                                .delete() { error in
+                                    if let error = error{
+                                        print("Document was not deleted \(error)")
+                                    }else{
+                                        print("Extra Orders deleted.")
+                                }
+                            }
+                        }
                     }
-                    
-                    extraOrderEntry.append(contentsOf: kitchenItems)
-                    
-                    let barItems = order.extraBarItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
-                        let seperator = "/"
-                        let partParts = item.components(separatedBy: seperator)
-                        let itemName = partParts[0]
-                        let itemPrice = Double(partParts[1])!
-                        
-                        let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
-                        return collectedItem
-                    }
-                    
-                    extraOrderEntry.append(contentsOf: barItems)
-                    
-                    let collectedOrder = ExtraOrderOverview(id: order.id, extraOrderPart: order.extraOrderPart, extraPrice: order.extraOrderPrice, forOrder: order.orderId, withItems: extraOrderEntry)
-                    return collectedOrder
+                }
             }
-                self.submittedExtraOrder = extraOrder.sorted { $0.extraOrderPart! > $1.extraOrderPart! }
-                self.collectAllOrderParts(withExtras: self.submittedExtraOrder)
-        }
     }
 }

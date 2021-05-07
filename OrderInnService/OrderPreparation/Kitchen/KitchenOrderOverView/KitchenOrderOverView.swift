@@ -55,6 +55,19 @@ struct KitchenOrderOverView: View {
                         }
                         .listStyle(InsetGroupedListStyle())
                     }
+                    Button(action: {
+                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: activeOrder.submittedExtraOrder)
+                    }, label: {
+                        Text("order completed")
+                            .bold()
+                            .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
+                                   minHeight: 0, idealHeight: 45, maxHeight: 55,
+                                   alignment: .center)
+                            .foregroundColor(Color(UIColor.systemBackground))
+                            .background(Color(UIColor.label))
+                            .cornerRadius(15)
+                    })
+                    .padding()
                 }
         }
         .navigationBarBackButtonHidden(true)
@@ -70,7 +83,7 @@ struct KitchenOrderOverView: View {
                                     })
                                 })
         .onAppear{
-            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
+            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!, withItems: activeOrder.submittedExtraOrder)
         }
     }
 }
