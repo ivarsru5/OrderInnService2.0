@@ -35,12 +35,14 @@ struct KitchenOrderOverView: View {
                                 Section(header: Text("Extra order: \(order.extraOrderPart!)")){
                                     ForEach(order.withItems, id: \.id){ item in
                                         HStack{
-                                            Image(systemName: "circle")
-                                                .foregroundColor(Color(UIColor.label))
-                                                .font(.custom("SF Symbols", size: 7.5))
-                                            
                                             Text(item.itemName)
                                                 .bold()
+                                                .foregroundColor(Color(UIColor.label))
+                                            
+                                            Spacer()
+                                            
+                                            Text("\(item.itemPrice, specifier: "%.2f")EUR")
+                                                .italic()
                                                 .foregroundColor(Color(UIColor.label))
                                         }
                                     }
@@ -49,14 +51,14 @@ struct KitchenOrderOverView: View {
                             
                             Section(header: Text("Submited item's")){
                                 ForEach(orderOverview.collectedOrder.withItems, id: \.id){ item in
-                                    MainOrderCell(itemName: item.itemName)
+                                    SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice!)
                                 }
                             }
                         }
                         .listStyle(InsetGroupedListStyle())
                     }
                     Button(action: {
-                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: activeOrder.submittedExtraOrder)
+                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: orderOverview.collectedOrder.withExtraItems)
                     }, label: {
                         Text("order completed")
                             .bold()
@@ -83,7 +85,7 @@ struct KitchenOrderOverView: View {
                                     })
                                 })
         .onAppear{
-            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!, withItems: activeOrder.submittedExtraOrder)
+            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
         }
     }
 }
