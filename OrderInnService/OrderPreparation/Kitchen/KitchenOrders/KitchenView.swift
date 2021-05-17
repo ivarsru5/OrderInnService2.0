@@ -14,10 +14,10 @@ struct KitchenView: View {
     
     var body: some View {
         ZStack{
-            if !kitchen.activeOrders.isEmpty{
+            if !kitchen.collectedOrders.isEmpty{
                 List{
                     Section(header: Text("Recived Orders")){
-                        ForEach(kitchen.activeOrders, id: \.id){ order in
+                        ForEach(kitchen.collectedOrders, id: \.id){ order in
                             Button(action: {
                                 self.kitchen.selectedOrder = order
                                 self.showOrderOverview.toggle()
@@ -28,7 +28,7 @@ struct KitchenView: View {
                                             .bold()
                                             .foregroundColor(Color(UIColor.label))
                                         
-                                        Text(order.forZone)
+                                        Text(order.inZone)
                                             .bold()
                                             .foregroundColor(Color(UIColor.label))
                                     }
@@ -62,7 +62,7 @@ struct KitchenView: View {
         }
         .navigationTitle("\(kitchen.getRestaurantName(fromQrString: qrScanner.restaurantQrCode)): \(qrScanner.kitchen!)")
         .onAppear{
-            kitchen.retriveActiveOrders()
+            kitchen.retriveActiveOrders(fromKey: qrScanner)
         }
     }
 }

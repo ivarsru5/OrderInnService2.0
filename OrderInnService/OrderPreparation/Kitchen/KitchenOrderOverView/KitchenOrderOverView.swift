@@ -31,16 +31,16 @@ struct KitchenOrderOverView: View {
                     VStack{
                         
                         List{
-                            ForEach(orderOverview.collectedOrder.withExtraItems, id: \.id){ order in
+                            ForEach(activeOrder.selectedOrder!.withExtraItems, id: \.id){ order in
                                 Section(header: Text("Extra order: \(order.extraOrderPart!)")){
                                     ForEach(order.withItems, id: \.id){ item in
                                         HStack{
                                             Text(item.itemName)
                                                 .bold()
                                                 .foregroundColor(Color(UIColor.label))
-                                            
+
                                             Spacer()
-                                            
+
                                             Text("\(item.itemPrice, specifier: "%.2f")EUR")
                                                 .italic()
                                                 .foregroundColor(Color(UIColor.label))
@@ -50,7 +50,7 @@ struct KitchenOrderOverView: View {
                             }
                             
                             Section(header: Text("Submited item's")){
-                                ForEach(orderOverview.collectedOrder.withItems, id: \.id){ item in
+                                ForEach(activeOrder.selectedOrder!.withItems, id: \.id){ item in
                                     SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice!)
                                 }
                             }
@@ -58,7 +58,7 @@ struct KitchenOrderOverView: View {
                         .listStyle(InsetGroupedListStyle())
                     }
                     Button(action: {
-                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: orderOverview.collectedOrder.withExtraItems)
+                        //orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: orderOverview.collectedOrder.withExtraItems)
                     }, label: {
                         Text("order completed")
                             .bold()
@@ -73,7 +73,7 @@ struct KitchenOrderOverView: View {
                 }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationTitle(activeOrder.selectedOrder!.forZone)
+        .navigationTitle(activeOrder.selectedOrder!.inZone)
         .navigationBarItems(trailing:
                                 HStack{
                                     Button(action: {
@@ -84,9 +84,9 @@ struct KitchenOrderOverView: View {
                                             .foregroundColor(.red)
                                     })
                                 })
-        .onAppear{
-            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
-        }
+//        .onAppear{
+//            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
+//        }
     }
 }
 
