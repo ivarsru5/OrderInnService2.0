@@ -21,7 +21,7 @@ struct KitchenOrderOverView: View {
                                 .bold()
                             
                             Text(activeOrder.selectedOrder!.forTable)
-                                .foregroundColor(.white)
+                                .foregroundColor(Color(UIColor.label))
                             
                             Spacer()
                         }

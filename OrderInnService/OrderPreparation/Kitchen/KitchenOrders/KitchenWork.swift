@@ -11,10 +11,6 @@ import FirebaseFirestore
 class KitchenWork: ObservableObject{
     @Published var collectedOrders = [ClientSubmittedOrder]()
     @Published var showActiveOrder = false
-    let databse = Firestore.firestore()
-    
-    var extraOrder = [ActiveExtraOrder]()
-    var order = [OrderOverview]()
     
     @Published var selectedOrder: ClientSubmittedOrder?{
         didSet{
@@ -22,116 +18,104 @@ class KitchenWork: ObservableObject{
         }
     }
     
+    var activeOrders = [KitchenOrder]()
+    var databse = Firestore.firestore()
+    
     func retriveActiveOrders(fromKey: QrCodeScannerWork){
+        activeOrders.removeAll()
         let group = DispatchGroup()
         UserDefaults.standard.kitchenQrStringKey = fromKey.restaurantQrCode
-        
+    
         group.enter()
         databse.collection("Restaurants")
             .document(UserDefaults.standard.kitchenQrStringKey)
             .collection("Order")
             .addSnapshotListener { snapshot, error in
-            
-            guard let snapshotDocument = snapshot?.documents else{
-                print("There is no documents")
-                group.leave()
-                return
-            }
-            
-            let collectedOrders = snapshotDocument.compactMap { activeOrderSnapshot -> ActiveOrder? in
-                guard let collectedOrder = ActiveOrder(snapshot: activeOrderSnapshot) else{
-                    return nil
+    
+                guard let snapshotDocument = snapshot?.documents else{
+                    print("There is no documents")
+                    group.leave()
+                    return
                 }
-                self.getExtraOrders(from: collectedOrder, dispach: group)
-                return collectedOrder
+    
+                for document in snapshotDocument{
+                    var activeExtraOrder = [ActiveExtraOrder]()
+    
+                    group.enter()
+                    self.databse.collection("Restaurants")
+                        .document(UserDefaults.standard.kitchenQrStringKey)
+                        .collection("ExtraOrder").whereField("forOrder", isEqualTo: document.documentID)
+                        .getDocuments { snapshot, error in
+    
+                            guard let snapshotDocument = snapshot?.documents else{
+                                group.leave()
+                                return
+                            }
+    
+                            for extraOrder in snapshotDocument{
+                                guard let collectedExtraOrder = ActiveExtraOrder(snapshot: extraOrder) else{
+                                    return
+                                }
+                                activeExtraOrder.append(collectedExtraOrder)
+                            }
+    
+                            guard let collectedOrder = KitchenOrder(snapshot: document, extraOrders: activeExtraOrder) else{
+                                return
+                            }
+    
+                            self.activeOrders.append(collectedOrder)
+    
+                            group.leave()
+                        }
+                }
+                //self.activeOrders = retrivedOrders
+                group.leave()
             }
-                
-                self.order = collectedOrders.map{ order -> OrderOverview in
-                    let items = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
+    
+        group.notify(queue: .main){
+            self.collectedOrders = self.activeOrders.map{ order -> ClientSubmittedOrder in
+    
+                let items = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
+                    let seperator = "/"
+                    let partParts = item.components(separatedBy: seperator)
+                    let itemName = partParts[0]
+                    let itemPrice = Double(partParts[1])
+    
+                    let collectedItem = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: itemPrice)
+                    return collectedItem
+                }
+    
+                let extraOrders = order.withExtras.map{ extraOrder -> ExtraOrderOverview in
+    
+                    let extraItems = extraOrder.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
                         let seperator = "/"
                         let partParts = item.components(separatedBy: seperator)
                         let itemName = partParts[0]
                         let itemPrice = Double(partParts[1])
-                        
-                        let collectedItem = OrderOverview.OrderOverviewEntry(itemName: itemName, itemPrice: itemPrice)
-                        return collectedItem
+    
+                        return ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice!)
                     }
-                    let collectedOrder = OrderOverview(id: order.id,
-                                                       placedBy: order.placedBy,
-                                                       orderCompleted: order.orderCompleted,
-                                                       orderClosed: order.orderClosed,
-                                                       totalPrice: order.totalPrice,
-                                                       forTable: order.forTable,
-                                                       inZone: order.forZone,
-                                                       withItems: items)
-                    return collectedOrder
+    
+                    return ExtraOrderOverview(id: extraOrder.id,
+                                              extraOrderPart: extraOrder.extraOrderPart,
+                                              extraPrice: extraOrder.extraOrderPrice,
+                                              forOrder: extraOrder.orderId,
+                                              withItems: extraItems)
                 }
-                group.leave()
-        }
-        
-        group.notify(queue: .main){
-            self.collectedOrders = self.order.map { order -> ClientSubmittedOrder in
-                let extraPart = self.extraOrder.map { extra -> ExtraOrderOverview in
-                    var extraOverview: ExtraOrderOverview!
-                    
-                    if extra.orderId == order.id{
-                            let kitchenItems = extra.extraItems.map{ item -> ExtraOrderOverview.ExtraOrderEntry in
-                                let seperator = "/"
-                                let partParts = item.components(separatedBy: seperator)
-                                let itemName = partParts[0]
-                                let itemPrice = Double(partParts[1])!
-                                
-                                let collectedItem = ExtraOrderOverview.ExtraOrderEntry(itemName: itemName, itemPrice: itemPrice)
-                                return collectedItem
-                            }
-                        
-                        extraOverview = ExtraOrderOverview(id: extra.id,
-                                                           extraOrderPart: extra.extraOrderPart,
-                                                           extraPrice: extra.extraOrderPrice,
-                                                           forOrder: extra.orderId,
-                                                           withItems: kitchenItems)
-                    }
-                    return extraOverview
-                }
-                
-                let entry = ClientSubmittedOrder(id: order.id,
-                                                 placedBy: order.placedBy,
-                                                 orderCompleted: order.orderCompleted,
-                                                 orderClosed: order.orderClosed,
-                                                 totalPrice: order.totalPrice,
-                                                 forTable: order.forTable,
-                                                 inZone: order.inZone,
-                                                 withItems: order.withItems,
-                                                 withExtraItems: extraPart)
-                return entry
+    
+                return ClientSubmittedOrder(id: order.id,
+                                            placedBy: order.placedBy,
+                                            orderCompleted: order.orderCompleted,
+                                            orderClosed: order.orderClosed,
+                                            totalPrice: order.totalPrice,
+                                            forTable: order.forTable,
+                                            inZone: order.forZone,
+                                            withItems: items,
+                                            withExtraItems: extraOrders)
             }
         }
     }
-    
-    func getExtraOrders(from order: ActiveOrder, dispach: DispatchGroup){
-        dispach.enter()
-        databse.collection("Restaurants")
-            .document(UserDefaults.standard.kitchenQrStringKey)
-            .collection("ExtraOrder").whereField("forOrder", isEqualTo: order.id)
-            .addSnapshotListener { snapshot, error in
-                
-                guard let snapshotDocument = snapshot?.documents else{
-                    print("There is no documents")
-                    dispach.leave()
-                    return
-                }
-                
-                self.extraOrder = snapshotDocument.compactMap{ activeExtras -> ActiveExtraOrder? in
-                    guard let collectedExtras = ActiveExtraOrder(snapshot: activeExtras) else{
-                        return nil
-                    }
-                    return collectedExtras
-                }
-                dispach.leave()
-            }
-    }
-    
-    
+
     func getRestaurantName(fromQrString: String) -> String{
         let seperator = "-"
         let path = fromQrString.components(separatedBy: seperator)
