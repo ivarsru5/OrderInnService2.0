@@ -75,7 +75,7 @@ class KitchenWork: ObservableObject{
             }
     
         group.notify(queue: .main){
-            self.collectedOrders = self.activeOrders.compactMap{ order -> ClientSubmittedOrder? in
+            let clientOrder = self.activeOrders.compactMap{ order -> ClientSubmittedOrder? in
     
                 let items = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
                     let seperator = "/"
@@ -104,7 +104,10 @@ class KitchenWork: ObservableObject{
                                               forOrder: extraOrder.orderId,
                                               withItems: extraItems)
                 }
-                if items.count > 0 || extraOrders.count > 0{
+                
+                let itemCount = items.count + extraOrders.count
+                
+                if itemCount > 0{
                     return ClientSubmittedOrder(id: order.id,
                                                 placedBy: order.placedBy,
                                                 orderOpened: order.orderOpened,
@@ -118,6 +121,7 @@ class KitchenWork: ObservableObject{
                     return nil
                 }
             }
+            self.collectedOrders = clientOrder.sorted { !$0.orderOpened && $1.orderOpened }
         }
     }
 
