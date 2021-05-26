@@ -56,7 +56,7 @@ class RestaurantOrderWork: ObservableObject{
             "forTable": restaurantOrder.forTable,
             "inZone": restaurantOrder.forZone,
             "toatlOrderPrice": totalPrice,
-            "orderComplete": restaurantOrder.orderCompleted,
+            "orderOpened": restaurantOrder.orderOpened,
             "orderClosed" : restaurantOrder.orderClosed
         ]
         

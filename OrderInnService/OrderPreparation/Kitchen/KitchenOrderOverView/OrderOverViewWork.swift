@@ -41,4 +41,19 @@ class KitchenOrderWork: ObservableObject{
             }
         }
     }
+    
+    func markOrderAsRead(forOrder: ClientSubmittedOrder){
+        databse.collection("Restaurants").document(UserDefaults.standard.kitchenQrStringKey)
+            .collection("Order")
+            .document(forOrder.id)
+            .updateData([
+                "orderOpened" : true
+            ]) { error in
+                if let err = error{
+                    print("Error updating document \(err)")
+                }else{
+                    print("Order opened")
+            }
+        }
+    }
 }

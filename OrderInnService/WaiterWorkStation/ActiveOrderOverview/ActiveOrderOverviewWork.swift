@@ -46,7 +46,7 @@ class ActiveOrderOverviewWork: ObservableObject{
         let totalOrderPrice = extraOrderPrice + submitedOrder.totalPrice
         self.totalCollectedOrderPrice = totalOrderPrice
         
-        self.collectedOrder = ClientSubmittedOrder(id: submitedOrder.id, placedBy: submitedOrder.placedBy, orderCompleted: submitedOrder.orderCompleted, orderClosed: submitedOrder.orderClosed, totalPrice: totalOrderPrice, forTable: submitedOrder.forTable, withItems: submitedOrder.withItems, withExtraItems: withExtras)
+        self.collectedOrder = ClientSubmittedOrder(id: submitedOrder.id, placedBy: submitedOrder.placedBy, orderOpened: submitedOrder.orderCompleted, orderClosed: submitedOrder.orderClosed, totalPrice: totalOrderPrice, forTable: submitedOrder.forTable, withItems: submitedOrder.withItems, withExtraItems: withExtras)
     }
     
     func retreveSubmitedItems(from items: ActiveOrder){
@@ -72,7 +72,7 @@ class ActiveOrderOverviewWork: ObservableObject{
         
         submitedItems.append(contentsOf: submittedDrinks)
         
-        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderCompleted, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
+        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderOpened, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
         
         getExtraOrders(from: items)
     }

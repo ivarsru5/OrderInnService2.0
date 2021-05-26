@@ -28,11 +28,11 @@ struct KitchenView: View {
                                     HStack{
                                         Text("In Zone: ")
                                             .bold()
-                                            .foregroundColor(Color(UIColor.label))
+                                            .foregroundColor(order.orderOpened ? Color(UIColor.label) : Color.red)
                                         
                                         Text(order.inZone)
                                             .bold()
-                                            .foregroundColor(Color(UIColor.label))
+                                            .foregroundColor(order.orderOpened ? Color(UIColor.label) : Color.red)
                                     }
                                     
                                     Spacer()

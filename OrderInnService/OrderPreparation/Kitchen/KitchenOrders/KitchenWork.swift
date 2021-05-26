@@ -75,7 +75,7 @@ class KitchenWork: ObservableObject{
             }
     
         group.notify(queue: .main){
-            self.collectedOrders = self.activeOrders.map{ order -> ClientSubmittedOrder in
+            self.collectedOrders = self.activeOrders.compactMap{ order -> ClientSubmittedOrder? in
     
                 let items = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
                     let seperator = "/"
@@ -104,16 +104,19 @@ class KitchenWork: ObservableObject{
                                               forOrder: extraOrder.orderId,
                                               withItems: extraItems)
                 }
-    
-                return ClientSubmittedOrder(id: order.id,
-                                            placedBy: order.placedBy,
-                                            orderCompleted: order.orderCompleted,
-                                            orderClosed: order.orderClosed,
-                                            totalPrice: order.totalPrice,
-                                            forTable: order.forTable,
-                                            inZone: order.forZone,
-                                            withItems: items,
-                                            withExtraItems: extraOrders)
+                if items.count > 0 || extraOrders.count > 0{
+                    return ClientSubmittedOrder(id: order.id,
+                                                placedBy: order.placedBy,
+                                                orderOpened: order.orderOpened,
+                                                orderClosed: order.orderClosed,
+                                                totalPrice: order.totalPrice,
+                                                forTable: order.forTable,
+                                                inZone: order.forZone,
+                                                withItems: items,
+                                                withExtraItems: extraOrders)
+                }else{
+                    return nil
+                }
             }
         }
     }

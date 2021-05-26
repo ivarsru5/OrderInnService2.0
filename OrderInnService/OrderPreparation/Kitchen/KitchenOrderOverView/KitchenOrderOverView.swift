@@ -84,5 +84,8 @@ struct KitchenOrderOverView: View {
                                             .foregroundColor(.red)
                                     })
                                 })
+        .onAppear{
+            orderOverview.markOrderAsRead(forOrder: activeOrder.selectedOrder!)
+        }
     }
 }
