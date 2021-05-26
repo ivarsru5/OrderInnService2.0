@@ -12,6 +12,8 @@ struct KitchenView: View {
     @ObservedObject var qrScanner: QrCodeScannerWork
     @State var showOrderOverview  = false
     
+    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
+    
     var body: some View {
         ZStack{
             if !kitchen.collectedOrders.isEmpty{
@@ -63,6 +65,12 @@ struct KitchenView: View {
         .navigationTitle("\(kitchen.getRestaurantName(fromQrString: qrScanner.restaurantQrCode)): \(qrScanner.kitchen!)")
         .onAppear{
             kitchen.retriveActiveOrders(fromKey: qrScanner)
+        }
+        .onReceive(timer){ time in
+            kitchen.retriveActiveOrders(fromKey: nil)
+        }
+        .onDisappear{
+            self.timer.upstream.connect().cancel()
         }
     }
 }

@@ -21,16 +21,19 @@ class KitchenWork: ObservableObject{
     var activeOrders = [KitchenOrder]()
     var databse = Firestore.firestore()
     
-    func retriveActiveOrders(fromKey: QrCodeScannerWork){
+    func retriveActiveOrders(fromKey: QrCodeScannerWork?){
         activeOrders.removeAll()
         let group = DispatchGroup()
-        UserDefaults.standard.kitchenQrStringKey = fromKey.restaurantQrCode
-    
+        
+        if fromKey != nil{
+            UserDefaults.standard.kitchenQrStringKey = fromKey!.restaurantQrCode
+        }
+        
         group.enter()
         databse.collection("Restaurants")
             .document(UserDefaults.standard.kitchenQrStringKey)
             .collection("Order")
-            .addSnapshotListener { snapshot, error in
+            .getDocuments { snapshot, error in
     
                 guard let snapshotDocument = snapshot?.documents else{
                     print("There is no documents")
@@ -46,7 +49,7 @@ class KitchenWork: ObservableObject{
                         .document(UserDefaults.standard.kitchenQrStringKey)
                         .collection("ExtraOrder").whereField("forOrder", isEqualTo: document.documentID)
                         .getDocuments { snapshot, error in
-    
+                            
                             guard let snapshotDocument = snapshot?.documents else{
                                 group.leave()
                                 return
@@ -68,7 +71,6 @@ class KitchenWork: ObservableObject{
                             group.leave()
                         }
                 }
-                //self.activeOrders = retrivedOrders
                 group.leave()
             }
     

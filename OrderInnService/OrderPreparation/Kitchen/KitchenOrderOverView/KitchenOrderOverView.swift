@@ -58,7 +58,7 @@ struct KitchenOrderOverView: View {
                         .listStyle(InsetGroupedListStyle())
                     }
                     Button(action: {
-                        //orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!, withExtras: orderOverview.collectedOrder.withExtraItems)
+                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
                     }, label: {
                         Text("order completed")
                             .bold()
@@ -84,25 +84,5 @@ struct KitchenOrderOverView: View {
                                             .foregroundColor(.red)
                                     })
                                 })
-//        .onAppear{
-//            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
-//        }
-    }
-}
-
-
-struct MainOrderCell: View{
-    var itemName: String
-    
-    var body: some View{
-        HStack{
-            Image(systemName: "circle")
-                .foregroundColor(Color(UIColor.label))
-                .font(.custom("SF Symbols", size: 7.5))
-            
-            Text(itemName)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-        }
     }
 }
