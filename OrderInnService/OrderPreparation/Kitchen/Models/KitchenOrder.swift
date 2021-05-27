@@ -14,7 +14,7 @@ struct KitchenOrder: Identifiable {
     var barItems: [String]
     var placedBy: String
     var orderOpened: Bool
-    var orderClosed: Bool
+    var orderReady: Bool
     var totalPrice: Double
     var forTable: String
     var forZone: String
@@ -54,10 +54,10 @@ struct KitchenOrder: Identifiable {
         }
         self.forTable = forTable
         
-        guard let orderClosed = data["orderClosed"] as? Bool else{
+        guard let orderReady = data["orderReady"] as? Bool else{
             return nil
         }
-        self.orderClosed = orderClosed
+        self.orderReady = orderReady
         
         guard let forZone = data["inZone"] as? String else{
             return nil

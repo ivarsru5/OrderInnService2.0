@@ -57,7 +57,7 @@ class RestaurantOrderWork: ObservableObject{
             "inZone": restaurantOrder.forZone,
             "toatlOrderPrice": totalPrice,
             "orderOpened": restaurantOrder.orderOpened,
-            "orderClosed" : restaurantOrder.orderClosed
+            "orderReady" : restaurantOrder.orderReady
         ]
         
         databse.collection("Restaurants")

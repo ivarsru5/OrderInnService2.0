@@ -69,9 +69,6 @@ struct KitchenView: View {
         .onReceive(timer){ time in
             kitchen.retriveActiveOrders(fromKey: nil)
         }
-        .onDisappear{
-            self.timer.upstream.connect().cancel()
-        }
     }
 }
 

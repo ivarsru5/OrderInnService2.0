@@ -72,7 +72,7 @@ class ActiveOrderOverviewWork: ObservableObject{
         
         submitedItems.append(contentsOf: submittedDrinks)
         
-        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderOpened, orderClosed: items.orderClosed, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
+        self.submitedOrder = OrderOverview(id: items.id, placedBy: items.placedBy, orderCompleted: items.orderOpened, orderClosed: items.orderReady, totalPrice: items.totalPrice, forTable: items.forTable, withItems: submitedItems)
         
         getExtraOrders(from: items)
     }

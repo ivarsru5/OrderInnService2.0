@@ -12,7 +12,7 @@ struct RestaurantOrder: Identifiable{
     var menuItems: [MenuItem]
     var placedBy: String
     var orderOpened: Bool
-    var orderClosed: Bool
+    var orderReady: Bool
     var forTable: String
     var forZone: String
     
@@ -20,7 +20,7 @@ struct RestaurantOrder: Identifiable{
         self.menuItems = []
         self.placedBy = UserDefaults.standard.currentUser
         self.orderOpened = false
-        self.orderClosed = false
+        self.orderReady = false
         self.forTable = ""
         self.forZone = ""
     }

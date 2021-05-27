@@ -111,7 +111,7 @@ class KitchenWork: ObservableObject{
                     return ClientSubmittedOrder(id: order.id,
                                                 placedBy: order.placedBy,
                                                 orderOpened: order.orderOpened,
-                                                orderClosed: order.orderClosed,
+                                                orderClosed: order.orderReady,
                                                 totalPrice: order.totalPrice,
                                                 forTable: order.forTable,
                                                 inZone: order.forZone,
@@ -121,7 +121,7 @@ class KitchenWork: ObservableObject{
                     return nil
                 }
             }
-            self.collectedOrders = clientOrder.sorted { !$0.orderOpened && $1.orderOpened }
+            self.collectedOrders = clientOrder.sorted { !$0.orderOpened && $1.orderOpened }.filter{ !$0.orderClosed }
         }
     }
 
