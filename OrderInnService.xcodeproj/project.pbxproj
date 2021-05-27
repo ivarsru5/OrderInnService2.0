@@ -52,6 +52,8 @@
 		58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB626284ED500574D4F /* HalfModalView.swift */; };
 		58F0D7412632E51F0093B6EA /* OrderCatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F0D7402632E51F0093B6EA /* OrderCatView.swift */; };
 		58F2895B26384E6200C973DB /* ActiveOrderOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */; };
+		58F91D71265FB87B0059E71A /* KitchenTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D70265FB87B0059E71A /* KitchenTabView.swift */; };
+		58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D73265FC3000059E71A /* ItemAvailability.swift */; };
 		8D81E1853CD596EA1AD61F7F /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */; };
 /* End PBXBuildFile section */
 
@@ -103,6 +105,8 @@
 		58F07AB626284ED500574D4F /* HalfModalView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HalfModalView.swift; sourceTree = "<group>"; };
 		58F0D7402632E51F0093B6EA /* OrderCatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCatView.swift; sourceTree = "<group>"; };
 		58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderOverview.swift; sourceTree = "<group>"; };
+		58F91D70265FB87B0059E71A /* KitchenTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenTabView.swift; sourceTree = "<group>"; };
+		58F91D73265FC3000059E71A /* ItemAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAvailability.swift; sourceTree = "<group>"; };
 		6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.debug.xcconfig"; sourceTree = "<group>"; };
 		B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.release.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.release.xcconfig"; sourceTree = "<group>"; };
 		CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -200,9 +204,11 @@
 		581340C2264520D6003E9BC6 /* Kitchen */ = {
 			isa = PBXGroup;
 			children = (
+				58F91D70265FB87B0059E71A /* KitchenTabView.swift */,
 				5822002D2658DE8B003D878C /* Models */,
 				581340C526452112003E9BC6 /* KitchenOrderOverView */,
 				581340C3264520F9003E9BC6 /* KitchenOrders */,
+				58F91D72265FC2DB0059E71A /* ItemAvailability */,
 			);
 			path = Kitchen;
 			sourceTree = "<group>";
@@ -359,6 +365,14 @@
 			path = ActiveOrderOverview;
 			sourceTree = "<group>";
 		};
+		58F91D72265FC2DB0059E71A /* ItemAvailability */ = {
+			isa = PBXGroup;
+			children = (
+				58F91D73265FC3000059E71A /* ItemAvailability.swift */,
+			);
+			path = ItemAvailability;
+			sourceTree = "<group>";
+		};
 		63EFB55165DA9DC0E0B1E609 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -482,6 +496,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				58F91D71265FB87B0059E71A /* KitchenTabView.swift in Sources */,
 				5813CC5626309EB700924ED9 /* MenuView.swift in Sources */,
 				580E1E232636D5AA00A16228 /* TabView.swift in Sources */,
 				58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */,
@@ -508,6 +523,7 @@
 				5813CC5C26309EFB00924ED9 /* MenuItem.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				581DF41C26371C6600B426FC /* ActiveOrderWork.swift in Sources */,
+				58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */,
 				58F0D7412632E51F0093B6EA /* OrderCatView.swift in Sources */,
 				58F07AAC26282A0900574D4F /* QrCodeScannerWork.swift in Sources */,
 				5813CC5926309EF200924ED9 /* MenuCategory.swift in Sources */,

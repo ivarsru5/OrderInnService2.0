@@ -52,6 +52,9 @@ struct KitchenView: View {
                         .padding()
                     }
                 }
+                .onReceive(timer){ time in
+                    kitchen.retriveActiveOrders(fromKey: nil)
+                }
             }else{
                 Text("There have not been placed any order yet.")
                     .font(.headline)
@@ -65,9 +68,6 @@ struct KitchenView: View {
         .navigationTitle("\(kitchen.getRestaurantName(fromQrString: qrScanner.restaurantQrCode)): \(qrScanner.kitchen!)")
         .onAppear{
             kitchen.retriveActiveOrders(fromKey: qrScanner)
-        }
-        .onReceive(timer){ time in
-            kitchen.retriveActiveOrders(fromKey: nil)
         }
     }
 }

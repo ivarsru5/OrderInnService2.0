@@ -121,7 +121,7 @@ class KitchenWork: ObservableObject{
                     return nil
                 }
             }
-            self.collectedOrders = clientOrder.sorted { !$0.orderOpened && $1.orderOpened }.filter{ !$0.orderClosed }
+            self.collectedOrders = clientOrder.sorted { !$0.orderOpened && $1.orderOpened }
         }
     }
 
