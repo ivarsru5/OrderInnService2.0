@@ -16,6 +16,7 @@ struct MenuView: View {
     @State var alertitem: AlertItem?
     @State var showOrder = false
     @State var showOrderCart = false
+    @State var expandMenu = false
     
     var body: some View {
         VStack{
@@ -23,15 +24,20 @@ struct MenuView: View {
                 ForEach(menuOverview.menuCategory, id:\.id){ category in
                     Button(action: {
                         self.menuOverview.category = category
-                        self.menuOverview.getMenuItems(with: category)
+                        self.expandMenu.toggle()
                     }, label: {
                         Text(category.name)
                             .bold()
                             .foregroundColor(Color(UIColor.label))
                     })
+                    if expandMenu{
+                        ForEach(category.menuItems, id: \.id) { item in
+                            MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverview, menuItem: item)
+                                .padding(.leading, 10)
+                        }
+                    }
                 }
             }
-            .listStyle(InsetGroupedListStyle())
             .navigationBarItems(trailing: HStack{
                 Button(action: {
                     if restaurantOrder.restaurantOrder.menuItems.isEmpty{
@@ -63,61 +69,58 @@ struct MenuView: View {
             restaurantOrder.restaurantOrder.forTable = table.selectedTabel!.table
             restaurantOrder.restaurantOrder.forZone = zone.selectedZone!.location
         }
-        .sheet(isPresented: $menuOverview.presentMenu){
-            MenuItemView(menuOverView: menuOverview, restaurantOrder: restaurantOrder, dismissMenu: $menuOverview.presentMenu, totalPrice: restaurantOrder.totalPrice)
-        }
         .alert(item: $alertitem){ alert in
             Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }
     }
 }
 
-struct MenuItemView: View {
-    @ObservedObject var menuOverView: MenuOverViewWork
-    @ObservedObject var restaurantOrder: RestaurantOrderWork
-    @Binding var dismissMenu: Bool
-    var totalPrice: Double
-    
-    var body: some View{
-        VStack{
-            HStack{
-                HStack{
-                    Image(systemName: "cart")
-                        .font(.custom("SFSymbols", size: 20))
-                        .foregroundColor(.blue)
-                    
-                    Text("\(totalPrice, specifier: "%.2f")EUR")
-                        .italic()
-                        .foregroundColor(.blue)
-                }
-                Spacer()
-                
-                Button(action: {
-                    dismissMenu.toggle()
-                }, label: {
-                    Text("Done")
-                        .bold()
-                        .foregroundColor(.blue)
-                })
-            }
-            .padding()
-            
-            VStack{
-                Text(menuOverView.category!.name)
-                    .bold()
-                    .foregroundColor(Color(UIColor.label))
-                    .font(.headline)
-                
-                List{
-                    ForEach(menuOverView.menuItems, id: \.id){ item in
-                        MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverView, menuItem: item)
-                    }
-                }
-                .listStyle(InsetGroupedListStyle())
-            }
-        }
-    }
-}
+//struct MenuItemView: View {
+//    @ObservedObject var menuOverView: MenuOverViewWork
+//    @ObservedObject var restaurantOrder: RestaurantOrderWork
+//    @Binding var dismissMenu: Bool
+//    var totalPrice: Double
+//
+//    var body: some View{
+//        VStack{
+//            HStack{
+//                HStack{
+//                    Image(systemName: "cart")
+//                        .font(.custom("SFSymbols", size: 20))
+//                        .foregroundColor(.blue)
+//
+//                    Text("\(totalPrice, specifier: "%.2f")EUR")
+//                        .italic()
+//                        .foregroundColor(.blue)
+//                }
+//                Spacer()
+//
+//                Button(action: {
+//                    dismissMenu.toggle()
+//                }, label: {
+//                    Text("Done")
+//                        .bold()
+//                        .foregroundColor(.blue)
+//                })
+//            }
+//            .padding()
+//
+//            VStack{
+//                Text(menuOverView.category!.name)
+//                    .bold()
+//                    .foregroundColor(Color(UIColor.label))
+//                    .font(.headline)
+//
+//                List{
+//                    ForEach(menuOverView.menuItems, id: \.id){ item in
+//                        MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverView, menuItem: item)
+//                    }
+//                }
+//                .listStyle(InsetGroupedListStyle())
+//            }
+//        }
+//    }
+//}
 
 struct MenuItemCell: View{
     @ObservedObject var restaurantOrder: RestaurantOrderWork
@@ -143,7 +146,7 @@ struct MenuItemCell: View{
                     restaurantOrder.removeFromOrder(menuItem)
                    self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
                 }, label: {
-                    Image(systemName: "minus.rectangle.fill")
+                    Image(systemName: "minus.circle.fill")
                         .font(.custom("SF Symbols", size: 30))
                         .foregroundColor(Color(UIColor.label))
                 })
@@ -157,7 +160,7 @@ struct MenuItemCell: View{
                     restaurantOrder.addToOrder(menuItem)
                    self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
                 }, label: {
-                        Image(systemName: "plus.rectangle.fill")
+                        Image(systemName: "plus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color(UIColor.label))
                     })

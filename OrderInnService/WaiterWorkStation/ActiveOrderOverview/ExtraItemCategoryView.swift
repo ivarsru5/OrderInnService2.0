@@ -18,7 +18,6 @@ struct ExtraItemCategoryView: View {
                 ForEach(menuOverview.menuCategory, id: \.id){ category in
                     Button(action: {
                         self.menuOverview.category = category
-                        self.menuOverview.getMenuItems(with: category)
                     }, label: {
                         Text(category.name)
                             .bold()
@@ -44,11 +43,11 @@ struct ExtraItemMenuView: View{
     var body: some View{
         
         VStack{
-            List{
-                ForEach(menuOverview.menuItems, id: \.id){ item in
-                    ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
-                }
-            }
+//            List{
+//                ForEach(menuOverview.menuItems, id: \.id){ item in
+//                    ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
+//                }
+//            }
         }
         .navigationTitle(menuOverview.category!.name)
         .navigationBarItems(trailing: Button(action: {

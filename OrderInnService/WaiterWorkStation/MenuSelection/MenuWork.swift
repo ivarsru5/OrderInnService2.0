@@ -10,7 +10,6 @@ import FirebaseFirestore
 
 class MenuOverViewWork: ObservableObject{
     @Published var menuCategory = [MenuCategory]()
-    @Published var menuItems = [MenuItem]()
     @Published var presentMenu = false
     let database = Firestore.firestore()
     
@@ -21,40 +20,54 @@ class MenuOverViewWork: ObservableObject{
     }
     
     func getMenuCategory(){
-        database.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("MenuCategory").getDocuments { snapshot, error in
-            guard let documentSnapshot = snapshot?.documents else {
-                print("There is no categorys")
-                return
-            }
-            self.menuCategory = documentSnapshot.compactMap{ categorySnapshot -> MenuCategory? in
-                guard let collectedCategory = MenuCategory(snapshot: categorySnapshot) else{
-                    //TODO: Present Alert
-                    return nil
-                }
-                return collectedCategory
-            }
-        }
-    }
-    
-    func getMenuItems(with categoryID: MenuCategory){
+        var menu = [MenuCategory]()
+        let group = DispatchGroup()
+        
+        group.enter()
         database.collection("Restaurants")
             .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("MenuCategory")
-            .document(categoryID.id)
-            .collection("Menu")
             .getDocuments { snapshot, error in
-                guard let documentSnapshot = snapshot?.documents else{
-                    print("There is no menu Items")
+                guard let documentSnapshot = snapshot?.documents else {
+                    print("There is no categorys")
+                    group.leave()
                     return
                 }
-                self.menuItems = documentSnapshot.compactMap{ menuItemSnapshot -> MenuItem? in
-                    guard let collectedItem = MenuItem(snapshot: menuItemSnapshot) else{
-                        //TODO: Present alert
-                        return nil
-                    }
-                    return collectedItem
+                
+                for document in documentSnapshot{
+                    var menuItems = [MenuItem]()
+                    
+                    group.enter()
+                    self.database.collection("Restaurants")
+                        .document(UserDefaults.standard.wiaterQrStringKey)
+                        .collection("MenuCategory")
+                        .document(document.documentID)
+                        .collection("Menu")
+                        .getDocuments { snapshot, error in
+                            guard let documentSnapshot = snapshot?.documents else{
+                                print("There is no menu Items")
+                                group.leave()
+                                return
+                            }
+                            
+                            for item in documentSnapshot{
+                                guard let items = MenuItem(snapshot: item) else{
+                                    return
+                                }
+                                menuItems.append(items)
+                            }
+                            guard let category = MenuCategory(snapshot: document, menuItems: menuItems) else{
+                                return
+                            }
+                            menu.append(category)
+                            group.leave()
+                        }
                 }
+                group.leave()
             }
+        group.notify(queue: .main){
+            self.menuCategory = menu
+        }
     }
 }
 
