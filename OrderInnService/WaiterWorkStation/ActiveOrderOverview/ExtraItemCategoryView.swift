@@ -15,48 +15,26 @@ struct ExtraItemCategoryView: View {
     var body: some View {
         VStack{
             List{
-                ForEach(menuOverview.menuCategory, id: \.id){ category in
+                ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
                     Button(action: {
-                        self.menuOverview.category = category
+                        self.menuOverview.menuCategory[index].isExpanded.toggle()
                     }, label: {
                         Text(category.name)
                             .bold()
                             .foregroundColor(Color(UIColor.label))
                     })
+                    if category.isExpanded{
+                        ForEach(category.menuItems, id: \.id) { item in
+                            ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
+                        }
+                    }
                 }
             }
-            .listStyle(InsetGroupedListStyle())
-            
-            NavigationLink(destination: ExtraItemMenuView(menuOverview: menuOverview, activeOrderOverview: activeOrderOverview), isActive: $menuOverview.presentMenu){ EmptyView() }
         }
         .navigationTitle(activeOrder.selectedOrder!.forTable)
         .onAppear{
             menuOverview.getMenuCategory()
         }
-    }
-}
-
-struct ExtraItemMenuView: View{
-    @ObservedObject var menuOverview: MenuOverViewWork
-    @ObservedObject var activeOrderOverview: ActiveOrderOverviewWork
-    
-    var body: some View{
-        
-        VStack{
-//            List{
-//                ForEach(menuOverview.menuItems, id: \.id){ item in
-//                    ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
-//                }
-//            }
-        }
-        .navigationTitle(menuOverview.category!.name)
-        .navigationBarItems(trailing: Button(action: {
-            //TODO: Heare goes converting in extra item array
-        }, label: {
-            HStack{
-                Text(",-\(activeOrderOverview.extraOrderTotalPrice, specifier: "%.2f")EUR")
-            }
-        }))
     }
 }
 

@@ -21,16 +21,15 @@ struct MenuView: View {
     var body: some View {
         VStack{
             List{
-                ForEach(menuOverview.menuCategory, id:\.id){ category in
+                ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
                     Button(action: {
-                        self.menuOverview.category = category
-                        self.expandMenu.toggle()
+                        self.menuOverview.menuCategory[index].isExpanded.toggle()
                     }, label: {
                         Text(category.name)
                             .bold()
                             .foregroundColor(Color(UIColor.label))
                     })
-                    if expandMenu{
+                    if category.isExpanded{
                         ForEach(category.menuItems, id: \.id) { item in
                             MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverview, menuItem: item)
                                 .padding(.leading, 10)
@@ -50,7 +49,7 @@ struct MenuView: View {
                         Image(systemName: "cart")
                             .font(.custom("SF Symbols", size: 20))
                             .foregroundColor(.blue)
-                        
+
                         Text("\(restaurantOrder.totalPrice, specifier: "%.2f")EUR")
                             .bold()
                             .foregroundColor(Color.blue)
@@ -74,53 +73,6 @@ struct MenuView: View {
         }
     }
 }
-
-//struct MenuItemView: View {
-//    @ObservedObject var menuOverView: MenuOverViewWork
-//    @ObservedObject var restaurantOrder: RestaurantOrderWork
-//    @Binding var dismissMenu: Bool
-//    var totalPrice: Double
-//
-//    var body: some View{
-//        VStack{
-//            HStack{
-//                HStack{
-//                    Image(systemName: "cart")
-//                        .font(.custom("SFSymbols", size: 20))
-//                        .foregroundColor(.blue)
-//
-//                    Text("\(totalPrice, specifier: "%.2f")EUR")
-//                        .italic()
-//                        .foregroundColor(.blue)
-//                }
-//                Spacer()
-//
-//                Button(action: {
-//                    dismissMenu.toggle()
-//                }, label: {
-//                    Text("Done")
-//                        .bold()
-//                        .foregroundColor(.blue)
-//                })
-//            }
-//            .padding()
-//
-//            VStack{
-//                Text(menuOverView.category!.name)
-//                    .bold()
-//                    .foregroundColor(Color(UIColor.label))
-//                    .font(.headline)
-//
-//                List{
-//                    ForEach(menuOverView.menuItems, id: \.id){ item in
-//                        MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverView, menuItem: item)
-//                    }
-//                }
-//                .listStyle(InsetGroupedListStyle())
-//            }
-//        }
-//    }
-//}
 
 struct MenuItemCell: View{
     @ObservedObject var restaurantOrder: RestaurantOrderWork

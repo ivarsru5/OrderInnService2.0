@@ -10,14 +10,7 @@ import FirebaseFirestore
 
 class MenuOverViewWork: ObservableObject{
     @Published var menuCategory = [MenuCategory]()
-    @Published var presentMenu = false
     let database = Firestore.firestore()
-    
-    @Published var category: MenuCategory?{
-        didSet{
-            self.presentMenu.toggle()
-        }
-    }
     
     func getMenuCategory(){
         var menu = [MenuCategory]()

@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct MenuCategory: Identifiable{
+struct MenuCategory: Identifiable, Hashable{
     var id = UUID().uuidString
     var name: String
     var menuItems: [MenuItem]
