@@ -74,31 +74,63 @@ struct ExtraMenuItemView: View{
     
     var body: some View{
         List{
-            ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
-                Button(action: {
-                    self.menuOverview.menuCategory[index].isExpanded.toggle()
-                }, label: {
+            Section(header: Text("Meal's").font(.headline)){
+                ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
+                    Button(action: {
+                        self.menuOverview.menuCategory[index].isExpanded.toggle()
+                    }, label: {
+                        
+                        HStack{
+                            Text(category.name)
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                            
+                            Spacer()
+                            
+                            Image(systemName: "arrowtriangle.right.fill")
+                                .foregroundColor(Color(UIColor.label))
+                                .font(.custom("SF Symbols", fixedSize: 20))
+                                .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
+                                .animation(.linear(duration: 0.1), value: category.isExpanded)
+                        }
+                        .padding()
+                    })
+                    .listRowBackground(Color.secondary)
                     
-                    HStack{
-                        Text(category.name)
-                            .bold()
-                            .foregroundColor(Color(UIColor.label))
-                        
-                        Spacer()
-                        
-                        Image(systemName: "arrowtriangle.right.fill")
-                            .foregroundColor(Color(UIColor.label))
-                            .font(.custom("SF Symbols", fixedSize: 20))
-                            .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
-                            .animation(.linear(duration: 0.1), value: category.isExpanded)
+                    if category.isExpanded{
+                        ForEach(category.menuItems, id: \.id) { item in
+                            ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
+                        }
                     }
-                    .padding()
-                })
-                .listRowBackground(Color.secondary)
-                
-                if category.isExpanded{
-                    ForEach(category.menuItems, id: \.id) { item in
-                        ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
+                }
+            }
+            Section(header: Text("Drinks").font(.headline)){
+                ForEach(Array(self.menuOverview.menuDrinks.enumerated()), id: \.element){ index ,category in
+                    Button(action: {
+                        self.menuOverview.menuDrinks[index].isExpanded.toggle()
+                    }, label: {
+                        
+                        HStack{
+                            Text(category.name)
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                            
+                            Spacer()
+                            
+                            Image(systemName: "arrowtriangle.right.fill")
+                                .foregroundColor(Color(UIColor.label))
+                                .font(.custom("SF Symbols", fixedSize: 20))
+                                .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
+                                .animation(.linear(duration: 0.1), value: category.isExpanded)
+                        }
+                        .padding()
+                    })
+                    .listRowBackground(Color.secondary)
+                    
+                    if category.isExpanded{
+                        ForEach(category.drinks, id: \.id) { item in
+                            ExtraItemCell(activeOrderOverview: activeOrderOverview, menuOverview: menuOverview, menuItem: item)
+                        }
                     }
                 }
             }
