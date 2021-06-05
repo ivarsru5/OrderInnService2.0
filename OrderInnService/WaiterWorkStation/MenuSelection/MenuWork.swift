@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 class MenuOverViewWork: ObservableObject{
     @Published var menuCategory = [MenuCategory]()
+    @Published var menuDrinks = [MenuDrinks]()
     let database = Firestore.firestore()
     
     func getMenuCategory(){
@@ -59,7 +60,15 @@ class MenuOverViewWork: ObservableObject{
                 group.leave()
             }
         group.notify(queue: .main){
-            self.menuCategory = menu
+            self.menuDrinks = menu.compactMap { item -> MenuDrinks? in
+                guard item.type == "drink" else{
+                    return nil
+                }
+                
+                let drinks = MenuDrinks(name: item.name, drinks: item.menuItems)
+                return drinks
+            }
+            self.menuCategory = menu.filter { $0.type == "food" }
         }
     }
 }

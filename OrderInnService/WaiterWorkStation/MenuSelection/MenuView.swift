@@ -14,42 +14,11 @@ struct MenuView: View {
     @ObservedObject var table: TableSelectionWork
     @ObservedObject var zone: ZoneWork
     @State var alertitem: AlertItem?
-    @State var showOrder = false
     @State var showOrderCart = false
-    @State var expandMenu = false
     
     var body: some View {
         VStack{
-            List{
-                ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
-                    Button(action: {
-                        self.menuOverview.menuCategory[index].isExpanded.toggle()
-                    }, label: {
-                        HStack{
-                            Text(category.name)
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                            
-                            Spacer()
-                            
-                            Image(systemName: "arrowtriangle.right.fill")
-                                .foregroundColor(Color(UIColor.label))
-                                .font(.custom("SF Symbols", fixedSize: 20))
-                                .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
-                                .animation(.linear(duration: 0.1), value: category.isExpanded)
-                        }
-                        .padding()
-                    })
-                    .listRowBackground(Color.secondary)
-                    
-                    if category.isExpanded{
-                        ForEach(category.menuItems, id: \.id) { item in
-                            MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverview, menuItem: item)
-                                .padding(.leading, 30)
-                        }
-                    }
-                }
-            }
+            MenuItemView(restaurantOrder: restaurantOrder, menuOverview: menuOverview, showOrderCart: $showOrderCart, alertitem: $alertitem)
             
             .navigationBarItems(trailing: HStack{
                 Button(action: {
@@ -136,6 +105,47 @@ struct MenuItemCell: View{
             .padding(.all, 5)
         .onAppear{
             self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
+        }
+    }
+}
+
+struct MenuItemView: View{
+    @ObservedObject var restaurantOrder: RestaurantOrderWork
+    @ObservedObject var menuOverview: MenuOverViewWork
+    @Binding var showOrderCart: Bool
+    @Binding var alertitem: AlertItem?
+    
+    
+    var body: some View{
+        List{
+            ForEach(Array(self.menuOverview.menuCategory.enumerated()), id: \.element){ index ,category in
+                Button(action: {
+                    self.menuOverview.menuCategory[index].isExpanded.toggle()
+                }, label: {
+                    HStack{
+                        Text(category.name)
+                            .bold()
+                            .foregroundColor(Color(UIColor.label))
+                        
+                        Spacer()
+                        
+                        Image(systemName: "arrowtriangle.right.fill")
+                            .foregroundColor(Color(UIColor.label))
+                            .font(.custom("SF Symbols", fixedSize: 20))
+                            .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
+                            .animation(.linear(duration: 0.1), value: category.isExpanded)
+                    }
+                    .padding()
+                })
+                .listRowBackground(Color.secondary)
+                
+                if category.isExpanded{
+                    ForEach(category.menuItems, id: \.id) { item in
+                        MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverview, menuItem: item)
+                            .padding(.leading, 30)
+                    }
+                }
+            }
         }
     }
 }
