@@ -71,5 +71,43 @@ class MenuOverViewWork: ObservableObject{
             self.menuCategory = menu.filter { $0.type == "food" }
         }
     }
+    
+    func changeItemAvailability(inCategory: MenuCategory ,item: MenuItem){
+        
+        if item.available{
+            self.database.collection("Restaurants")
+                .document(UserDefaults.standard.wiaterQrStringKey)
+                .collection("MenuCategory")
+                .document(inCategory.id)
+                .collection("Menu")
+                .document(item.id)
+                .updateData([
+                    "available" : false
+                ]) { error in
+                    if let err = error{
+                        print("Error updating document \(err)")
+                    }else{
+                        print("Failed to mark Item as not available!")
+                    }
+                }
+            
+        }else{
+            self.database.collection("Restaurants")
+                .document(UserDefaults.standard.wiaterQrStringKey)
+                .collection("MenuCategory")
+                .document(inCategory.id)
+                .collection("Menu")
+                .document(item.id)
+                .updateData([
+                    "available" : true
+                ]) { error in
+                    if let err = error{
+                        print("Error updating document \(err)")
+                    }else{
+                        print("Failed to mark Item as available!")
+                }
+            }
+        }
+    }
 }
 
