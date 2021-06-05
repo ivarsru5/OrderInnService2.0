@@ -25,18 +25,32 @@ struct MenuView: View {
                     Button(action: {
                         self.menuOverview.menuCategory[index].isExpanded.toggle()
                     }, label: {
-                        Text(category.name)
-                            .bold()
-                            .foregroundColor(Color(UIColor.label))
+                        HStack{
+                            Text(category.name)
+                                .bold()
+                                .foregroundColor(Color(UIColor.label))
+                            
+                            Spacer()
+                            
+                            Image(systemName: "arrowtriangle.right.fill")
+                                .foregroundColor(Color(UIColor.label))
+                                .font(.custom("SF Symbols", fixedSize: 20))
+                                .rotationEffect(Angle(degrees: category.isExpanded ? 90 : 0))
+                                .animation(.linear(duration: 0.1), value: category.isExpanded)
+                        }
+                        .padding()
                     })
+                    .listRowBackground(Color.secondary)
+                    
                     if category.isExpanded{
                         ForEach(category.menuItems, id: \.id) { item in
                             MenuItemCell(restaurantOrder: restaurantOrder, menuOverview: menuOverview, menuItem: item)
-                                .padding(.leading, 10)
+                                .padding(.leading, 30)
                         }
                     }
                 }
             }
+            
             .navigationBarItems(trailing: HStack{
                 Button(action: {
                     if restaurantOrder.restaurantOrder.menuItems.isEmpty{
