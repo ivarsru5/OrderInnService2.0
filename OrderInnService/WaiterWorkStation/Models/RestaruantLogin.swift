@@ -17,6 +17,7 @@ struct Restaurant: Identifiable{
         var id = UUID().uuidString
         let name: String
         let lastName: String
+        let manager: Bool
         let isActive: Bool
         
         init?(snapshot: QueryDocumentSnapshot){
@@ -37,6 +38,11 @@ struct Restaurant: Identifiable{
                 return nil
             }
             self.isActive = isActive
+            
+            guard let manager = data["manager"] as? Bool else{
+                return nil
+            }
+            self.manager = manager
         }
     }
 }

@@ -10,6 +10,8 @@ import SwiftUI
 struct ZoneSelection: View {
     @ObservedObject var qrScanner: QrCodeScannerWork
     @StateObject var zoneWork = ZoneWork()
+    @State var alertItem: AlertItem?
+    @State var showFinishedOrders = false
     
     var body: some View {
         ZStack{
@@ -42,8 +44,28 @@ struct ZoneSelection: View {
             NavigationLink(destination: TableSelectionView(zones: zoneWork), isActive: $zoneWork.goToTableView, label: {
                 EmptyView()
             })
+            NavigationLink(destination: Text("Hello!"), isActive: $showFinishedOrders){
+                EmptyView()
+            }
+        }
+        .navigationBarItems(trailing: HStack{
+            Button(action: {
+                if qrScanner.employee!.manager{
+                    self.showFinishedOrders.toggle()
+                }else{
+                    self.alertItem = UIAlerts.restrictions
+                }
+            }, label: {
+                Image(systemName: "folder")
+                    .font(.custom("SF Symbols", size: 20))
+                    .foregroundColor(.blue)
+            })
+        })
+        .alert(item: $alertItem){ alert in
+            Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }
         .onAppear{
+            qrScanner.loadUser()
             qrScanner.retriveRestaurant(with: UserDefaults.standard.wiaterQrStringKey)
             zoneWork.getZones()
             print(UserDefaults.standard.currentUser)

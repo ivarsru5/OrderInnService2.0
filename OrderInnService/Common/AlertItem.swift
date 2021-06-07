@@ -30,5 +30,11 @@ struct AlertContext{
 }
 
 struct UIAlerts{
-    static let emptyOrder = AlertItem(title: Text("Whoops..."), message: Text("Please add atleast one item to continue."), dismissButton: .default(Text("OK")))
+    static let emptyOrder = AlertItem(title: Text("Whoops..."),
+                                      message: Text("Please add atleast one item to continue."),
+                                      dismissButton: .default(Text("OK")))
+    
+    static let restrictions = AlertItem(title: Text("Error"),
+                                        message: Text("You dont have access to this action, please contact you'r supervisor!"),
+                                        dismissButton: .default(Text("OK")))
 }

@@ -11,6 +11,7 @@ import FirebaseFirestore
 class QrCodeScannerWork: ObservableObject{
     @Published var restaurant = Restaurant()
     @Published var users = [Restaurant.RestaurantEmploye]()
+    @Published var employee: Restaurant.RestaurantEmploye?
     @Published var displayUsers = false
     @Published var loadingQuery = true
     @Published var kitchen: String?
@@ -56,7 +57,10 @@ class QrCodeScannerWork: ObservableObject{
     }
     
     func getUsers(with id: String){
-        databse.collection("Restaurants").document(id).collection("Users").getDocuments { snapshot, error in
+        databse.collection("Restaurants")
+            .document(id)
+            .collection("Users")
+            .getDocuments { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no documents")
@@ -84,5 +88,29 @@ class QrCodeScannerWork: ObservableObject{
                 print("Document successfuly updated.")
             }
         }
+    }
+    
+    func loadUser(){
+        let user = UserDefaults.standard.currentUser.components(separatedBy: " ")
+        let userName = user[0]
+        let userLastName = user[1]
+        
+        databse.collection("Restaurants")
+            .document(UserDefaults.standard.wiaterQrStringKey)
+            .collection("Users")
+            .whereField("name", isEqualTo: userName)
+            .whereField("lastName", isEqualTo: userLastName)
+            .getDocuments { snapshot, error in
+                guard let userSnapshot = snapshot?.documents else{
+                    print("There is not a user.")
+                    return
+                }
+                for user in userSnapshot{
+                    guard let collecetdUser = Restaurant.RestaurantEmploye(snapshot: user) else{
+                        return
+                    }
+                    self.employee = collecetdUser
+                }
+            }
     }
 }

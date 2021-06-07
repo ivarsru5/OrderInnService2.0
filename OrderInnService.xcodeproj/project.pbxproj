@@ -152,6 +152,7 @@
 		580509162629AAEA007CF39B /* Common */ = {
 			isa = PBXGroup;
 			children = (
+				58F07AA82628274700574D4F /* AlertItem.swift */,
 				580509172629AB07007CF39B /* QrParsing.swift */,
 				58F07AB626284ED500574D4F /* HalfModalView.swift */,
 				58F07AB2262830D400574D4F /* BlurEffect.swift */,
@@ -190,7 +191,6 @@
 				58F0D73F2632E4FF0093B6EA /* OrderCartView */,
 				580E1E252636D5E400A16228 /* ActiveTables */,
 				58F2895926384E3C00C973DB /* ActiveOrderOverview */,
-				58F07AA72628273900574D4F /* AlertItems */,
 			);
 			path = WaiterWorkStation;
 			sourceTree = "<group>";
@@ -328,14 +328,6 @@
 				58F07AA42628255200574D4F /* QrCodeScannerView.swift */,
 			);
 			path = "UIKit Components";
-			sourceTree = "<group>";
-		};
-		58F07AA72628273900574D4F /* AlertItems */ = {
-			isa = PBXGroup;
-			children = (
-				58F07AA82628274700574D4F /* AlertItem.swift */,
-			);
-			path = AlertItems;
 			sourceTree = "<group>";
 		};
 		58F07AAE26282FC300574D4F /* Extensions */ = {
