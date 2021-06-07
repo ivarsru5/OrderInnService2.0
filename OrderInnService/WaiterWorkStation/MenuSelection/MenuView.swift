@@ -76,33 +76,39 @@ struct MenuItemCell: View{
             
             Spacer()
             
-            HStack{
-                Button(action: {
-                    restaurantOrder.removeFromOrder(menuItem)
-                   self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
-                }, label: {
-                    Image(systemName: "minus.circle.fill")
-                        .font(.custom("SF Symbols", size: 30))
-                        .foregroundColor(Color(UIColor.label))
-                })
-                .buttonStyle(PlainButtonStyle())
-                
-                Text("\(itemAmount)")
-                    .foregroundColor(.secondary)
-                    .font(.headline)
-                
-                Button(action: {
-                    restaurantOrder.addToOrder(menuItem)
-                   self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
-                }, label: {
+            if menuItem.available{
+                HStack{
+                    Button(action: {
+                        restaurantOrder.removeFromOrder(menuItem)
+                        self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
+                    }, label: {
+                        Image(systemName: "minus.circle.fill")
+                            .font(.custom("SF Symbols", size: 30))
+                            .foregroundColor(Color(UIColor.label))
+                    })
+                    .buttonStyle(PlainButtonStyle())
+                    
+                    Text("\(itemAmount)")
+                        .foregroundColor(.secondary)
+                        .font(.headline)
+                    
+                    Button(action: {
+                        restaurantOrder.addToOrder(menuItem)
+                        self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
+                    }, label: {
                         Image(systemName: "plus.circle.fill")
                             .font(.custom("SF Symbols", size: 30))
                             .foregroundColor(Color(UIColor.label))
                     })
                     .buttonStyle(PlainButtonStyle())
                 }
+            }else{
+                Text("Not Available")
+                    .bold()
+                    .foregroundColor(Color(UIColor.label))
             }
-            .padding(.all, 5)
+        }
+        .padding(.all, 5)
         .onAppear{
             self.itemAmount = restaurantOrder.getItemCount(forItem: menuItem)
         }

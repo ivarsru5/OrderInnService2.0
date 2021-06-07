@@ -8,15 +8,15 @@
 import SwiftUI
 
 struct ItemAvailability: View {
-    @StateObject var menuWork = MenuOverViewWork()
+    @StateObject var availabilityController = ItemAvailabilityController()
     @State var changeItemStatus = false
     
     var body: some View {
         VStack{
             List{
-                ForEach(Array(self.menuWork.menuCategory.enumerated()), id: \.element){ index ,category in
+                ForEach(Array(self.availabilityController.menuCategory.enumerated()), id: \.element){ index ,category in
                     Button(action: {
-                        self.menuWork.menuCategory[index].isExpanded.toggle()
+                        self.availabilityController.menuCategory[index].isExpanded.toggle()
                     }, label: {
                         HStack{
                             Text(category.name)
@@ -52,18 +52,18 @@ struct ItemAvailability: View {
                                     .bold()
                                     .foregroundColor(item.available ? Color.green : Color.red)
                             }
+                            .onTapGesture{
+                                self.changeItemStatus.toggle()
+                            }
                             .padding(.all, 5)
                             .actionSheet(isPresented: $changeItemStatus) {
                                 ActionSheet(title: Text("Change item status"), message: Text("Are you sure you want to chage item availability?"), buttons: [
                                     .default(Text("Change")) {
-                                        self.menuWork.changeItemAvailability(inCategory: category, item: item)
-                                        //self.menuWork.getMenuCategory()
+                                        self.availabilityController.changeItemAvailability(inCategory: category, item: item)
+                                        self.availabilityController.getMenuCategory()
                                     },
                                     .cancel()
                                 ])
-                            }
-                            .onTapGesture{
-                                self.changeItemStatus.toggle()
                             }
                         }
                     }
@@ -72,7 +72,7 @@ struct ItemAvailability: View {
         }
         .navigationTitle("Menu Availability")
         .onAppear{
-            menuWork.getMenuCategory()
+            availabilityController.getMenuCategory()
         }
     }
 }

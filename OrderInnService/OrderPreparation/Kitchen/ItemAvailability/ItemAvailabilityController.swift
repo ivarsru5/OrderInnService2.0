@@ -1,14 +1,14 @@
 //
-//  MenuCategoryWork.swift
+//  ItemAvailabilityController.swift
 //  OrderInnService
 //
-//  Created by Ivars Ruģelis on 21/04/2021.
+//  Created by Ivars Ruģelis on 07/06/2021.
 //
 
-import SwiftUI
-import FirebaseFirestore
+import Foundation
+import Firebase
 
-class MenuOverViewWork: ObservableObject{
+class ItemAvailabilityController: ObservableObject{
     @Published var menuCategory = [MenuCategory]()
     @Published var menuDrinks = [MenuDrinks]()
     let database = Firestore.firestore()
@@ -19,7 +19,7 @@ class MenuOverViewWork: ObservableObject{
         
         group.enter()
         database.collection("Restaurants")
-            .document(UserDefaults.standard.wiaterQrStringKey)
+            .document(UserDefaults.standard.kitchenQrStringKey)
             .collection("MenuCategory")
             .getDocuments { snapshot, error in
                 guard let documentSnapshot = snapshot?.documents else {
@@ -33,7 +33,7 @@ class MenuOverViewWork: ObservableObject{
                     
                     group.enter()
                     self.database.collection("Restaurants")
-                        .document(UserDefaults.standard.wiaterQrStringKey)
+                        .document(UserDefaults.standard.kitchenQrStringKey)
                         .collection("MenuCategory")
                         .document(document.documentID)
                         .collection("Menu")
@@ -71,5 +71,42 @@ class MenuOverViewWork: ObservableObject{
             self.menuCategory = menu.filter { $0.type == "food" }
         }
     }
+    
+    func changeItemAvailability(inCategory: MenuCategory ,item: MenuItem){
+        
+        if item.available{
+            self.database.collection("Restaurants")
+                .document(UserDefaults.standard.kitchenQrStringKey)
+                .collection("MenuCategory")
+                .document(inCategory.id)
+                .collection("Menu")
+                .document(item.id)
+                .updateData([
+                    "available" : false
+                ]) { error in
+                    if let err = error{
+                        print("Error updating document \(err)")
+                    }else{
+                        print("Item changed to not available!")
+                    }
+                }
+            
+        }else{
+            self.database.collection("Restaurants")
+                .document(UserDefaults.standard.kitchenQrStringKey)
+                .collection("MenuCategory")
+                .document(inCategory.id)
+                .collection("Menu")
+                .document(item.id)
+                .updateData([
+                    "available" : true
+                ]) { error in
+                    if let err = error{
+                        print("Error updating document \(err)")
+                    }else{
+                        print("Item changed to available!")
+                }
+            }
+        }
+    }
 }
-
