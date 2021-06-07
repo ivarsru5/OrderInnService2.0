@@ -69,6 +69,7 @@ class ItemAvailabilityController: ObservableObject{
                 return drinks
             }
             self.menuCategory = menu.filter { $0.type == "food" }
+            self.menuCategory.sort { $0.name < $1.name }
         }
     }
     

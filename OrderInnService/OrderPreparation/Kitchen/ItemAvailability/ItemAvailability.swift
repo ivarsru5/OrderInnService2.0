@@ -37,35 +37,29 @@ struct ItemAvailability: View {
                     
                     if category.isExpanded{
                         ForEach(category.menuItems, id: \.id) { item in
-                            HStack{
-                                Image(systemName: "circle.fill")
-                                    .font(.custom("SF Symbols", size: 10))
-                                    .foregroundColor(Color(UIColor.label))
-                                
-                                Text(item.name)
-                                    .bold()
-                                    .foregroundColor(Color(UIColor.label))
-                                
-                                Spacer()
-                                
-                                Text(item.available ? "Is Available" : "Not Available")
-                                    .bold()
-                                    .foregroundColor(item.available ? Color.green : Color.red)
-                            }
-                            .onTapGesture{
-                                self.changeItemStatus.toggle()
-                            }
-                            .padding(.all, 5)
-                            .actionSheet(isPresented: $changeItemStatus) {
-                                ActionSheet(title: Text("Change item status"), message: Text("Are you sure you want to chage item availability?"), buttons: [
-                                    .default(Text("Change")) {
-                                        self.availabilityController.changeItemAvailability(inCategory: category, item: item)
-                                        self.availabilityController.getMenuCategory()
-                                    },
-                                    .cancel()
-                                ])
-                            }
+                            Button(action: {
+                                self.availabilityController.changeItemAvailability(inCategory: category, item: item)
+                                self.availabilityController.getMenuCategory()
+                            }, label: {
+                                HStack{
+                                    Image(systemName: "circle.fill")
+                                        .font(.custom("SF Symbols", size: 10))
+                                        .foregroundColor(Color(UIColor.label))
+                                    
+                                    Text(item.name)
+                                        .bold()
+                                        .foregroundColor(Color(UIColor.label))
+                                    
+                                    Spacer()
+                                    
+                                    Text(item.available ? "Is Available" : "Not Available")
+                                        .bold()
+                                        .foregroundColor(item.available ? Color.green : Color.red)
+                                }
+                            })
+                            .buttonStyle(PlainButtonStyle())
                         }
+                        .padding(.all, 5)
                     }
                 }
             }
