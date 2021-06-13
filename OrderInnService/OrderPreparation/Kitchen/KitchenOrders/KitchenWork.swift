@@ -35,13 +35,13 @@ class KitchenWork: ObservableObject{
             .collection("Order")
             .getDocuments { snapshot, error in
     
-                guard let snapshotDocument = snapshot?.documents else{
+                guard let snapshotDDocument = snapshot?.documents else{
                     print("There is no documents")
                     group.leave()
                     return
                 }
     
-                for document in snapshotDocument{
+                for document in snapshotDDocument{
                     var activeExtraOrder = [ActiveExtraOrder]()
     
                     group.enter()
@@ -76,6 +76,11 @@ class KitchenWork: ObservableObject{
     
         group.notify(queue: .main){
             let clientOrder = self.activeOrders.compactMap{ order -> ClientSubmittedOrder? in
+                
+                let formatter = DateFormatter()
+                let date = order.created.dateValue()
+                formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
+                let formattedStamp = formatter.string(from: date)
     
                 let items = order.kitchenItems.map { item -> OrderOverview.OrderOverviewEntry in
                     let seperator = "/"
@@ -115,6 +120,7 @@ class KitchenWork: ObservableObject{
                                                 totalPrice: order.totalPrice,
                                                 forTable: order.forTable,
                                                 inZone: order.forZone,
+                                                created: formattedStamp,
                                                 withItems: items,
                                                 withExtraItems: extraOrders)
                 }else{

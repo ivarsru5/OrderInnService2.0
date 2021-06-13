@@ -18,6 +18,7 @@ struct KitchenOrder: Identifiable {
     var totalPrice: Double
     var forTable: String
     var forZone: String
+    var created: Timestamp
     var withExtras: [ActiveExtraOrder]
     
     init?(snapshot: QueryDocumentSnapshot, extraOrders: [ActiveExtraOrder]){
@@ -63,6 +64,11 @@ struct KitchenOrder: Identifiable {
             return nil
         }
         self.forZone = forZone
+        
+        guard let created = data["created"] as? Timestamp else{
+            return nil
+        }
+        self.created = created
         
         self.withExtras = extraOrders
     }

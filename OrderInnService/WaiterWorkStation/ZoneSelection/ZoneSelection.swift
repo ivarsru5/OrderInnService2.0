@@ -44,6 +44,7 @@ struct ZoneSelection: View {
             NavigationLink(destination: TableSelectionView(zones: zoneWork), isActive: $zoneWork.goToTableView, label: {
                 EmptyView()
             })
+            //TODO: Create order cloasing.
             NavigationLink(destination: Text("Hello!"), isActive: $showFinishedOrders){
                 EmptyView()
             }

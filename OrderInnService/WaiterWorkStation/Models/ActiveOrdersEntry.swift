@@ -46,6 +46,7 @@ struct ClientSubmittedOrder: Identifiable{
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var inZone: String = ""
+    var created: String = ""
     var withItems: [OrderOverview.OrderOverviewEntry] = []
     var withExtraItems: [ExtraOrderOverview] = []
 }
