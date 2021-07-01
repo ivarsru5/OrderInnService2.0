@@ -51,3 +51,9 @@ struct ClientSubmittedOrder: Identifiable{
     var withExtraItems: [ExtraOrderOverview] = []
 }
 
+extension ClientSubmittedOrder: Equatable{
+    static func == (lhs: ClientSubmittedOrder, rhs: ClientSubmittedOrder) -> Bool {
+        return lhs.id == rhs.id
+    }
+}
+

@@ -12,8 +12,6 @@ struct KitchenView: View {
     @ObservedObject var qrScanner: QrCodeScannerWork
     @State var showOrderOverview  = false
     
-    let timer = Timer.publish(every: 15, on: .main, in: .common).autoconnect()
-    
     var body: some View {
         ZStack{
             if !kitchen.collectedOrders.isEmpty{
@@ -52,9 +50,6 @@ struct KitchenView: View {
                         .padding()
                     }
                 }
-                .onReceive(timer){ time in
-                    kitchen.retriveActiveOrders(fromKey: nil)
-                }
             }else{
                 Text("There have not been placed any order yet.")
                     .font(.headline)
@@ -66,9 +61,6 @@ struct KitchenView: View {
             NavigationLink(destination: KitchenOrderOverView(activeOrder: kitchen, dismissOrderView: $showOrderOverview), isActive: $showOrderOverview) { EmptyView()}
         }
         .navigationTitle("\(kitchen.getRestaurantName(fromQrString: qrScanner.restaurantQrCode)): \(qrScanner.kitchen!)")
-        .onAppear{
-            kitchen.retriveActiveOrders(fromKey: qrScanner)
-        }
     }
 }
 

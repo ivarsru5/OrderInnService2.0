@@ -59,6 +59,7 @@ struct KitchenOrderOverView: View {
                     }
                     Button(action: {
                         orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
+                        activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
                     }, label: {
                         Text("order completed")
                             .bold()
