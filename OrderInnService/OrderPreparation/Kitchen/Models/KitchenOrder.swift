@@ -15,6 +15,7 @@ struct KitchenOrder: Identifiable {
     var placedBy: String
     var orderOpened: Bool
     var orderReady: Bool
+    var orderSeen: Bool
     var totalPrice: Double
     var forTable: String
     var forZone: String
@@ -69,6 +70,11 @@ struct KitchenOrder: Identifiable {
             return nil
         }
         self.created = created
+        
+        guard let orderSeen = data["orderSeen"] as? Bool else{
+            return nil
+        }
+        self.orderSeen = orderSeen
         
         self.withExtras = extraOrders
     }

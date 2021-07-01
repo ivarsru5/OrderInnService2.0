@@ -24,6 +24,7 @@ class KitchenWork: ObservableObject{
     init(){
         self.getOrders { order in
             self.collectedOrders.append(order)
+            self.collectedOrders.sort { !$0.orderOpened && $1.orderOpened }
         }
     }
     

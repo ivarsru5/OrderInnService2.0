@@ -58,6 +58,7 @@ class RestaurantOrderWork: ObservableObject{
             "toatlOrderPrice": totalPrice,
             "orderOpened": restaurantOrder.orderOpened,
             "orderReady" : restaurantOrder.orderReady,
+            "orderSeen" : restaurantOrder.orderSeen,
             "created": Timestamp(date: Date())
         ]
         

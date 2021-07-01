@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct KitchenOrderOverView: View {
+    @Environment(\.presentationMode) var presetationMode
     @StateObject var orderOverview = KitchenOrderWork()
     @ObservedObject var activeOrder: KitchenWork
     @Binding var dismissOrderView: Bool
@@ -60,6 +61,7 @@ struct KitchenOrderOverView: View {
                     Button(action: {
                         orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
                         activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
+                        presetationMode.wrappedValue.dismiss()
                     }, label: {
                         Text("order completed")
                             .bold()

@@ -15,6 +15,7 @@ struct RestaurantOrder: Identifiable{
     var orderReady: Bool
     var forTable: String
     var forZone: String
+    var orderSeen: Bool
     
     init(){
         self.menuItems = []
@@ -23,6 +24,7 @@ struct RestaurantOrder: Identifiable{
         self.orderReady = false
         self.forTable = ""
         self.forZone = ""
+        self.orderSeen = false
     }
     
     struct Course{
