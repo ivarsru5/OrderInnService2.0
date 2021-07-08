@@ -9,39 +9,59 @@ import Foundation
 import FirebaseFirestore
 
 extension UserDefaults{
+    fileprivate enum Keys: String {
+        case startScreen = "qr_scanner"
+        case waiterQrString = "wiater_Qr_String_Key"
+        case kitchenQrString = "kitchen_Qr_String_Key"
+        case currentUser = "current_user"
+
+        static let allKeys = [
+            startScreen,
+            waiterQrString,
+            kitchenQrString,
+            currentUser,
+        ]
+    }
+
     var startScreen: Bool{
         get{
-            return (UserDefaults.standard.value(forKey: "qr_scanner") as? Bool ?? false)
+            return (UserDefaults.standard.value(forKey: Keys.startScreen.rawValue) as? Bool ?? false)
         }
         set{
-            UserDefaults.standard.setValue(newValue, forKey: "qr_scanner")
+            UserDefaults.standard.setValue(newValue, forKey: Keys.startScreen.rawValue)
         }
     }
     
     var wiaterQrStringKey: String{
         get{
-            return(UserDefaults.standard.value(forKey: "wiater_Qr_String_Key") as? String ?? "")
+            return(UserDefaults.standard.value(forKey: Keys.waiterQrString.rawValue) as? String ?? "")
         }
         set{
-            UserDefaults.standard.setValue(newValue, forKey: "wiater_Qr_String_Key")
+            UserDefaults.standard.setValue(newValue, forKey: Keys.waiterQrString.rawValue)
         }
     }
     
     var kitchenQrStringKey: String{
         get{
-            return(UserDefaults.standard.value(forKey: "kitchen_Qr_String_Key") as? String ?? "")
+            return(UserDefaults.standard.value(forKey: Keys.kitchenQrString.rawValue) as? String ?? "")
         }
         set{
-            UserDefaults.standard.setValue(newValue, forKey: "kitchen_Qr_String_Key")
+            UserDefaults.standard.setValue(newValue, forKey: Keys.kitchenQrString.rawValue)
         }
     }
     
     var currentUser: String{
         get{
-            return (UserDefaults.standard.value(forKey: "current_user") as? String ?? "")
+            return (UserDefaults.standard.value(forKey: Keys.currentUser.rawValue) as? String ?? "")
         }
         set{
-            UserDefaults.standard.setValue(newValue, forKey: "current_user")
+            UserDefaults.standard.setValue(newValue, forKey: Keys.currentUser.rawValue)
+        }
+    }
+
+    static func deleteAllValues() {
+        Keys.allKeys.forEach { key in
+            UserDefaults.standard.removeObject(forKey: key.rawValue)
         }
     }
 }

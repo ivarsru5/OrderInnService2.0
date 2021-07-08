@@ -28,6 +28,17 @@ struct OrderTabView: View {
                 Image(systemName: "scroll")
                 Text("Active Order's")
             }
+
+            #if DEBUG
+            NavigationView {
+                DebugMenu()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem {
+                Image(systemName: "wrench.and.screwdriver")
+                Text("Debug")
+            }
+            #endif
         }
     }
 }
