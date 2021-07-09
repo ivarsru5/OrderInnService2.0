@@ -8,12 +8,10 @@
 import SwiftUI
 
 struct KitchenTabView: View {
-    @ObservedObject var qrScanner: QrCodeScannerWork
-    
     var body: some View {
         TabView{
             NavigationView{
-                KitchenView(qrScanner: qrScanner)
+                KitchenView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem{

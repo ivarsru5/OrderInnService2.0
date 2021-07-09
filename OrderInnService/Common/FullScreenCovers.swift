@@ -8,9 +8,8 @@
 import SwiftUI
 
 struct ToZoneView: View {
-    @ObservedObject var qrscanner: QrCodeScannerWork
     var body: some View {
-        OrderTabView(qrScanner: qrscanner)
+        OrderTabView()
     }
 }
 

@@ -9,6 +9,7 @@ import SwiftUI
 import FirebaseFirestore
 
 struct DebugMenu: View {
+    @EnvironmentObject var authManager: AuthManager
     @State var userDefaultsDumped = false
     @State var promptToResetUserDefaults = false
 
@@ -28,37 +29,18 @@ struct DebugMenu: View {
         // as having effectively logged out, hence we do that here such that
         // it's possible to log in afterwards. Actual UserDefaults clearing goes
         // on in actuallyResetUserDefaults.
-        let nameSurname = UserDefaults.standard.currentUser.components(separatedBy: " ")
-        let name = nameSurname[0], surname = nameSurname[1]
-
-        Firestore.firestore()
-            .collection("Restaurants")
-            .document(UserDefaults.standard.wiaterQrStringKey)
-            .collection("Users")
-            // HACK[pn]: We should be storing the user ID instead of their name
-            // such that filtering by first and last name isn't necessary and
-            // the relevant document can be looked up immediately.
-            .whereField("name", isEqualTo: name)
-            .whereField("lastName", isEqualTo: surname)
-            .getDocuments(completion: { maybeSnapshot, error in
-                guard let snapshot = maybeSnapshot else {
-                    print("[Debug] Restaurant gone? \(String(describing: error))")
-                    actuallyResetUserDefaults()
+        if let waiter = authManager.waiter {
+            waiter.firebaseReference.updateData(["isActive": true], completion: { maybeError in
+                if let error = maybeError {
+                    print("[Debug] Failed to update current user: \(String(describing: error))")
                 }
-
-                // HACK[pn]: See above.
-                Firestore.firestore()
-                    .collection("Restaurants")
-                    .document(UserDefaults.standard.wiaterQrStringKey)
-                    .collection("Users")
-                    .document(snapshot.documents.first!.documentID)
-                    .updateData(["isActive": true], completion: { maybeError in
-                        if let error = maybeError {
-                            print("[Debug] Failed to update current user: \(String(describing: error))")
-                        }
-                        actuallyResetUserDefaults()
-                    })
+                actuallyResetUserDefaults()
             })
+        } else {
+            // Technically unreachable since this screen is attached only to
+            // the service workflow, but regardless.
+            actuallyResetUserDefaults()
+        }
     }
     func actuallyResetUserDefaults() -> Never {
         print("=== Resetting user defaults. The app will crash afterwards.")

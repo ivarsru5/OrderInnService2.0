@@ -8,18 +8,18 @@
 import UIKit
 import AVFoundation
 
-enum CameraError: String{
+enum CameraError: String {
     case invalidDeviceInput
     case invalidCodeFormat
     case invalidQrCode
 }
 
 protocol ScannerVCDelegate: AnyObject {
-    func didFind(qrCode: QRURL)
+    func didFind(qrCode: LoginQRCode)
     func didSurface(error: CameraError)
 }
 
-class QrScannerViewController: UIViewController{
+class QrScannerViewController: UIViewController {
     let session = AVCaptureSession()
     var preViewLayer: AVCaptureVideoPreviewLayer?
     weak var scannerDelegate: ScannerVCDelegate?
@@ -100,12 +100,10 @@ extension QrScannerViewController: AVCaptureMetadataOutputObjectsDelegate{
             return
         }
         session.stopRunning()
-        
-        if let result = QRURL.validateWaiter(from: qrCode){
+
+        if let result = LoginQRCode.parse(from: qrCode) {
             scannerDelegate?.didFind(qrCode: result)
-        }else if let result = QRURL.validateKitchen(from: qrCode){
-            scannerDelegate?.didFind(qrCode: result)
-        }else{
+        } else {
             scannerDelegate?.didSurface(error: .invalidQrCode)
         }
     }

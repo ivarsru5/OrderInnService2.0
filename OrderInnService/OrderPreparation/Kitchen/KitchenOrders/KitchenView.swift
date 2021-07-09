@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct KitchenView: View {
+    @EnvironmentObject var authManager: AuthManager
     @StateObject var kitchen = KitchenWork()
-    @ObservedObject var qrScanner: QrCodeScannerWork
     @State var showOrderOverview  = false
     
     var body: some View {
@@ -60,7 +60,7 @@ struct KitchenView: View {
             
             NavigationLink(destination: KitchenOrderOverView(activeOrder: kitchen, dismissOrderView: $showOrderOverview), isActive: $showOrderOverview) { EmptyView()}
         }
-        .navigationTitle("\(kitchen.getRestaurantName(fromQrString: qrScanner.restaurantQrCode)): \(qrScanner.kitchen!)")
+        .navigationTitle("\(authManager.restaurant.name): \(authManager.kitchen!)")
     }
 }
 

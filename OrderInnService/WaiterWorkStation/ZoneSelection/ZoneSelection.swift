@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct ZoneSelection: View {
-    @ObservedObject var qrScanner: QrCodeScannerWork
+    @EnvironmentObject var authManager: AuthManager
     @StateObject var zoneWork = ZoneWork()
     @State var alertItem: AlertItem?
     @State var showFinishedOrders = false
@@ -16,7 +16,7 @@ struct ZoneSelection: View {
     var body: some View {
         ZStack{
             if !zoneWork.loadingQuery{
-                if qrScanner.restaurant.subscriptionPaid{
+                if authManager.restaurant.subscriptionPaid{
                     List{
                         ForEach(zoneWork.zones, id: \.id){ zone in
                             Button(action: {
@@ -51,9 +51,9 @@ struct ZoneSelection: View {
         }
         .navigationBarItems(trailing: HStack{
             Button(action: {
-                if qrScanner.employee!.manager{
+                if authManager.waiter!.manager {
                     self.showFinishedOrders.toggle()
-                }else{
+                } else {
                     self.alertItem = UIAlerts.restrictions
                 }
             }, label: {
@@ -66,10 +66,7 @@ struct ZoneSelection: View {
             Alert(title: alert.title, message: alert.message, dismissButton: alert.dismissButton)
         }
         .onAppear{
-            qrScanner.loadUser()
-            qrScanner.retriveRestaurant(with: UserDefaults.standard.wiaterQrStringKey)
-            zoneWork.getZones()
-            print(UserDefaults.standard.currentUser)
+            zoneWork.getZones(for: authManager.restaurant)
         }
     }
 }

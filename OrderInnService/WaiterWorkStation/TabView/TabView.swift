@@ -8,21 +8,16 @@
 import SwiftUI
 
 struct OrderTabView: View {
-    @ObservedObject var qrScanner: QrCodeScannerWork
-    
     var body: some View {
-        TabView{
-            NavigationView{
-                ZoneSelection(qrScanner: qrScanner)
-            }
+        TabView {
+            NavigationView { ZoneSelection() }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem{
                 Image(systemName: "tray")
                 Text("Place Order")
             }
-            NavigationView{
-                ActiveOrderView()
-            }
+
+            NavigationView{ ActiveOrderView() }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem{
                 Image(systemName: "scroll")
@@ -30,9 +25,7 @@ struct OrderTabView: View {
             }
 
             #if DEBUG
-            NavigationView {
-                DebugMenu()
-            }
+            NavigationView { DebugMenu() }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
                 Image(systemName: "wrench.and.screwdriver")

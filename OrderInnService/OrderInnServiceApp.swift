@@ -14,10 +14,11 @@ struct OrderInnServiceApp: App {
     init(){
         FirebaseApp.configure()
     }
-    
+
     var body: some Scene {
         WindowGroup {
             LounchScreen()
+                .environmentObject(AuthManager.shared)
         }
     }
 }

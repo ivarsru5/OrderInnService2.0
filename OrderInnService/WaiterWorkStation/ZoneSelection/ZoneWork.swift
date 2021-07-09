@@ -20,8 +20,8 @@ class ZoneWork: ObservableObject{
         }
     }
     
-    func getZones(){
-        databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Zone").getDocuments { snapshot, error in
+    func getZones(for restaurant: Restaurant){
+        restaurant.firebaseReference.collection("Zone").getDocuments { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no zones")

@@ -10,8 +10,7 @@ import Combine
 import AVFoundation
 
 struct QrCodeScannerView: UIViewControllerRepresentable{
-    @Binding var restaurant: String
-    @Binding var kitchen: String?
+    @EnvironmentObject var authManager: AuthManager
     @Binding var alertItem: AlertItem?
     
     func makeUIViewController(context: Context) -> QrScannerViewController {
@@ -26,29 +25,36 @@ struct QrCodeScannerView: UIViewControllerRepresentable{
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(qrScannerView: self)
+        Coordinator(authManager: authManager, alertItem: $alertItem)
     }
     
-    class Coordinator: NSObject, ScannerVCDelegate{
-        private var qrScannerView: QrCodeScannerView
-        
-        init(qrScannerView: QrCodeScannerView){
-            self.qrScannerView = qrScannerView
+    class Coordinator: NSObject, ScannerVCDelegate {
+        let authManager: AuthManager
+        let alertItem: Binding<AlertItem?>
+
+        init(authManager: AuthManager, alertItem: Binding<AlertItem?>) {
+            self.authManager = authManager
+            self.alertItem = alertItem
         }
-        
-        func didFind(qrCode: QRURL) {
-            qrScannerView.restaurant = qrCode.restaurant
-            qrScannerView.kitchen = qrCode.kitchen
+
+        private var _authManagerLoginCancellable: AnyCancellable!
+        func didFind(qrCode: LoginQRCode) {
+            _authManagerLoginCancellable = authManager.logIn(using: qrCode).sink(receiveCompletion: {
+                result in
+                if case .failure(_) = result {
+                    // TODO: show error...
+                }
+            }, receiveValue: { _ in })
         }
         
         func didSurface(error: CameraError) {
             switch error {
             case .invalidDeviceInput:
-                qrScannerView.alertItem = AlertContext.invalidDevice
+                alertItem.wrappedValue = AlertContext.invalidDevice
             case .invalidCodeFormat:
-                qrScannerView.alertItem = AlertContext.invalidCodeFormat
+                alertItem.wrappedValue = AlertContext.invalidCodeFormat
             case .invalidQrCode:
-                qrScannerView.alertItem = AlertContext.invalidQrCode
+                alertItem.wrappedValue = AlertContext.invalidQrCode
             }
         }
     }
