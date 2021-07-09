@@ -9,12 +9,12 @@ import Foundation
 import FirebaseFirestore
 
 class ZoneWork: ObservableObject{
-    @Published var zones = [Zones]()
+    @Published var zones = [Zone]()
     @Published var loadingQuery = true
     @Published var goToTableView = false
     let databse = Firestore.firestore()
     
-    @Published var selectedZone: Zones?{
+    @Published var selectedZone: Zone?{
         didSet{
             self.goToTableView.toggle()
         }
@@ -27,8 +27,8 @@ class ZoneWork: ObservableObject{
                 print("There is no zones")
                 return
             }
-            self.zones = snapshotDocument.compactMap { zoneSnapshot -> Zones? in
-                guard let collectdeZone = Zones(snapshot: zoneSnapshot) else{
+            self.zones = snapshotDocument.compactMap { zoneSnapshot -> Zone? in
+                guard let collectdeZone = Zone(snapshot: zoneSnapshot) else{
                     //TODO: display alert
                     return nil
                 }

@@ -20,7 +20,7 @@ class TableSelectionWork: ObservableObject{
         }
     }
     
-    func getTables(with zoneId: Zones){
+    func getTables(with zoneId: Zone){
         database.collection("Restaurants")
             .document(UserDefaults.standard.wiaterQrStringKey)
             .collection("Zone")

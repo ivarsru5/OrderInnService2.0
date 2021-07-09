@@ -41,20 +41,20 @@ struct Restaurant: Identifiable {
             .document(id)
     }
 
-    func loadUsers() -> Publishers.Map<Future<QuerySnapshot, Error>, [RestaurantEmploye]> {
+    func loadUsers() -> Publishers.Map<Future<QuerySnapshot, Error>, [Employee]> {
         return Firestore.firestore()
             .collection(Restaurant.firebaseCollection)
             .document(id)
-            .collection(RestaurantEmploye.firebaseCollection)
+            .collection(Employee.firebaseCollection)
             .getDocumentsFuture()
             .map { snapshot in
                 return snapshot.documents.map { document in
-                    return RestaurantEmploye(from: document, withRestaurantID: id)
+                    return Employee(from: document, withRestaurantID: id)
                 }
             }
     }
 
-    struct RestaurantEmploye: Identifiable {
+    struct Employee: Identifiable {
         typealias ID = String
 
         static let firebaseCollection = "Users"
@@ -80,7 +80,7 @@ struct Restaurant: Identifiable {
         }
 
         static func load(forRestaurantID restaurantID: Restaurant.ID,
-                         withUserID userID: RestaurantEmploye.ID) -> Future<RestaurantEmploye, Error> {
+                         withUserID userID: Employee.ID) -> Future<Employee, Error> {
             return Future() { resolve in
                 Firestore.firestore()
                     .collection("Restaurants")
@@ -94,7 +94,7 @@ struct Restaurant: Identifiable {
                             return
                         }
 
-                        let employee = RestaurantEmploye(from: snapshot, withRestaurantID: restaurantID)
+                        let employee = Employee(from: snapshot, withRestaurantID: restaurantID)
                         resolve(.success(employee))
                     }
             }
@@ -104,7 +104,7 @@ struct Restaurant: Identifiable {
             Firestore.firestore()
                 .collection(Restaurant.firebaseCollection)
                 .document(restaurantID)
-                .collection(RestaurantEmploye.firebaseCollection)
+                .collection(Employee.firebaseCollection)
                 .document(id)
         }
     }

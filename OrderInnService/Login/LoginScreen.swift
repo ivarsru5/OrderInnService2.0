@@ -8,7 +8,7 @@
 import SwiftUI
 import Combine
 
-struct QrScannerView: View {
+struct LoginScreen: View {
     @EnvironmentObject var authManager: AuthManager
     @State var alertItem: AlertItem?
 
@@ -23,11 +23,11 @@ struct QrScannerView: View {
     }
     var body: some View {
         ZStack {
-            QrCodeScannerView(alertItem: $alertItem)
+            QRScannerView(alertItem: $alertItem)
                 .edgesIgnoringSafeArea(.all)
             
             BlurEffectView(effect: UIBlurEffect(style: .dark))
-                .inverseMask(Circle().padding())
+                .inverseMask(RoundedRectangle(cornerRadius: 16.0, style: .circular).padding())
                 .edgesIgnoringSafeArea(.all)
             VStack {
                 Text("Please scan QR code.")
@@ -50,21 +50,11 @@ struct QrScannerView: View {
     }
 }
 
-enum FullScreenCover: Hashable, Identifiable{
-    case toZones
-    case toQrScanner
-    
-    var id: Int{
-        return self.hashValue
-    }
-}
-
 struct EmployeeList: View {
     @EnvironmentObject var authManager: AuthManager
-    @State var presentFullScreenCover: FullScreenCover? = nil
 
     class Model: ObservableObject {
-        @Published var users: [Restaurant.RestaurantEmploye]?
+        @Published var users: [Restaurant.Employee]?
 
         var _loadUsersCancellable: AnyCancellable!
 
@@ -87,7 +77,7 @@ struct EmployeeList: View {
             .multilineTextAlignment(.center)
 
         Button(action: {
-            self.presentFullScreenCover = .toQrScanner
+            authManager.resetAuthState()
         }, label: {
             Text("Retry Scan")
                 .frame(width: 250, height: 50, alignment: .center)
@@ -98,7 +88,7 @@ struct EmployeeList: View {
         .padding()
     }
 
-    @ViewBuilder func userListing(restaurant: Restaurant, users: [Restaurant.RestaurantEmploye]) -> some View {
+    @ViewBuilder func userListing(restaurant: Restaurant, users: [Restaurant.Employee]) -> some View {
         Text("\(restaurant.name)")
             .bold()
             .foregroundColor(Color(UIColor.label))
@@ -143,17 +133,5 @@ struct EmployeeList: View {
             model.loadUsers(from: authManager)
         }
         .navigationBarHidden(true)
-        // TODO[pn 2021-07-09]: This is definitely not how this should work.
-        // At the very least, this should be replaced all the way back in the
-        // aptly-named LounchScreen [sic], not overlaid _on top_ of the QR
-        // scanner, lest it cause a memory leak.
-        .fullScreenCover(item: $presentFullScreenCover) { item in
-            if item == .toZones{
-//                ToZoneView(qrscanner: scannerWork)
-                EmptyView()
-            }else if item == .toQrScanner{
-                ToQrScannerView()
-            }
-        }
     }
 }

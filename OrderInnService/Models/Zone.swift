@@ -8,7 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
-struct Zones: Identifiable {
+struct Zone: Identifiable {
     var id = UUID().uuidString
     let location: String
     

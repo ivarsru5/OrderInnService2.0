@@ -15,7 +15,7 @@ class AuthManager: ObservableObject {
         case loading
         case unauthenticated
         case authenticatedWaiterUnknownID(restaurantID: Restaurant.ID)
-        case authenticatedWaiter(restaurantID: Restaurant.ID, employeeID: Restaurant.RestaurantEmploye.ID)
+        case authenticatedWaiter(restaurantID: Restaurant.ID, employeeID: Restaurant.Employee.ID)
         case authenticatedKitchen(restaurantID: Restaurant.ID, kitchen: String)
     }
 
@@ -37,7 +37,7 @@ class AuthManager: ObservableObject {
     }
 
     var restaurant: Restaurant!
-    var waiter: Restaurant.RestaurantEmploye?
+    var waiter: Restaurant.Employee?
     var kitchen: String? {
         switch authState {
         case .authenticatedKitchen(restaurantID: _, kitchen: let kitchen): return kitchen
@@ -61,7 +61,7 @@ class AuthManager: ObservableObject {
 
     private var subs = Set<AnyCancellable>()
 
-    private func load(restaurant: Restaurant.ID, user: Restaurant.RestaurantEmploye.ID) {
+    private func load(restaurant: Restaurant.ID, user: Restaurant.Employee.ID) {
         var sub: AnyCancellable? = nil
         var sub2: AnyCancellable? = nil
 
@@ -78,7 +78,7 @@ class AuthManager: ObservableObject {
             [unowned self] restaurant in
             self.restaurant = restaurant
 
-            sub2 = Restaurant.RestaurantEmploye.load(forRestaurantID: restaurant.id, withUserID: user).sink(receiveCompletion: {
+            sub2 = Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user).sink(receiveCompletion: {
                 [unowned self] result in
                 if case .failure(let error) = result {
                     fatalError("FIXME Failed to load user: \(String(describing: error))")
@@ -121,6 +121,10 @@ class AuthManager: ObservableObject {
         sub!.store(in: &subs)
     }
 
+    func resetAuthState() {
+        authState = .unauthenticated
+    }
+
     func logIn(using qrCode: LoginQRCode) -> Future<AuthState, Error> {
         return Future() { [unowned self] resolve in
             var sub: AnyCancellable? = nil
@@ -149,7 +153,7 @@ class AuthManager: ObservableObject {
         }
     }
 
-    func finishWaiterLogin(withUser user: Restaurant.RestaurantEmploye) -> Future<Void, Error> {
+    func finishWaiterLogin(withUser user: Restaurant.Employee) -> Future<Void, Error> {
         guard case .authenticatedWaiterUnknownID(restaurantID: let restaurantID) = self.authState else {
             fatalError("AuthManager.finishWaiterLogin called with improper starting state")
         }
@@ -178,7 +182,7 @@ class AuthManager: ObservableObject {
 
     private func persistAuthState() {
         let restaurantID: Restaurant.ID?
-        let userID: Restaurant.RestaurantEmploye.ID?
+        let userID: Restaurant.Employee.ID?
         switch authState {
         case .loading:
             fatalError("BUG Tried to persist loading (i.e, undefined) auth state to UserDefaults")

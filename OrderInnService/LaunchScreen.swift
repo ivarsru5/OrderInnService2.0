@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct LounchScreen: View {
+struct LaunchScreen: View {
     @EnvironmentObject var authManager: AuthManager
     
     var body: some View {
@@ -15,7 +15,7 @@ struct LounchScreen: View {
         case .loading:
             Spinner()
         case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _):
-            QrScannerView()
+            LoginScreen()
         case .authenticatedWaiter(restaurantID: _, employeeID: _):
             OrderTabView()
         case .authenticatedKitchen(restaurantID: _, kitchen: _):
@@ -26,6 +26,6 @@ struct LounchScreen: View {
 
 struct LounchScreen_Previews: PreviewProvider {
     static var previews: some View {
-        LounchScreen()
+        LaunchScreen()
     }
 }

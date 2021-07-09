@@ -45,9 +45,3 @@ extension IfLet where NilContent == EmptyView {
         self.init(value, whenPresent: contentBuilder, whenAbsent: { EmptyView() })
     }
 }
-
-extension Binding {
-    init(readOnly `get`: @escaping () -> Value) {
-        self.init(get: `get`, set: { _ in fatalError("Tried to set read-only binding") })
-    }
-}

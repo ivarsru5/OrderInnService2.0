@@ -17,7 +17,7 @@ struct OrderInnServiceApp: App {
 
     var body: some Scene {
         WindowGroup {
-            LounchScreen()
+            LaunchScreen()
                 .environmentObject(AuthManager.shared)
         }
     }
