@@ -31,7 +31,7 @@ class AuthManager: ObservableObject {
     }
     var isAuthenticated: Bool {
         switch authState {
-        case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _): return false
+        case .loading, .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _): return false
         default: return true
         }
     }
