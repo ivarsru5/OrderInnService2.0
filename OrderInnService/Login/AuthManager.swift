@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+fileprivate func noop() { }
+
 class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
@@ -68,10 +70,17 @@ class AuthManager: ObservableObject {
     }
 
     private var subs = Set<AnyCancellable>()
+    func sink(_ publisher: AnyPublisher<Void, Never>) {
+        var sub: AnyCancellable?
+        sub = publisher.sink(receiveCompletion: { [weak self] _ in
+            if let this = self, let sub_ = sub {
+                this.subs.remove(sub_)
+            }
+        }, receiveValue: noop)
+    }
 
     private func load(restaurant: Restaurant.ID, user: Restaurant.Employee.ID) {
-        var sub: AnyCancellable?
-        sub = Restaurant.load(withID: restaurant)
+        let pub = Restaurant.load(withID: restaurant)
             .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
@@ -79,46 +88,42 @@ class AuthManager: ObservableObject {
                 self.restaurant = restaurant
                 return Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user)
             }
+            .map { [unowned self] user in
+                self.waiter = user
+                authState = .authenticatedWaiter(restaurantID: self.restaurant.id, employeeID: user.id)
+            }
             .mapError { error in
                 fatalError("FIXME Failed to load user: \(String(describing: error))")
             }
-            .sink { [unowned self] user in
-                self.waiter = user
-                authState = .authenticatedWaiter(restaurantID: self.restaurant.id, employeeID: user.id)
-                if let _ = sub {
-                    sub = nil
-                }
-            }
+            .eraseToAnyPublisher()
+        self.sink(pub)
     }
 
     private func load(kitchenForRestaurant restaurant: Restaurant.ID) {
-        var sub: AnyCancellable?
-        sub = Restaurant.load(withID: restaurant)
+        let pub = Restaurant.load(withID: restaurant)
+            .map { [unowned self] restaurant in
+                self.restaurant = restaurant
+                authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
+            }
             .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
-            .sink { [unowned self] restaurant in
-                self.restaurant = restaurant
-                authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
-                if let _ = sub {
-                    sub = nil
-                }
-            }
+            .eraseToAnyPublisher()
+        self.sink(pub)
     }
 
     func resetAuthState() {
         if case .authenticatedWaiter(restaurantID: _, employeeID: _) = authState {
-            var sub: AnyCancellable?
-            sub = logoutWaiter().sink(receiveCompletion: {
-                [unowned self] result in
-                if case .failure(let error) = result {
+            let pub = logoutWaiter()
+                .map { [unowned self] _ in
+                    authState = .unauthenticated
+                }
+                .`catch` { error -> Empty<Void, Never> in
                     print("Failed to log out: \(String(describing: error))")
+                    return Empty()
                 }
-                authState = .unauthenticated
-                if let _ = sub {
-                    sub = nil
-                }
-            }, receiveValue: { })
+                .eraseToAnyPublisher()
+            self.sink(pub)
         } else {
             authState = .unauthenticated
         }
