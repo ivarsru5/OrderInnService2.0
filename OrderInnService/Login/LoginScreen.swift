@@ -57,6 +57,7 @@ struct EmployeeList: View {
         @Published var users: [Restaurant.Employee]?
 
         var _loadUsersCancellable: AnyCancellable!
+        var _finishLoginCancellable: AnyCancellable!
 
         func loadUsers(from authManager: AuthManager) {
             _loadUsersCancellable = authManager.restaurant.loadUsers().sink(receiveCompletion: {
@@ -99,7 +100,17 @@ struct EmployeeList: View {
             ForEach(users) { user in
                 Button(action: {
                     // TODO: Handle potential error that can arise while marking user as inactive.
-                    _ = authManager.finishWaiterLogin(withUser: user)
+                    var sub: AnyCancellable?
+                    sub = authManager.finishWaiterLogin(withUser: user)
+                        .sink(receiveCompletion: { result in
+                            if case .failure(let error) = result {
+                                // TODO display error...
+                                print("Failed to finish login: \(String(describing: error))")
+                            }
+                            if let _ = sub {
+                                sub = nil
+                            }
+                        }, receiveValue: { _ in })
                 }, label: {
                     HStack{
                         Image(systemName: "person.circle.fill")

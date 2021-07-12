@@ -27,6 +27,10 @@ struct KitchenTabView: View {
                 Image(systemName: "tray")
                 Text("Availability")
             }
+
+            #if DEBUG
+            DebugMenu.navigationViewWithTabItem
+            #endif
         }
     }
 }

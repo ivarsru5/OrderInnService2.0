@@ -19,13 +19,8 @@ struct LaunchScreen: View {
         case .authenticatedWaiter(restaurantID: _, employeeID: _):
             OrderTabView()
         case .authenticatedKitchen(restaurantID: _, kitchen: _):
-            KitchenView()
+            KitchenTabView()
         }
     }
 }
 
-struct LounchScreen_Previews: PreviewProvider {
-    static var previews: some View {
-        LaunchScreen()
-    }
-}

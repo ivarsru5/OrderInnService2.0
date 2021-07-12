@@ -6,12 +6,51 @@
 //
 
 import SwiftUI
+import Combine
 import FirebaseFirestore
 
+#if DEBUG
 struct DebugMenu: View {
+    class Model {
+        var subs = Set<AnyCancellable>()
+    }
+
     @EnvironmentObject var authManager: AuthManager
     @State var userDefaultsDumped = false
     @State var promptToResetUserDefaults = false
+
+    func switchActiveUserToWaiter() {
+        switch authManager.authState {
+        case .authenticatedWaiter(restaurantID: _, employeeID: _): return
+        default: break
+        }
+
+        let qr = LoginQRCode.waiter(restaurantID: authManager.restaurant.id)
+        var sub: AnyCancellable?
+        sub = authManager.logIn(using: qr).sink(receiveCompletion: {
+            _ in
+            if let _ = sub {
+                sub = nil
+            }
+        }, receiveValue: { _ in })
+    }
+
+    func switchActiveUserToKitchen() {
+        switch authManager.authState {
+        case .authenticatedKitchen(restaurantID: _, kitchen: _): return
+        default: break
+        }
+
+        let qr = LoginQRCode.kitchen(restaurantID: authManager.restaurant.id, kitchen: "")
+
+        var sub: AnyCancellable?
+        sub = authManager.logIn(using: qr).sink(receiveCompletion: {
+            _ in
+            if let _ = sub {
+                sub = nil
+            }
+        }, receiveValue: { _ in })
+    }
 
     func dumpUserDefaultsToConsole() {
         print("=== Begin user defaults dump.")
@@ -50,10 +89,18 @@ struct DebugMenu: View {
 
     var body: some View {
         List {
-            Button("Dump User Defaults to Console",
-                   action: self.dumpUserDefaultsToConsole)
-            Button("Reset App Data",
-                   action: { promptToResetUserDefaults = true })
+            Section(header: Text("Active User")) {
+                Button("Switch to Waiter",
+                       action: self.switchActiveUserToWaiter)
+                Button("Switch to Kitchen",
+                       action: self.switchActiveUserToKitchen)
+            }
+            Section(header: Text("App Data")) {
+                Button("Dump User Defaults to Console",
+                       action: self.dumpUserDefaultsToConsole)
+                Button("Reset App Data",
+                       action: { promptToResetUserDefaults = true })
+            }
         }
         .navigationTitle("Debug Actions")
         .alert(isPresented: $userDefaultsDumped) {
@@ -70,9 +117,18 @@ struct DebugMenu: View {
                   secondaryButton: .default(Text("No")))
         }
     }
+
+    static var navigationViewWithTabItem: some View {
+        NavigationView {
+            DebugMenu()
+        }
+        .tabItem {
+            Image(systemName: "wrench.and.screwdriver")
+            Text("Debug")
+        }
+    }
 }
 
-#if DEBUG
 struct DebugMenu_Previews: PreviewProvider {
     static var previews: some View {
         DebugMenu()

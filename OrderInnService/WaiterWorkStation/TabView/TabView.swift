@@ -25,12 +25,7 @@ struct OrderTabView: View {
             }
 
             #if DEBUG
-            NavigationView { DebugMenu() }
-            .navigationViewStyle(StackNavigationViewStyle())
-            .tabItem {
-                Image(systemName: "wrench.and.screwdriver")
-                Text("Debug")
-            }
+            DebugMenu.navigationViewWithTabItem
             #endif
         }
     }

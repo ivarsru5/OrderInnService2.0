@@ -21,6 +21,17 @@ class AuthManager: ObservableObject {
 
     private var _initialised = false
     @Published private(set) var authState: AuthState {
+        willSet {
+            // HACK[pn]: Since SwiftUI updates views in a weird order that
+            // can cause conditionals not to be re-rendered before their children
+            // are, and since switching authState while one of the children views
+            // is already rendered can cause crashes due to accessing nilable data,
+            // we need to propagate this cached value separately and, more importantly,
+            // *not remove it* if authState is switched from kitchen to waiter.
+            if case .authenticatedKitchen(restaurantID: _, kitchen: let kitchen) = newValue {
+                self.kitchen = kitchen
+            }
+        }
         didSet {
             if case .loading = oldValue {
                 _initialised = true
@@ -38,12 +49,7 @@ class AuthManager: ObservableObject {
 
     var restaurant: Restaurant!
     var waiter: Restaurant.Employee?
-    var kitchen: String? {
-        switch authState {
-        case .authenticatedKitchen(restaurantID: _, kitchen: let kitchen): return kitchen
-        default: return nil
-        }
-    }
+    private(set) var kitchen: String?
 
     init() {
         authState = .loading
@@ -62,98 +68,108 @@ class AuthManager: ObservableObject {
     private var subs = Set<AnyCancellable>()
 
     private func load(restaurant: Restaurant.ID, user: Restaurant.Employee.ID) {
-        var sub: AnyCancellable? = nil
-        var sub2: AnyCancellable? = nil
-
-        sub = Restaurant.load(withID: restaurant).sink(receiveCompletion: {
-            [unowned self] result in
-            if case .failure(let error) = result {
+        var sub: AnyCancellable?
+        sub = Restaurant.load(withID: restaurant)
+            .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
-            if let this = sub {
-                self.subs.remove(this)
-                sub = nil
+            .flatMap { [unowned self] restaurant -> AnyPublisher<Restaurant.Employee, Error> in
+                self.restaurant = restaurant
+                return Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user)
             }
-        }, receiveValue: {
-            [unowned self] restaurant in
-            self.restaurant = restaurant
-
-            sub2 = Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user).sink(receiveCompletion: {
-                [unowned self] result in
-                if case .failure(let error) = result {
-                    fatalError("FIXME Failed to load user: \(String(describing: error))")
-                }
-                if let this = sub2 {
-                    self.subs.remove(this)
-                    sub2 = nil
-                }
-            }, receiveValue: { [unowned self] user in
+            .mapError { error in
+                fatalError("FIXME Failed to load user: \(String(describing: error))")
+            }
+            .sink { [unowned self] user in
                 self.waiter = user
-                
-                authState = .authenticatedWaiter(restaurantID: restaurant.id, employeeID: user.id)
-            })
-            sub2!.store(in: &subs)
-        })
-        sub!.store(in: &subs)
+                authState = .authenticatedWaiter(restaurantID: self.restaurant.id, employeeID: user.id)
+                if let _ = sub {
+                    sub = nil
+                }
+            }
     }
 
     private func load(kitchenForRestaurant restaurant: Restaurant.ID) {
-        var sub: AnyCancellable? = nil
-
-        sub = Restaurant.load(withID: restaurant).sink(receiveCompletion: {
-            [unowned self] result in
-            if case .failure(let error) = result {
+        var sub: AnyCancellable?
+        sub = Restaurant.load(withID: restaurant)
+            .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
-            if let this = sub {
-                self.subs.remove(this)
-                sub = nil
+            .sink { [unowned self] restaurant in
+                self.restaurant = restaurant
+                authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
+                if let _ = sub {
+                    sub = nil
+                }
             }
-        }, receiveValue: {
-            [unowned self] restaurant in
-            self.restaurant = restaurant
-
-            // TODO[pn 2021-07-09]: If the kitchen parameter gets used, it needs
-            // to be loaded from UserDefaults over here instead of this empty
-            // string.
-            authState = .authenticatedKitchen(restaurantID: restaurant.id, kitchen: "")
-        })
-        sub!.store(in: &subs)
     }
 
     func resetAuthState() {
-        authState = .unauthenticated
-    }
-
-    func logIn(using qrCode: LoginQRCode) -> Future<AuthState, Error> {
-        return Future() { [unowned self] resolve in
-            var sub: AnyCancellable? = nil
-            sub = Restaurant.load(withID: qrCode.restaurantID).sink(receiveCompletion: {
+        if case .authenticatedWaiter(restaurantID: _, employeeID: _) = authState {
+            var sub: AnyCancellable?
+            sub = logoutWaiter().sink(receiveCompletion: {
                 [unowned self] result in
                 if case .failure(let error) = result {
-                    resolve(.failure(error))
+                    print("Failed to log out: \(String(describing: error))")
                 }
-
-                if let this = sub {
-                    subs.remove(this)
+                authState = .unauthenticated
+                if let _ = sub {
                     sub = nil
                 }
-            }, receiveValue: { [unowned self] restaurant in
+            }, receiveValue: { })
+        } else {
+            authState = .unauthenticated
+        }
+    }
+
+    func testAsyncReturnBool() async -> Bool {
+        return true
+    }
+
+    func logIn(using qrCode: LoginQRCode) -> AnyPublisher<AuthState, Error> {
+        var logoutPublisher: AnyPublisher<Void, Error>
+
+        if case .authenticatedWaiter(restaurantID: _, employeeID: _) = self.authState {
+            logoutPublisher = logoutWaiter().eraseToAnyPublisher()
+        } else {
+            logoutPublisher = Just(())
+                .mapError { _ in DummyError.unexpectedError }
+                .eraseToAnyPublisher()
+        }
+
+        return logoutPublisher
+            .flatMap {
+                Restaurant.load(withID: qrCode.restaurantID)
+            }
+            .map { [unowned self] restaurant -> AuthState in
                 self.restaurant = restaurant
+
                 switch qrCode {
                 case .waiter(_):
                     self.authState = .authenticatedWaiterUnknownID(restaurantID: restaurant.id)
                 case .kitchen(_, let kitchen):
                     self.authState = .authenticatedKitchen(restaurantID: restaurant.id, kitchen: kitchen)
                 }
-                persistAuthState()
-                resolve(.success(self.authState))
-            })
-            sub!.store(in: &subs)
-        }
+
+                return self.authState
+            }
+            .eraseToAnyPublisher()
     }
 
-    func finishWaiterLogin(withUser user: Restaurant.Employee) -> Future<Void, Error> {
+    func logoutWaiter() -> AnyPublisher<Void, Error> {
+        guard case .authenticatedWaiter(restaurantID: _, employeeID: _) = authState else {
+            fatalError("AuthManager.logoutWaiter called with improper starting state")
+        }
+
+        return waiter!.firebaseReference
+            .updateDataFuture(["isActive": true])
+            .map { [unowned self] in
+                self.waiter = nil
+            }
+            .eraseToAnyPublisher()
+    }
+
+    func finishWaiterLogin(withUser user: Restaurant.Employee) -> AnyPublisher<Void, Error> {
         guard case .authenticatedWaiterUnknownID(restaurantID: let restaurantID) = self.authState else {
             fatalError("AuthManager.finishWaiterLogin called with improper starting state")
         }
@@ -164,20 +180,13 @@ class AuthManager: ObservableObject {
         // that.
         // TODO[pn 2021-07-09]: Is there a strategy for marking users as
         // available to use afterwards?
-        return Future() { [unowned self] resolve in
-            user.firebaseReference.updateData(["isActive": false], completion: {
-                [unowned self] maybeError in
-                guard maybeError == nil else {
-                    resolve(.failure(maybeError!))
-                    return
-                }
-
+        return user.firebaseReference
+            .updateDataFuture(["isActive": false])
+            .map { [unowned self] in
                 self.waiter = user
                 self.authState = .authenticatedWaiter(restaurantID: restaurantID, employeeID: user.id)
-                persistAuthState()
-                resolve(.success(()))
-            })
-        }
+            }
+            .eraseToAnyPublisher()
     }
 
     private func persistAuthState() {

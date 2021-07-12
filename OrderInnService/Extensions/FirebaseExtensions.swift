@@ -22,6 +22,18 @@ extension FirebaseFirestore.DocumentReference {
             }
         }
     }
+
+    func updateDataFuture(_ fields: [AnyHashable: Any]) -> Future<Void, Error> {
+        return Future() { [self] resolve in
+            updateData(fields, completion: { maybeError in
+                if let error = maybeError {
+                    resolve(.failure(error))
+                } else {
+                    resolve(.success(()))
+                }
+            })
+        }
+    }
 }
 
 extension FirebaseFirestore.CollectionReference {

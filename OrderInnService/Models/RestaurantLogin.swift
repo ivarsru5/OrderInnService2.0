@@ -25,7 +25,7 @@ struct Restaurant: Identifiable {
         self.subscriptionPaid = snapshot["subscriptionPaid"] as! Bool
     }
 
-    static func load(withID id: String) -> Publishers.Map<Future<DocumentSnapshot, Error>, Restaurant> {
+    static func load(withID id: String) -> AnyPublisher<Restaurant, Error> {
         return Firestore.firestore()
             .collection(Restaurant.firebaseCollection)
             .document(id)
@@ -33,6 +33,7 @@ struct Restaurant: Identifiable {
             .map { snapshot in
                 return Restaurant(from: snapshot)
             }
+            .eraseToAnyPublisher()
     }
 
     var firebaseReference: DocumentReference {
@@ -41,7 +42,7 @@ struct Restaurant: Identifiable {
             .document(id)
     }
 
-    func loadUsers() -> Publishers.Map<Future<QuerySnapshot, Error>, [Employee]> {
+    func loadUsers() -> AnyPublisher<[Employee], Error> {
         return Firestore.firestore()
             .collection(Restaurant.firebaseCollection)
             .document(id)
@@ -52,6 +53,7 @@ struct Restaurant: Identifiable {
                     return Employee(from: document, withRestaurantID: id)
                 }
             }
+            .eraseToAnyPublisher()
     }
 
     struct Employee: Identifiable {
@@ -80,24 +82,17 @@ struct Restaurant: Identifiable {
         }
 
         static func load(forRestaurantID restaurantID: Restaurant.ID,
-                         withUserID userID: Employee.ID) -> Future<Employee, Error> {
-            return Future() { resolve in
-                Firestore.firestore()
-                    .collection("Restaurants")
-                    .document(restaurantID)
-                    .collection("Users")
-                    .document(userID)
-                    .getDocument {
-                        maybeSnapshot, error in
-                        guard let snapshot = maybeSnapshot else {
-                            resolve(.failure(error!))
-                            return
-                        }
-
-                        let employee = Employee(from: snapshot, withRestaurantID: restaurantID)
-                        resolve(.success(employee))
-                    }
-            }
+                         withUserID userID: Employee.ID) -> AnyPublisher<Employee, Error> {
+            return Firestore.firestore()
+                .collection("Restaurants")
+                .document(restaurantID)
+                .collection("Users")
+                .document(userID)
+                .getDocumentFuture()
+                .map { snapshot in
+                    Employee(from: snapshot, withRestaurantID: restaurantID)
+                }
+                .eraseToAnyPublisher()
         }
 
         var firebaseReference: DocumentReference {

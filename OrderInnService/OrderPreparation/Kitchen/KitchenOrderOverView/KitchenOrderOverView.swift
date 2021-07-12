@@ -8,10 +8,7 @@
 import SwiftUI
 
 struct KitchenOrderOverView: View {
-    @Environment(\.presentationMode) var presetationMode
-    @StateObject var orderOverview = KitchenOrderWork()
-    @ObservedObject var activeOrder: KitchenWork
-    @Binding var dismissOrderView: Bool
+    var order: ClientSubmittedOrder
     
     var body: some View {
         ZStack{
@@ -21,7 +18,7 @@ struct KitchenOrderOverView: View {
                             Text("Table: ")
                                 .bold()
                             
-                            Text(activeOrder.selectedOrder!.forTable)
+                            Text(order.forTable)
                                 .foregroundColor(Color(UIColor.label))
                             
                             Spacer()
@@ -32,7 +29,7 @@ struct KitchenOrderOverView: View {
                     VStack{
                         
                         List{
-                            ForEach(activeOrder.selectedOrder!.withExtraItems, id: \.id){ order in
+                            ForEach(order.withExtraItems, id: \.id) { order in
                                 Section(header: Text("Extra order: \(order.extraOrderPart!)")){
                                     ForEach(order.withItems, id: \.id){ item in
                                         HStack{
@@ -51,7 +48,7 @@ struct KitchenOrderOverView: View {
                             }
                             
                             Section(header: Text("Submited item's")){
-                                ForEach(activeOrder.selectedOrder!.withItems, id: \.id){ item in
+                                ForEach(order.withItems, id: \.id){ item in
                                     SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice!)
                                 }
                             }
@@ -59,9 +56,9 @@ struct KitchenOrderOverView: View {
                         .listStyle(InsetGroupedListStyle())
                     }
                     Button(action: {
-                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
-                        activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
-                        presetationMode.wrappedValue.dismiss()
+//                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
+//                        activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
+//                        presetationMode.wrappedValue.dismiss()
                     }, label: {
                         Text("order completed")
                             .bold()
@@ -75,20 +72,9 @@ struct KitchenOrderOverView: View {
                     .padding()
                 }
         }
-        .navigationBarBackButtonHidden(true)
-        .navigationTitle(activeOrder.selectedOrder!.inZone)
-        .navigationBarItems(trailing:
-                                HStack{
-                                    Button(action: {
-                                        self.dismissOrderView.toggle()
-                                    }, label: {
-                                        Text("Return")
-                                            .bold()
-                                            .foregroundColor(.red)
-                                    })
-                                })
+        .navigationTitle(order.inZone)
         .onAppear{
-            orderOverview.markOrderAsRead(forOrder: activeOrder.selectedOrder!)
+//            orderOverview.markOrderAsRead(forOrder: activeOrder.selectedOrder!)
         }
     }
 }

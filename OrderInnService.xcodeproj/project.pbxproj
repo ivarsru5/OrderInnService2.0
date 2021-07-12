@@ -56,6 +56,7 @@
 		69142D4A26986EA50044D34F /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4926986EA50044D34F /* SwiftUIExtensions.swift */; };
 		69142D4C2698966E0044D34F /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4B2698966E0044D34F /* AuthManager.swift */; };
 		69142D4E2698995E0044D34F /* LoginQRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4D2698995E0044D34F /* LoginQRCode.swift */; };
+		695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 695C3DD0269CA6660084E449 /* CombineExtensions.swift */; };
 		8D81E1853CD596EA1AD61F7F /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */; };
 /* End PBXBuildFile section */
 
@@ -112,6 +113,7 @@
 		69142D4926986EA50044D34F /* SwiftUIExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIExtensions.swift; sourceTree = "<group>"; };
 		69142D4B2698966E0044D34F /* AuthManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuthManager.swift; sourceTree = "<group>"; };
 		69142D4D2698995E0044D34F /* LoginQRCode.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginQRCode.swift; sourceTree = "<group>"; };
+		695C3DD0269CA6660084E449 /* CombineExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CombineExtensions.swift; sourceTree = "<group>"; };
 		B74389A744C6D626A6848115 /* Pods-OrderInnService.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.release.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.release.xcconfig"; sourceTree = "<group>"; };
 		CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -189,7 +191,6 @@
 				58F0D73F2632E4FF0093B6EA /* OrderCartView */,
 				580E1E252636D5E400A16228 /* ActiveTables */,
 				58F2895926384E3C00C973DB /* ActiveOrderOverview */,
-				69142D42269740A50044D34F /* Debug */,
 			);
 			path = WaiterWorkStation;
 			sourceTree = "<group>";
@@ -265,6 +266,7 @@
 				582066D72628129400D3BCCA /* OrderInnServiceApp.swift */,
 				5811F945262DE53000050F2C /* LaunchScreen.swift */,
 				580506F32629670B007CF39B /* Models */,
+				69142D42269740A50044D34F /* Debug */,
 				5838DB2D262820A2001698D7 /* Login */,
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
 				580FEE3B26412BF3006ED835 /* OrderPreparation */,
@@ -339,6 +341,7 @@
 				5811F942262DE4EA00050F2C /* UserDefaultsExtension.swift */,
 				69142D472698690E0044D34F /* FirebaseExtensions.swift */,
 				69142D4926986EA50044D34F /* SwiftUIExtensions.swift */,
+				695C3DD0269CA6660084E449 /* CombineExtensions.swift */,
 			);
 			path = Extensions;
 			sourceTree = "<group>";
@@ -529,6 +532,7 @@
 				580E1E2D2636D61300A16228 /* ActiveOrderView.swift in Sources */,
 				5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */,
 				5813CC5C26309EFB00924ED9 /* MenuItem.swift in Sources */,
+				695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				581DF41C26371C6600B426FC /* ActiveOrderWork.swift in Sources */,
 				58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */,

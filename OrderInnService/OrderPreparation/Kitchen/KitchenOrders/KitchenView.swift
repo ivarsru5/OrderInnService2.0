@@ -10,18 +10,14 @@ import SwiftUI
 struct KitchenView: View {
     @EnvironmentObject var authManager: AuthManager
     @StateObject var kitchen = KitchenWork()
-    @State var showOrderOverview  = false
     
     var body: some View {
         ZStack{
             if !kitchen.collectedOrders.isEmpty{
                 List{
                     Section(header: Text("Recived Orders")){
-                        ForEach(kitchen.collectedOrders, id: \.id){ order in
-                            Button(action: {
-                                self.kitchen.selectedOrder = order
-                                self.showOrderOverview.toggle()
-                            }, label: {
+                        ForEach(kitchen.collectedOrders, id: \.id) { order in
+                            NavigationLink(destination: KitchenOrderOverView(order: order)) {
                                 HStack{
                                     HStack{
                                         Text("In Zone: ")
@@ -45,7 +41,7 @@ struct KitchenView: View {
                                             .foregroundColor(.secondary)
                                     }
                                 }
-                            })
+                            }
                         }
                         .padding()
                     }
@@ -57,8 +53,6 @@ struct KitchenView: View {
                     .multilineTextAlignment(.center)
                     .padding()
             }
-            
-            NavigationLink(destination: KitchenOrderOverView(activeOrder: kitchen, dismissOrderView: $showOrderOverview), isActive: $showOrderOverview) { EmptyView()}
         }
         .navigationTitle("\(authManager.restaurant.name): \(authManager.kitchen!)")
     }
