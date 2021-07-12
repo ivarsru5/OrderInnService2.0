@@ -39,7 +39,11 @@ extension UserDefaults {
             return self.string(forKey: Keys.restaurantID.key)
         }
         set {
-            self.set(newValue, forKey: Keys.restaurantID.key)
+            if newValue != nil {
+                self.set(newValue!, forKey: Keys.restaurantID.key)
+            } else {
+                self.removeObject(forKey: Keys.restaurantID.key)
+            }
         }
     }
     var userID: String? {
@@ -47,7 +51,11 @@ extension UserDefaults {
             return self.string(forKey: Keys.userID.key)
         }
         set {
-            self.set(newValue, forKey: Keys.userID.key)
+            if newValue != nil {
+                self.set(newValue!, forKey: Keys.userID.key)
+            } else {
+                self.removeObject(forKey: Keys.userID.key)
+            }
         }
     }
 

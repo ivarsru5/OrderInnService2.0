@@ -20,7 +20,7 @@ class AuthManager: ObservableObject {
     }
 
     private var _initialised = false
-    @Published private(set) var authState: AuthState {
+    @Published private(set) var authState: AuthState = .loading {
         willSet {
             // HACK[pn]: Since SwiftUI updates views in a weird order that
             // can cause conditionals not to be re-rendered before their children
@@ -34,8 +34,13 @@ class AuthManager: ObservableObject {
         }
         didSet {
             if case .loading = oldValue {
-                _initialised = true
-            } else if _initialised {
+                // Shouldn't persist next state since it was loaded from init.
+            } else if case .authenticatedWaiterUnknownID(restaurantID: _) = authState {
+                // Shouldn't persist this state since it's incomplete. If app
+                // exits at this point, the persisted value will basically
+                // equal not being logged in, even if the user was, in fact,
+                // logged in.
+            } else {
                 persistAuthState()
             }
         }
@@ -52,8 +57,6 @@ class AuthManager: ObservableObject {
     private(set) var kitchen: String?
 
     init() {
-        authState = .loading
-
         let userDefaults = UserDefaults.standard
         if let restaurantID = userDefaults.restaurantID, let userID = userDefaults.userID {
             load(restaurant: restaurantID, user: userID)
@@ -62,7 +65,6 @@ class AuthManager: ObservableObject {
         } else {
             authState = .unauthenticated
         }
-        _initialised = true
     }
 
     private var subs = Set<AnyCancellable>()
@@ -193,9 +195,9 @@ class AuthManager: ObservableObject {
         let restaurantID: Restaurant.ID?
         let userID: Restaurant.Employee.ID?
         switch authState {
-        case .loading:
-            fatalError("BUG Tried to persist loading (i.e, undefined) auth state to UserDefaults")
-        case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _):
+        case .loading, .authenticatedWaiterUnknownID(restaurantID: _):
+            fatalError("BUG Tried to persist an unfinished auth state to UserDefaults")
+        case .unauthenticated:
             restaurantID = nil
             userID = nil
         case .authenticatedWaiter(restaurantID: let _restaurantID, employeeID: let _userID):
@@ -208,6 +210,7 @@ class AuthManager: ObservableObject {
             restaurantID = _restaurantID
             userID = nil
         }
+
         UserDefaults.standard.restaurantID = restaurantID
         UserDefaults.standard.userID = userID
     }
