@@ -140,7 +140,7 @@ class AuthManager: ObservableObject {
             logoutPublisher = logoutWaiter().eraseToAnyPublisher()
         } else {
             logoutPublisher = Just(())
-                .mapError { _ in DummyError.unexpectedError }
+                .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         }
 
