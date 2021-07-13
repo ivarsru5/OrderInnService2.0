@@ -10,7 +10,7 @@ import Foundation
 struct RestaurantOrder: Identifiable{
     var id = UUID().uuidString
     var menuItems: [MenuItem]
-    var placedBy: Restaurant.Employee
+    var placedBy: String
     var orderReady: Bool
     var forTable: String
     var forZone: String
@@ -22,7 +22,7 @@ struct RestaurantOrder: Identifiable{
         self.forTable = ""
         self.forZone = ""
         self.orderSeen = false
-        self.placedBy = AuthManager.shared.waiter!
+        self.placedBy = "\(AuthManager.shared.waiter!.name) \(AuthManager.shared.waiter!.lastName)"
     }
     
     struct Course{

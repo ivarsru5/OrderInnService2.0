@@ -15,6 +15,7 @@ class ActiveOrderWork: ObservableObject{
     let databse = Firestore.firestore()
     
     @Published var selectedOrder: ActiveOrder?
+    var employee = "\(AuthManager.shared.waiter!.name) \(AuthManager.shared.waiter!.lastName)"
     
     func retriveActiveOrders(){
         databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Order").getDocuments { snapshot, error in
@@ -30,7 +31,7 @@ class ActiveOrderWork: ObservableObject{
                 }
                 return collectedOrder
             }
-            self.activeOrders = collectdeTables.filter{ $0.placedBy == UserDefaults.standard.currentUser && !$0.orderReady}
+            self.activeOrders = collectdeTables.filter{ $0.placedBy == self.employee}
             self.preperedOrders = collectdeTables.filter { $0.orderReady }
         }
     }
