@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct ActiveOrderOverview: View {
+    @Environment (\.presentationMode) var presentationMode
     @StateObject var orderOverview = ActiveOrderOverviewWork()
     @ObservedObject var activeOrder: ActiveOrderWork
     @State var showMenu = false
@@ -124,7 +125,7 @@ struct ActiveOrderOverview: View {
         .navigationBarItems(trailing:
                                 HStack{
                                     Button(action: {
-                                        self.activeOrder.showActiveOrder.toggle()
+                                        self.presentationMode.wrappedValue.dismiss()
                                     }, label: {
                                         Text("Done")
                                             .bold()

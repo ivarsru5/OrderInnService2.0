@@ -13,12 +13,12 @@ struct ActiveOrder: Identifiable {
     var kitchenItems: [String]
     var barItems: [String]
     var placedBy: String
-    var orderOpened: Bool
     var orderReady: Bool
     var totalPrice: Double
     var forTable: String
     var forZone: String
     var orderSeen: Bool
+    var created: Timestamp
     
     init?(snapshot: QueryDocumentSnapshot){
         let data = snapshot.data()
@@ -38,11 +38,6 @@ struct ActiveOrder: Identifiable {
             return nil
         }
         self.placedBy = placedBy
-        
-        guard let orderOpened = data["orderOpened"] as? Bool else{
-            return nil
-        }
-        self.orderOpened = orderOpened
         
         guard let totalPrice = data["toatlOrderPrice"] as? Double else{
             return nil
@@ -68,6 +63,11 @@ struct ActiveOrder: Identifiable {
             return nil
         }
         self.orderSeen = orderSeen
+        
+        guard let created = data["created"] as? Timestamp else{
+            return nil
+        }
+        self.created = created
     }
 }
 

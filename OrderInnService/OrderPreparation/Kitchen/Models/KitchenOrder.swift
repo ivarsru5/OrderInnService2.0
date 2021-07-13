@@ -13,7 +13,6 @@ struct KitchenOrder: Identifiable {
     var kitchenItems: [String]
     var barItems: [String]
     var placedBy: String
-    var orderOpened: Bool
     var orderReady: Bool
     var orderSeen: Bool
     var totalPrice: Double
@@ -40,11 +39,6 @@ struct KitchenOrder: Identifiable {
             return nil
         }
         self.placedBy = placedBy
-        
-        guard let orderCompleted = data["orderOpened"] as? Bool else{
-            return nil
-        }
-        self.orderOpened = orderCompleted
         
         guard let totalPrice = data["toatlOrderPrice"] as? Double else{
             return nil

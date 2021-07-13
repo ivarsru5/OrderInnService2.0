@@ -9,6 +9,7 @@ import SwiftUI
 
 struct ActiveOrderView: View {
     @StateObject var activeOrders = ActiveOrderWork()
+    @State var destanation: TargetDestanation? = nil
     
     var body: some View {
         ZStack{
@@ -18,6 +19,7 @@ struct ActiveOrderView: View {
                         ForEach(activeOrders.activeOrders, id: \.id){ order in
                             Button(action: {
                                 self.activeOrders.selectedOrder = order
+                                self.destanation = .toActiveOrder
                             }, label: {
                                 HStack{
                                     HStack{
@@ -46,6 +48,44 @@ struct ActiveOrderView: View {
                         }
                     }
                 }
+                
+                if !activeOrders.preperedOrders.isEmpty{
+                    List{
+                        Section(header: Text("Prepered Orders")){
+                            ForEach(activeOrders.preperedOrders, id: \.id){ preperedOrder in
+                                Button(action: {
+                                    self.activeOrders.selectedOrder = preperedOrder
+                                    self.destanation = .toPreperedOrder
+                                }, label: {
+                                    HStack{
+                                        HStack{
+                                            Text("In Zone: ")
+                                                .bold()
+                                                .foregroundColor(Color(UIColor.label))
+                                            
+                                            Text(preperedOrder.forZone)
+                                                .bold()
+                                                .foregroundColor(Color(UIColor.label))
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        HStack{
+                                            Text("Table: ")
+                                                .bold()
+                                                .foregroundColor(.secondary)
+                                            
+                                            Text(preperedOrder.forTable)
+                                                .bold()
+                                                .foregroundColor(.secondary)
+                                        }
+                                    }
+                                })
+                            }
+                        }
+                    }
+                }
+                
             }else{
                 Text("There is no active orders. Please make one to view activity.")
                     .font(.headline)
@@ -58,16 +98,24 @@ struct ActiveOrderView: View {
         .onAppear{
             activeOrders.retriveActiveOrders()
         }
-        .fullScreenCover(isPresented: $activeOrders.showActiveOrder){
+        .fullScreenCover(item: $destanation){ destanation in
             NavigationView{
-                ActiveOrderOverview(activeOrder: activeOrders)
+                switch destanation{
+                case .toActiveOrder:
+                    ActiveOrderOverview(activeOrder: activeOrders)
+                case .toPreperedOrder:
+                    Text("There will be prepered Orders")
+                }
             }
         }
     }
 }
 
-struct ActiveOrderView_Previews: PreviewProvider {
-    static var previews: some View {
-        ActiveOrderView()
+enum TargetDestanation: Hashable, Identifiable{
+    case toActiveOrder
+    case toPreperedOrder
+    
+    var id: Int{
+        return self.hashValue
     }
 }

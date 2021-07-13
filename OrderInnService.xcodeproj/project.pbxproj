@@ -34,6 +34,8 @@
 		582066DF2628129400D3BCCA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DE2628129400D3BCCA /* Preview Assets.xcassets */; };
 		582066E92628166900D3BCCA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 582066E82628166900D3BCCA /* GoogleService-Info.plist */; };
 		5822002F2658DEA0003D878C /* KitchenOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5822002E2658DEA0003D878C /* KitchenOrder.swift */; };
+		583FCE38269D9C48006F64ED /* ManagerAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583FCE37269D9C48006F64ED /* ManagerAccess.swift */; };
+		583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583FCE39269D9CCD006F64ED /* ManagerView.swift */; };
 		585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585231E4262DA90100826BBC /* ZoneSelection.swift */; };
 		5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */; };
 		58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B32630267E00FC9223 /* TableSelectionView.swift */; };
@@ -90,6 +92,8 @@
 		582066E02628129400D3BCCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		582066E82628166900D3BCCA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
 		5822002E2658DEA0003D878C /* KitchenOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenOrder.swift; sourceTree = "<group>"; };
+		583FCE37269D9C48006F64ED /* ManagerAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerAccess.swift; sourceTree = "<group>"; };
+		583FCE39269D9CCD006F64ED /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		585231E4262DA90100826BBC /* ZoneSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneSelection.swift; sourceTree = "<group>"; };
 		5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantOrder.swift; sourceTree = "<group>"; };
 		58B5D4B32630267E00FC9223 /* TableSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionView.swift; sourceTree = "<group>"; };
@@ -184,6 +188,7 @@
 		580E1E312636DBC300A16228 /* WaiterWorkStation */ = {
 			isa = PBXGroup;
 			children = (
+				583FCE36269D9BFC006F64ED /* ManagerControls */,
 				580E1E212636D59900A16228 /* TabView */,
 				582FD06D2628B63D00B73C8C /* ZoneSelection */,
 				58B5D4B22630265A00FC9223 /* TableSelection */,
@@ -314,6 +319,15 @@
 				69142D4D2698995E0044D34F /* LoginQRCode.swift */,
 			);
 			path = Login;
+			sourceTree = "<group>";
+		};
+		583FCE36269D9BFC006F64ED /* ManagerControls */ = {
+			isa = PBXGroup;
+			children = (
+				583FCE37269D9C48006F64ED /* ManagerAccess.swift */,
+				583FCE39269D9CCD006F64ED /* ManagerView.swift */,
+			);
+			path = ManagerControls;
 			sourceTree = "<group>";
 		};
 		58B5D4B22630265A00FC9223 /* TableSelection */ = {
@@ -515,6 +529,7 @@
 				69142D4C2698966E0044D34F /* AuthManager.swift in Sources */,
 				58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */,
 				581340C926452152003E9BC6 /* KitchenOrderOverView.swift in Sources */,
+				583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				69142D44269740E20044D34F /* DebugMenu.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
@@ -532,6 +547,7 @@
 				580E1E2D2636D61300A16228 /* ActiveOrderView.swift in Sources */,
 				5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */,
 				5813CC5C26309EFB00924ED9 /* MenuItem.swift in Sources */,
+				583FCE38269D9C48006F64ED /* ManagerAccess.swift in Sources */,
 				695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				581DF41C26371C6600B426FC /* ActiveOrderWork.swift in Sources */,

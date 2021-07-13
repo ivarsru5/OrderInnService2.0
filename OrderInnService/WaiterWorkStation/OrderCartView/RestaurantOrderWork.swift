@@ -56,7 +56,6 @@ class RestaurantOrderWork: ObservableObject{
             "forTable": restaurantOrder.forTable,
             "inZone": restaurantOrder.forZone,
             "toatlOrderPrice": totalPrice,
-            "orderOpened": restaurantOrder.orderOpened,
             "orderReady" : restaurantOrder.orderReady,
             "orderSeen" : restaurantOrder.orderSeen,
             "created": Timestamp(date: Date())

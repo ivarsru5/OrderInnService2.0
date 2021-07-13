@@ -10,14 +10,11 @@ import FirebaseFirestore
 
 class ActiveOrderWork: ObservableObject{
     @Published var activeOrders = [ActiveOrder]()
+    @Published var preperedOrders = [ActiveOrder]()
     @Published var showActiveOrder = false
     let databse = Firestore.firestore()
     
-    @Published var selectedOrder: ActiveOrder?{
-        didSet{
-            self.showActiveOrder.toggle()
-        }
-    }
+    @Published var selectedOrder: ActiveOrder?
     
     func retriveActiveOrders(){
         databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Order").getDocuments { snapshot, error in
@@ -33,7 +30,8 @@ class ActiveOrderWork: ObservableObject{
                 }
                 return collectedOrder
             }
-            self.activeOrders = collectdeTables.filter{ $0.placedBy == UserDefaults.standard.currentUser }
+            self.activeOrders = collectdeTables.filter{ $0.placedBy == UserDefaults.standard.currentUser && !$0.orderReady}
+            self.preperedOrders = collectdeTables.filter { $0.orderReady }
         }
     }
 }

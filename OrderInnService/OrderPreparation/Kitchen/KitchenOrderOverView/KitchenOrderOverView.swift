@@ -6,9 +6,27 @@
 //
 
 import SwiftUI
+import FirebaseFirestore
 
 struct KitchenOrderOverView: View {
+    @Environment(\.presentationMode) var presentationMode
     var order: ClientSubmittedOrder
+    
+    func markOrderAsReady(forOrder: ClientSubmittedOrder){
+        Firestore.firestore()
+            .collection("Restaurants").document(UserDefaults.standard.kitchenQrStringKey)
+            .collection("Order")
+            .document(forOrder.id)
+            .updateData([
+                "orderReady" : true
+            ]) { error in
+                if let err = error{
+                    print("Error updating document \(err)")
+                }else{
+                    print("Order prepered!")
+            }
+        }
+    }
     
     var body: some View {
         ZStack{
@@ -56,9 +74,8 @@ struct KitchenOrderOverView: View {
                         .listStyle(InsetGroupedListStyle())
                     }
                     Button(action: {
-//                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
-//                        activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
-//                        presetationMode.wrappedValue.dismiss()
+                        markOrderAsReady(forOrder: order)
+                        presentationMode.wrappedValue.dismiss()
                     }, label: {
                         Text("order completed")
                             .bold()

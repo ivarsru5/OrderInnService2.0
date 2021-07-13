@@ -11,7 +11,7 @@ struct OrderOverview: Identifiable{
     var id = UUID().uuidString
     var placedBy: String = ""
     var orderCompleted = false
-    var orderClosed: Bool = false
+    var orderReady: Bool = false
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var inZone: String = ""
@@ -42,7 +42,7 @@ struct ClientSubmittedOrder: Identifiable{
     var id = UUID().uuidString
     var placedBy: String = ""
     var orderOpened = false
-    var orderClosed: Bool = false
+    var orderReady: Bool = false
     var totalPrice: Double = 0.00
     var forTable: String = ""
     var inZone: String = ""

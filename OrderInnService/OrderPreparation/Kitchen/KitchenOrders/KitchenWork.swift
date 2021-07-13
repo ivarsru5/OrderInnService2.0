@@ -49,11 +49,13 @@ class KitchenWork: ObservableObject{
                         guard let decodedOrder = self.decodeOrder(order: collectedOrder) else{
                             return
                         }
-                        completion(decodedOrder)
+                        if decodedOrder.orderReady != true{
+                            completion(decodedOrder)
+                        }
                     }
                 }
             }
-        }
+    }
     
     func retriveExtraOrders(from order: DocumentSnapshot, completion: @escaping([ActiveExtraOrder]) -> Void){
         databse.collection("Restaurants")
@@ -116,8 +118,7 @@ class KitchenWork: ObservableObject{
             if itemCount > 0{
                 return ClientSubmittedOrder(id: order.id,
                                             placedBy: order.placedBy,
-                                            orderOpened: order.orderOpened,
-                                            orderClosed: order.orderReady,
+                                            orderOpened: order.orderReady,
                                             totalPrice: order.totalPrice,
                                             forTable: order.forTable,
                                             inZone: order.forZone,

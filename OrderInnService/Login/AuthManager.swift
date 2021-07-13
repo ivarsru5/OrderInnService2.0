@@ -48,7 +48,14 @@ class AuthManager: ObservableObject {
     }
 
     var restaurant: Restaurant!
-    var waiter: Restaurant.Employee?
+    var waiter: Restaurant.Employee? {
+         didSet {
+             if let waiter = self.waiter {
+                 UserDefaults.standard.currentUser = "\(waiter.name) \(waiter.lastName)"
+             }
+         }
+     }
+    
     private(set) var kitchen: String?
 
     init() {
@@ -122,9 +129,9 @@ class AuthManager: ObservableObject {
         }
     }
 
-    func testAsyncReturnBool() async -> Bool {
-        return true
-    }
+//    func testAsyncReturnBool() async -> Bool {
+//        return true
+//    }
 
     func logIn(using qrCode: LoginQRCode) -> AnyPublisher<AuthState, Error> {
         var logoutPublisher: AnyPublisher<Void, Error>
