@@ -9,10 +9,10 @@ import SwiftUI
 import Combine
 import FirebaseFirestore
 
-struct Restaurant: Identifiable {
+struct Restaurant: Identifiable, FirestoreInitiable {
     typealias ID = String
 
-    static let firebaseCollection = "Restaurants"
+    static let firestoreCollection = "Restaurants"
 
     let id: ID
     let name: String
@@ -27,7 +27,7 @@ struct Restaurant: Identifiable {
 
     static func load(withID id: String) -> AnyPublisher<Restaurant, Error> {
         return Firestore.firestore()
-            .collection(Restaurant.firebaseCollection)
+            .collection(Restaurant.firestoreCollection)
             .document(id)
             .getDocumentFuture()
             .map { snapshot in
@@ -36,30 +36,25 @@ struct Restaurant: Identifiable {
             .eraseToAnyPublisher()
     }
 
-    var firebaseReference: DocumentReference {
-        Firestore.firestore()
-            .collection(Restaurant.firebaseCollection)
+    var firestoreReference: TypedDocumentReference<Restaurant> {
+        let ref = Firestore.firestore()
+            .collection(Restaurant.firestoreCollection)
             .document(id)
+        return TypedDocumentReference(ref)
     }
 
     func loadUsers() -> AnyPublisher<[Employee], Error> {
-        return Firestore.firestore()
-            .collection(Restaurant.firebaseCollection)
-            .document(id)
-            .collection(Employee.firebaseCollection)
-            .getDocumentsFuture()
-            .map { snapshot in
-                return snapshot.documents.map { document in
-                    return Employee(from: document, withRestaurantID: id)
-                }
-            }
+        return firestoreReference
+            .collection(Employee.firestoreCollection, of: Employee.self)
+            .get()
+            .collect()
             .eraseToAnyPublisher()
     }
 
-    struct Employee: Identifiable {
+    struct Employee: Identifiable, FirestoreInitiable {
         typealias ID = String
 
-        static let firebaseCollection = "Users"
+        static let firestoreCollection = "Users"
 
         let restaurantID: Restaurant.ID
         let id: ID
@@ -71,14 +66,16 @@ struct Restaurant: Identifiable {
         let manager: Bool
         let isActive: Bool
 
-        init(from snapshot: DocumentSnapshot, withRestaurantID restaurantID: Restaurant.ID) {
+        init(from snapshot: DocumentSnapshot) {
             precondition(snapshot.exists)
-            self.restaurantID = restaurantID
             self.id = snapshot.documentID
             self.name = snapshot["name"] as! String
             self.lastName = snapshot["lastName"] as! String
             self.isActive = snapshot["isActive"] as! Bool
             self.manager = snapshot["manager"] as! Bool
+
+            let restaurant = snapshot.reference.parent.parent!
+            self.restaurantID = restaurant.documentID
         }
 
         static func load(forRestaurantID restaurantID: Restaurant.ID,
@@ -89,18 +86,17 @@ struct Restaurant: Identifiable {
                 .collection("Users")
                 .document(userID)
                 .getDocumentFuture()
-                .map { snapshot in
-                    Employee(from: snapshot, withRestaurantID: restaurantID)
-                }
+                .map { snapshot in Employee(from: snapshot) }
                 .eraseToAnyPublisher()
         }
 
-        var firebaseReference: DocumentReference {
-            Firestore.firestore()
-                .collection(Restaurant.firebaseCollection)
+        var firestoreReference: TypedDocumentReference<Employee> {
+            let ref = Firestore.firestore()
+                .collection(Restaurant.firestoreCollection)
                 .document(restaurantID)
-                .collection(Employee.firebaseCollection)
+                .collection(Employee.firestoreCollection)
                 .document(id)
+            return TypedDocumentReference(ref)
         }
     }
 }

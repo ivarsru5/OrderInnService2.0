@@ -5,36 +5,72 @@
 //  Created by Ivars Ruģelis on 21/04/2021.
 //
 
+import Combine
 import Foundation
 import FirebaseFirestore
 
-struct MenuCategory: Identifiable, Hashable{
-    var id = UUID().uuidString
-    var name: String
-    var type: String
-    var menuItems: [MenuItem]
-    var isExpanded = false
-    
-    init?(snapshot: QueryDocumentSnapshot, menuItems: [MenuItem]){
-        let data = snapshot.data()
-        self.id = snapshot.documentID
-        
-        guard let type = data["type"] as? String else{
-            return nil
-        }
-        self.type = type
-        
-        guard let name = data["name"] as? String else {
-            return nil
-        }
-        self.name = name
-        self.menuItems = menuItems
-    }
-}
+struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
+    typealias ID = String
 
-struct MenuDrinks: Identifiable, Hashable{
-    let id = UUID().uuidString
-    var name: String
-    var isExpanded = false
-    var drinks: [MenuItem]
+    // TODO[pn 2021-07-13]: Pluralisation typo.
+    static let firestoreCollection = "MenuCategory"
+
+    enum CategoryType: String, Codable {
+        case food = "food"
+        case drink = "drink"
+
+        init(from string: String) throws {
+            switch string {
+            case CategoryType.food.rawValue: self = .food
+            case CategoryType.drink.rawValue: self = .drink
+            default: throw ModelError.invalidEnumStringEncoding
+            }
+        }
+
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let value = try container.decode(String.self)
+            try self.init(from: value)
+        }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.rawValue)
+        }
+    }
+
+    private let restaurantID: Restaurant.ID
+    let id: ID
+    let name: String
+    let type: CategoryType
+
+    init(from snapshot: DocumentSnapshot) {
+        precondition(snapshot.exists)
+        id = snapshot.documentID
+        name = snapshot["name"] as! String
+        type = try! CategoryType(from: snapshot["type"] as! String)
+
+        let restaurant = snapshot.reference.parent.parent!
+        restaurantID = restaurant.documentID
+    }
+
+    var firestoreReference: TypedDocumentReference<MenuCategory> {
+        let ref = Firestore.firestore()
+            .collection(Restaurant.firestoreCollection)
+            .document(restaurantID)
+            .collection(MenuCategory.firestoreCollection)
+            .document(id)
+        return TypedDocumentReference(ref)
+    }
+
+    static func create(under restaurant: Restaurant,
+                       name: String, type: CategoryType) -> AnyPublisher<MenuCategory, Error> {
+        restaurant.firestoreReference
+            .collection(self.firestoreCollection, of: MenuCategory.self)
+            .addDocument(data: [
+                "name": name,
+                "type": type.rawValue,
+            ])
+            .get()
+    }
 }

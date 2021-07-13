@@ -21,7 +21,7 @@ class ZoneWork: ObservableObject{
     }
     
     func getZones(for restaurant: Restaurant){
-        restaurant.firebaseReference.collection("Zone").getDocuments { snapshot, error in
+        restaurant.firestoreReference.untyped.collection("Zone").getDocuments { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no zones")

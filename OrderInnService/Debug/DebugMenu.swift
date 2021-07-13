@@ -69,12 +69,17 @@ struct DebugMenu: View {
         // it's possible to log in afterwards. Actual UserDefaults clearing goes
         // on in actuallyResetUserDefaults.
         if let waiter = authManager.waiter {
-            waiter.firebaseReference.updateData(["isActive": true], completion: { maybeError in
-                if let error = maybeError {
-                    print("[Debug] Failed to update current user: \(String(describing: error))")
-                }
-                actuallyResetUserDefaults()
-            })
+            var sub: AnyCancellable?
+            sub = waiter.firestoreReference
+                .updateData(["isActive": true])
+                .sink(receiveCompletion: { result in
+                    sub = nil
+                    if case .failure(let error) = result {
+                        print("[Debug] Failed to update current user: \(String(describing: error))")
+                    } else {
+                        actuallyResetUserDefaults()
+                    }
+                }, receiveValue: { _ in })
         } else {
             // Technically unreachable since this screen is attached only to
             // the service workflow, but regardless.

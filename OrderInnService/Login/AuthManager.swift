@@ -168,9 +168,9 @@ class AuthManager: ObservableObject {
             fatalError("AuthManager.logoutWaiter called with improper starting state")
         }
 
-        return waiter!.firebaseReference
-            .updateDataFuture(["isActive": true])
-            .map { [unowned self] in
+        return waiter!.firestoreReference
+            .updateData(["isActive": true])
+            .map { [unowned self] _ in
                 self.waiter = nil
             }
             .eraseToAnyPublisher()
@@ -187,9 +187,10 @@ class AuthManager: ObservableObject {
         // that.
         // TODO[pn 2021-07-09]: Is there a strategy for marking users as
         // available to use afterwards?
-        return user.firebaseReference
-            .updateDataFuture(["isActive": false])
-            .map { [unowned self] in
+        return user.firestoreReference
+            .updateData(["isActive": false])
+            .flatMap { ref in ref.get() }
+            .map { [unowned self] user in
                 self.waiter = user
                 self.authState = .authenticatedWaiter(restaurantID: restaurantID, employeeID: user.id)
             }
