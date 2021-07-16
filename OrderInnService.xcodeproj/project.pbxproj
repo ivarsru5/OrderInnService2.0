@@ -53,6 +53,8 @@
 		58F2895B26384E6200C973DB /* ActiveOrderOverview.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */; };
 		58F91D71265FB87B0059E71A /* KitchenTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D70265FB87B0059E71A /* KitchenTabView.swift */; };
 		58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D73265FC3000059E71A /* ItemAvailability.swift */; };
+		58FF99B226A158C400A99F38 /* AdminGeneralSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF99B126A158C400A99F38 /* AdminGeneralSelection.swift */; };
+		58FF99B726A168B700A99F38 /* AddPersonel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF99B626A168B700A99F38 /* AddPersonel.swift */; };
 		69142D44269740E20044D34F /* DebugMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D43269740E20044D34F /* DebugMenu.swift */; };
 		69142D482698690E0044D34F /* FirebaseExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D472698690E0044D34F /* FirebaseExtensions.swift */; };
 		69142D4A26986EA50044D34F /* SwiftUIExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4926986EA50044D34F /* SwiftUIExtensions.swift */; };
@@ -111,6 +113,8 @@
 		58F2895A26384E6200C973DB /* ActiveOrderOverview.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderOverview.swift; sourceTree = "<group>"; };
 		58F91D70265FB87B0059E71A /* KitchenTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenTabView.swift; sourceTree = "<group>"; };
 		58F91D73265FC3000059E71A /* ItemAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAvailability.swift; sourceTree = "<group>"; };
+		58FF99B126A158C400A99F38 /* AdminGeneralSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminGeneralSelection.swift; sourceTree = "<group>"; };
+		58FF99B626A168B700A99F38 /* AddPersonel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPersonel.swift; sourceTree = "<group>"; };
 		6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.debug.xcconfig"; sourceTree = "<group>"; };
 		69142D43269740E20044D34F /* DebugMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugMenu.swift; sourceTree = "<group>"; };
 		69142D472698690E0044D34F /* FirebaseExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseExtensions.swift; sourceTree = "<group>"; };
@@ -247,6 +251,17 @@
 			path = MenuSelection;
 			sourceTree = "<group>";
 		};
+		5815FA3526A0072B0079D90B /* Admin */ = {
+			isa = PBXGroup;
+			children = (
+				58FF99B126A158C400A99F38 /* AdminGeneralSelection.swift */,
+				58FF99B526A168A000A99F38 /* InAppControls */,
+				58FF99B426A1689400A99F38 /* RestaurantInfo */,
+				58FF99B326A1688400A99F38 /* PersonelControlls */,
+			);
+			path = Admin;
+			sourceTree = "<group>";
+		};
 		582066CB2628129400D3BCCA = {
 			isa = PBXGroup;
 			children = (
@@ -273,6 +288,7 @@
 				580506F32629670B007CF39B /* Models */,
 				69142D42269740A50044D34F /* Debug */,
 				5838DB2D262820A2001698D7 /* Login */,
+				5815FA3526A0072B0079D90B /* Admin */,
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
 				580FEE3B26412BF3006ED835 /* OrderPreparation */,
 				58F07AAE26282FC300574D4F /* Extensions */,
@@ -386,6 +402,28 @@
 				58F91D73265FC3000059E71A /* ItemAvailability.swift */,
 			);
 			path = ItemAvailability;
+			sourceTree = "<group>";
+		};
+		58FF99B326A1688400A99F38 /* PersonelControlls */ = {
+			isa = PBXGroup;
+			children = (
+				58FF99B626A168B700A99F38 /* AddPersonel.swift */,
+			);
+			path = PersonelControlls;
+			sourceTree = "<group>";
+		};
+		58FF99B426A1689400A99F38 /* RestaurantInfo */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = RestaurantInfo;
+			sourceTree = "<group>";
+		};
+		58FF99B526A168A000A99F38 /* InAppControls */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			path = InAppControls;
 			sourceTree = "<group>";
 		};
 		63EFB55165DA9DC0E0B1E609 /* Pods */ = {
@@ -551,6 +589,7 @@
 				695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				581DF41C26371C6600B426FC /* ActiveOrderWork.swift in Sources */,
+				58FF99B726A168B700A99F38 /* AddPersonel.swift in Sources */,
 				58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */,
 				58F0D7412632E51F0093B6EA /* OrderCatView.swift in Sources */,
 				5813CC5926309EF200924ED9 /* MenuCategory.swift in Sources */,
@@ -563,6 +602,7 @@
 				5813CC5F26309FF700924ED9 /* MenuWork.swift in Sources */,
 				58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */,
 				5811F94A262DE7A500050F2C /* Zone.swift in Sources */,
+				58FF99B226A158C400A99F38 /* AdminGeneralSelection.swift in Sources */,
 				580FEE3D26412C07006ED835 /* KitchenView.swift in Sources */,
 				5822002F2658DEA0003D878C /* KitchenOrder.swift in Sources */,
 				582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */,
