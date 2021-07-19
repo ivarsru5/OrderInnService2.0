@@ -100,7 +100,7 @@ struct ActiveOrderView: View {
                 case .toActiveOrder:
                     ActiveOrderOverview(activeOrder: activeOrders)
                 case .toPreperedOrder:
-                    Text("There will be prepered Orders")
+                    PreperedOrderView(preperedOrders: activeOrders)
                 }
             }
         }

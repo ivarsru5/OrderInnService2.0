@@ -18,6 +18,7 @@ struct AdminGeneralSelection: View {
                             Text("Add member to team")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                     NavigationLink(
                         destination: RemoveMember(),
@@ -25,6 +26,7 @@ struct AdminGeneralSelection: View {
                             Text("Revoke access to member")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                 }
                 
@@ -35,6 +37,7 @@ struct AdminGeneralSelection: View {
                             Text("Active restaurant orders")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                     
                     NavigationLink(
@@ -43,6 +46,7 @@ struct AdminGeneralSelection: View {
                             Text("Closed order history")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                     
                 }
@@ -54,6 +58,7 @@ struct AdminGeneralSelection: View {
                             Text("Make an order")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                     
                     NavigationLink(
@@ -62,6 +67,7 @@ struct AdminGeneralSelection: View {
                             Text("Kitchen")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
+                                .padding(10)
                         })
                 }
             }

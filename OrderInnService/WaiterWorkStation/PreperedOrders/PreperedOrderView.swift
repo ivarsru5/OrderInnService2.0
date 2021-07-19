@@ -1,16 +1,16 @@
 //
-//  ActiveOrderEdidView.swift
+//  PreperedOrderView.swift
 //  OrderInnService
 //
-//  Created by Ivars Ruģelis on 27/04/2021.
+//  Created by Ivars Ruģelis on 19/07/2021.
 //
 
 import SwiftUI
 
-struct ActiveOrderOverview: View {
+struct PreperedOrderView: View {
     @Environment (\.presentationMode) var presentationMode
+    @ObservedObject var preperedOrders: ActiveOrderWork
     @StateObject var orderOverview = ActiveOrderOverviewWork()
-    @ObservedObject var activeOrder: ActiveOrderWork
     @State var showMenu = false
     
     var body: some View {
@@ -22,7 +22,7 @@ struct ActiveOrderOverview: View {
                             Text("Table: ")
                                 .bold()
                             
-                            Text(activeOrder.selectedOrder!.forTable)
+                            Text(preperedOrders.selectedOrder!.forTable)
                                 .foregroundColor(.white)
                         }
                         Spacer()
@@ -81,13 +81,17 @@ struct ActiveOrderOverview: View {
                     }
                     .padding()
                     
-                    NavigationLink(destination: ExtraItemCategoryView(activeOrderOverview: orderOverview, activeOrder: activeOrder), isActive: $showMenu) { EmptyView() }
+                    NavigationLink(destination: ExtraItemCategoryView(activeOrderOverview: orderOverview , activeOrder: preperedOrders), isActive: $showMenu) { EmptyView() }
                     
                     HStack{
                         if !orderOverview.menuItems.isEmpty{
+                            
+                            //After new extra coming in play the order should go back to active orders
+                            //and in be diplayed in kitchen.
+                            //And all other parts should be marked as finished, so not to confuse the kitchen staff.
                             Button(action: {
                                 withAnimation(.easeOut(duration: 0.5)){
-                                    orderOverview.submitExtraOrder(from: activeOrder.selectedOrder!)
+                                    orderOverview.submitExtraOrder(from: preperedOrders.selectedOrder!)
                                 }
                             }, label: {
                                 Text("Submit extra order")
@@ -98,9 +102,24 @@ struct ActiveOrderOverview: View {
                                     .foregroundColor(Color(UIColor.systemBackground))
                                     .background(Color(UIColor.label))
                                     .cornerRadius(15)
+                                    .multilineTextAlignment(.center)
                             })
-                            .padding()
                         }
+                        //After sending the check the order need to be placed in finished orders
+                        //only available to manager, so he can give status to it 'closed'
+                        Button(action: {
+                            //TODO: Add functionality to send check via sms.
+                        }, label: {
+                            Text("Send check via message")
+                                .bold()
+                                .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
+                                       minHeight: 0, idealHeight: 32, maxHeight: 54,
+                                       alignment: .center)
+                                .foregroundColor(Color(UIColor.systemBackground))
+                                .background(Color(UIColor.label))
+                                .cornerRadius(15)
+                                .multilineTextAlignment(.center)
+                        })
                         
                         Button(action: {
                             self.showMenu.toggle()
@@ -113,15 +132,16 @@ struct ActiveOrderOverview: View {
                                 .foregroundColor(Color(UIColor.systemBackground))
                                 .background(Color(UIColor.label))
                                 .cornerRadius(15)
+                                .multilineTextAlignment(.center)
                         })
-                        .padding()
                     }
+                    .padding(10)
                 }
             }else{
                 Spinner()
             }
         }
-        .navigationTitle(activeOrder.selectedOrder!.forZone)
+        .navigationTitle(preperedOrders.selectedOrder!.forZone)
         .navigationBarItems(trailing:
                                 HStack{
                                     Button(action: {
@@ -133,57 +153,7 @@ struct ActiveOrderOverview: View {
                                     })
                                 })
         .onAppear{
-            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
-        }
-    }
-}
-
-
-struct SubmittedOrderCell: View{
-    var itemName: String
-    var itemPrice: Double
-    
-    var body: some View{
-        HStack{
-            Text(verbatim: itemName)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-            
-            Spacer()
-            
-            Text("\(itemPrice,specifier: "%.2f")EUR")
-                .italic()
-                .foregroundColor(Color(UIColor.label))
-        }
-    }
-}
-
-struct AddedExtraItemsCell: View{
-    @ObservedObject var orderOverview: ActiveOrderOverviewWork
-    var item: MenuItem
-    
-    var body: some View{
-        HStack{
-            Text(item.name)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-            
-            Spacer()
-            HStack{
-                Text("\(item.price,specifier: "%.2f")EUR")
-                    .italic()
-                    .foregroundColor(Color(UIColor.label))
-                
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.5)){
-                        orderOverview.removeExtraItem(item)
-                    }
-                }, label: {
-                    Image(systemName: "xmark.circle")
-                        .font(.custom("SF Symbols", size: 20))
-                        .foregroundColor(.blue)
-                })
-            }
+            orderOverview.retreveSubmitedItems(from: preperedOrders.selectedOrder!)
         }
     }
 }

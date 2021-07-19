@@ -90,8 +90,7 @@ struct RestaurantActiveOrders: View {
             NavigationView{
                 switch destanation{
                 case .toActiveOrder:
-                    EmptyView()
-                    //ActiveOrderOverview(activeOrder: activeOrders)
+                    ActiveOrderInfoView(activeOrder: activeOrders)
                 case .toPreperedOrder:
                     Text("There will be prepered Orders")
                 }

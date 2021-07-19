@@ -1,17 +1,16 @@
 //
-//  ActiveOrderEdidView.swift
+//  ActiveOrderInfoView.swift
 //  OrderInnService
 //
-//  Created by Ivars Ruģelis on 27/04/2021.
+//  Created by Ivars Ruģelis on 19/07/2021.
 //
 
 import SwiftUI
 
-struct ActiveOrderOverview: View {
+struct ActiveOrderInfoView: View {
     @Environment (\.presentationMode) var presentationMode
     @StateObject var orderOverview = ActiveOrderOverviewWork()
-    @ObservedObject var activeOrder: ActiveOrderWork
-    @State var showMenu = false
+    @ObservedObject var activeOrder: ActiveOrders
     
     var body: some View {
         ZStack{
@@ -31,16 +30,6 @@ struct ActiveOrderOverview: View {
                     
                     VStack{
                         List{
-                            if !orderOverview.menuItems.isEmpty{
-                                Section(header: Text("Selected extra item's")){
-                                    ForEach(orderOverview.menuItems, id:\.id){ item in
-                                        AddedExtraItemsCell(orderOverview: orderOverview, item: item)
-                                    }
-                                }
-                            }else{
-                                EmptyView()
-                            }
-                            
                             ForEach(orderOverview.collectedOrder.withExtraItems, id: \.id){ order in
                                 Section(header: Text("Extra order: \(order.extraOrderPart!)")){
                                     ForEach(order.withItems, id: \.id){ item in
@@ -81,8 +70,6 @@ struct ActiveOrderOverview: View {
                     }
                     .padding()
                     
-                    NavigationLink(destination: ExtraItemCategoryView(activeOrderOverview: orderOverview, activeOrder: activeOrder), isActive: $showMenu) { EmptyView() }
-                    
                     HStack{
                         if !orderOverview.menuItems.isEmpty{
                             Button(action: {
@@ -101,20 +88,6 @@ struct ActiveOrderOverview: View {
                             })
                             .padding()
                         }
-                        
-                        Button(action: {
-                            self.showMenu.toggle()
-                        }, label: {
-                            Text("Add items to Order")
-                                .bold()
-                                .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
-                                       minHeight: 0, idealHeight: 32, maxHeight: 54,
-                                       alignment: .center)
-                                .foregroundColor(Color(UIColor.systemBackground))
-                                .background(Color(UIColor.label))
-                                .cornerRadius(15)
-                        })
-                        .padding()
                     }
                 }
             }else{
@@ -138,52 +111,3 @@ struct ActiveOrderOverview: View {
     }
 }
 
-
-struct SubmittedOrderCell: View{
-    var itemName: String
-    var itemPrice: Double
-    
-    var body: some View{
-        HStack{
-            Text(verbatim: itemName)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-            
-            Spacer()
-            
-            Text("\(itemPrice,specifier: "%.2f")EUR")
-                .italic()
-                .foregroundColor(Color(UIColor.label))
-        }
-    }
-}
-
-struct AddedExtraItemsCell: View{
-    @ObservedObject var orderOverview: ActiveOrderOverviewWork
-    var item: MenuItem
-    
-    var body: some View{
-        HStack{
-            Text(item.name)
-                .bold()
-                .foregroundColor(Color(UIColor.label))
-            
-            Spacer()
-            HStack{
-                Text("\(item.price,specifier: "%.2f")EUR")
-                    .italic()
-                    .foregroundColor(Color(UIColor.label))
-                
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.5)){
-                        orderOverview.removeExtraItem(item)
-                    }
-                }, label: {
-                    Image(systemName: "xmark.circle")
-                        .font(.custom("SF Symbols", size: 20))
-                        .foregroundColor(.blue)
-                })
-            }
-        }
-    }
-}
