@@ -39,12 +39,6 @@ struct RemoveMember: View {
     @StateObject var controlls = Controlls()
     
     @ViewBuilder func userListing(restaurant: Restaurant, users: [Restaurant.Employee]) -> some View {
-        Text("\(restaurant.name)")
-            .bold()
-            .foregroundColor(Color(UIColor.label))
-            .padding(.top, 10)
-            .font(.largeTitle)
-
         List{
             ForEach(users) { user in
                 Button(action: {
@@ -72,6 +66,7 @@ struct RemoveMember: View {
             }
         }
         .listStyle(InsetGroupedListStyle())
+        .navigationTitle(restaurant.name)
         .onReceive(controlls.$members, perform: { _ in
             controlls.loadUsers(from: authManager)
         })
