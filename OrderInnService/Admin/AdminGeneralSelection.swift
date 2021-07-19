@@ -20,7 +20,7 @@ struct AdminGeneralSelection: View {
                                 .foregroundColor(Color(UIColor.label))
                         })
                     NavigationLink(
-                        destination: EmptyView(),
+                        destination: RemoveMember(),
                         label: {
                             Text("Revoke access to member")
                                 .bold()

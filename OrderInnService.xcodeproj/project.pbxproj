@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5801CC3426A5557E00DD3DEC /* RemoveMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3326A5557E00DD3DEC /* RemoveMember.swift */; };
 		580506F526296723007CF39B /* RestaurantLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580506F426296723007CF39B /* RestaurantLogin.swift */; };
 		5808DDEC2632BD6800D0B0EC /* RestaurantOrderWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */; };
 		580E1E232636D5AA00A16228 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E1E222636D5AA00A16228 /* TabView.swift */; };
@@ -65,6 +66,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5801CC3326A5557E00DD3DEC /* RemoveMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveMember.swift; sourceTree = "<group>"; };
 		580506F426296723007CF39B /* RestaurantLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantLogin.swift; sourceTree = "<group>"; };
 		5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantOrderWork.swift; sourceTree = "<group>"; };
 		580E1E222636D5AA00A16228 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
@@ -408,6 +410,7 @@
 			isa = PBXGroup;
 			children = (
 				58FF99B626A168B700A99F38 /* AddPersonel.swift */,
+				5801CC3326A5557E00DD3DEC /* RemoveMember.swift */,
 			);
 			path = PersonelControlls;
 			sourceTree = "<group>";
@@ -568,6 +571,7 @@
 				58B5D4BB263027F400FC9223 /* TableSelectionWork.swift in Sources */,
 				581340C926452152003E9BC6 /* KitchenOrderOverView.swift in Sources */,
 				583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */,
+				5801CC3426A5557E00DD3DEC /* RemoveMember.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				69142D44269740E20044D34F /* DebugMenu.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,

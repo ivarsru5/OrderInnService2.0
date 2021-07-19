@@ -55,6 +55,21 @@ struct Restaurant: Identifiable {
             }
             .eraseToAnyPublisher()
     }
+    
+    func deleteUser(memberID: Employee.ID){
+        Firestore.firestore()
+            .collection(Restaurant.firebaseCollection)
+            .document(id)
+            .collection(Employee.firebaseCollection)
+            .document(memberID)
+            .delete(){ error in
+                if let error = error{
+                    print("User was not deleted \(error)")
+                }else{
+                    print("User deleted successfuly!")
+                }
+            }
+    }
 
     struct Employee: Identifiable {
         typealias ID = String
