@@ -20,6 +20,8 @@ struct LaunchScreen: View {
             OrderTabView()
         case .authenticatedKitchen(restaurantID: _, kitchen: _):
             KitchenTabView()
+        case .authenticatedAdmin(restaurantID: _, admin: _):
+            AdminGeneralSelection()
         }
     }
 }

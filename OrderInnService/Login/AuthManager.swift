@@ -17,6 +17,7 @@ class AuthManager: ObservableObject {
         case authenticatedWaiterUnknownID(restaurantID: Restaurant.ID)
         case authenticatedWaiter(restaurantID: Restaurant.ID, employeeID: Restaurant.Employee.ID)
         case authenticatedKitchen(restaurantID: Restaurant.ID, kitchen: String)
+        case authenticatedAdmin(restaurantID: Restaurant.ID, admin: String)
     }
 
     private var _initialised = false
@@ -156,6 +157,8 @@ class AuthManager: ObservableObject {
                     self.authState = .authenticatedWaiterUnknownID(restaurantID: restaurant.id)
                 case .kitchen(_, let kitchen):
                     self.authState = .authenticatedKitchen(restaurantID: restaurant.id, kitchen: kitchen)
+                case .admin(_, let admin):
+                    self.authState = .authenticatedAdmin(restaurantID: restaurant.id, admin: admin)
                 }
 
                 return self.authState
@@ -212,6 +215,10 @@ class AuthManager: ObservableObject {
             // HACK[pn]: Please see UserDefaultsExtension. 
             UserDefaults.standard.currentUser = "\(waiter!.name) \(waiter!.lastName)"
         case .authenticatedKitchen(restaurantID: let _restaurantID, kitchen: _):
+            restaurantID = _restaurantID
+            userID = nil
+            
+        case .authenticatedAdmin(restaurantID: let _restaurantID, admin: _):
             restaurantID = _restaurantID
             userID = nil
         }
