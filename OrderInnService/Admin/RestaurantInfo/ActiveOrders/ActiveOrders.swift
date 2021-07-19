@@ -1,24 +1,30 @@
 //
-//  ActiveOrderWork.swift
+//  ActiveOrders.swift
 //  OrderInnService
 //
-//  Created by Ivars Ruģelis on 26/04/2021.
+//  Created by Ivars Ruģelis on 19/07/2021.
 //
 
 import Foundation
 import FirebaseFirestore
 
-class ActiveOrderWork: ObservableObject{
+class ActiveOrders: ObservableObject{
     @Published var activeOrders = [ActiveOrder]()
     @Published var preperedOrders = [ActiveOrder]()
     @Published var showActiveOrder = false
     let databse = Firestore.firestore()
     
     @Published var selectedOrder: ActiveOrder?
-    var employee = "\(AuthManager.shared.waiter!.name) \(AuthManager.shared.waiter!.lastName)"
     
-    func retriveActiveOrders(){
-        databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Order").getDocuments { snapshot, error in
+    init(){
+        self.retriveActiveOrders { activeOrders in
+            self.activeOrders = activeOrders.filter { !$0.orderReady }
+            self.preperedOrders = activeOrders.filter { $0.orderReady }
+        }
+    }
+    
+    func retriveActiveOrders(completion: @escaping ([ActiveOrder]) -> Void){
+        databse.collection("Restaurants").document(UserDefaults.standard.wiaterQrStringKey).collection("Order").addSnapshotListener { snapshot, error in
             
             guard let snapshotDocument = snapshot?.documents else{
                 print("There is no documents")
@@ -31,8 +37,7 @@ class ActiveOrderWork: ObservableObject{
                 }
                 return collectedOrder
             }
-            self.activeOrders = collectdeTables.filter{ $0.placedBy == self.employee && !$0.orderReady}
-            self.preperedOrders = collectdeTables.filter { $0.orderReady }
+            completion(collectdeTables)
         }
     }
 }

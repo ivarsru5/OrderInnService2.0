@@ -1,18 +1,18 @@
 //
-//  ActiveOrderView.swift
+//  RestaurantActiveOrders.swift
 //  OrderInnService
 //
-//  Created by Ivars Ruģelis on 26/04/2021.
+//  Created by Ivars Ruģelis on 19/07/2021.
 //
 
 import SwiftUI
 
-struct ActiveOrderView: View {
-    @StateObject var activeOrders = ActiveOrderWork()
+struct RestaurantActiveOrders: View {
+    @StateObject var activeOrders = ActiveOrders()
     @State var destanation: TargetDestanation? = nil
     
     var body: some View {
-        ZStack{
+        VStack{
             if !activeOrders.activeOrders.isEmpty{
                 List{
                     Section(header: Text("Active Order")){
@@ -47,6 +47,7 @@ struct ActiveOrderView: View {
                             })
                         }
                     }
+                    
                     if !activeOrders.preperedOrders.isEmpty{
                         Section(header: Text("Prepered Orders")){
                             ForEach(activeOrders.preperedOrders, id: \.id){ preperedOrder in
@@ -82,36 +83,19 @@ struct ActiveOrderView: View {
                         }
                     }
                 }
-            }else{
-                Text("There is no active orders. Please make one to view activity.")
-                    .font(.headline)
-                    .foregroundColor(Color(UIColor.label))
-                    .multilineTextAlignment(.center)
-                    .padding()
             }
         }
         .navigationTitle("Active Orders")
-        .onAppear{
-            activeOrders.retriveActiveOrders()
-        }
         .fullScreenCover(item: $destanation){ destanation in
             NavigationView{
                 switch destanation{
                 case .toActiveOrder:
-                    ActiveOrderOverview(activeOrder: activeOrders)
+                    EmptyView()
+                    //ActiveOrderOverview(activeOrder: activeOrders)
                 case .toPreperedOrder:
                     Text("There will be prepered Orders")
                 }
             }
         }
-    }
-}
-
-enum TargetDestanation: Hashable, Identifiable{
-    case toActiveOrder
-    case toPreperedOrder
-    
-    var id: Int{
-        return self.hashValue
     }
 }

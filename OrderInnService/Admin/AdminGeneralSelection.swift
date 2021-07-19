@@ -30,7 +30,7 @@ struct AdminGeneralSelection: View {
                 
                 Section(header: Text("Restaurant info")){
                     NavigationLink(
-                        destination: EmptyView(),
+                        destination: RestaurantActiveOrders(),
                         label: {
                             Text("Active restaurant orders")
                                 .bold()

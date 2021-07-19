@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		5801CC3426A5557E00DD3DEC /* RemoveMember.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3326A5557E00DD3DEC /* RemoveMember.swift */; };
+		5801CC3626A5756200DD3DEC /* RestaurantActiveOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3526A5756200DD3DEC /* RestaurantActiveOrders.swift */; };
+		5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3826A5774D00DD3DEC /* ActiveOrders.swift */; };
 		580506F526296723007CF39B /* RestaurantLogin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580506F426296723007CF39B /* RestaurantLogin.swift */; };
 		5808DDEC2632BD6800D0B0EC /* RestaurantOrderWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */; };
 		580E1E232636D5AA00A16228 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E1E222636D5AA00A16228 /* TabView.swift */; };
@@ -67,6 +69,8 @@
 
 /* Begin PBXFileReference section */
 		5801CC3326A5557E00DD3DEC /* RemoveMember.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveMember.swift; sourceTree = "<group>"; };
+		5801CC3526A5756200DD3DEC /* RestaurantActiveOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantActiveOrders.swift; sourceTree = "<group>"; };
+		5801CC3826A5774D00DD3DEC /* ActiveOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrders.swift; sourceTree = "<group>"; };
 		580506F426296723007CF39B /* RestaurantLogin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantLogin.swift; sourceTree = "<group>"; };
 		5808DDEB2632BD6800D0B0EC /* RestaurantOrderWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantOrderWork.swift; sourceTree = "<group>"; };
 		580E1E222636D5AA00A16228 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
@@ -146,6 +150,15 @@
 				CE781D33A4AA74DA91BE73F7 /* Pods_OrderInnService.framework */,
 			);
 			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		5801CC3726A5773700DD3DEC /* ActiveOrders */ = {
+			isa = PBXGroup;
+			children = (
+				5801CC3526A5756200DD3DEC /* RestaurantActiveOrders.swift */,
+				5801CC3826A5774D00DD3DEC /* ActiveOrders.swift */,
+			);
+			path = ActiveOrders;
 			sourceTree = "<group>";
 		};
 		580506F32629670B007CF39B /* Models */ = {
@@ -418,6 +431,7 @@
 		58FF99B426A1689400A99F38 /* RestaurantInfo */ = {
 			isa = PBXGroup;
 			children = (
+				5801CC3726A5773700DD3DEC /* ActiveOrders */,
 			);
 			path = RestaurantInfo;
 			sourceTree = "<group>";
@@ -564,6 +578,7 @@
 				5813CC5626309EB700924ED9 /* MenuView.swift in Sources */,
 				580E1E232636D5AA00A16228 /* TabView.swift in Sources */,
 				58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */,
+				5801CC3626A5756200DD3DEC /* RestaurantActiveOrders.swift in Sources */,
 				5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */,
 				58F07AA22628218400574D4F /* QRScannerViewController.swift in Sources */,
 				581DF41926371B3B00B426FC /* ActiveOrder.swift in Sources */,
@@ -575,6 +590,7 @@
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				69142D44269740E20044D34F /* DebugMenu.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
+				5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */,
 				5811F946262DE53000050F2C /* LaunchScreen.swift in Sources */,
 				581AB020266DF67D0049CD27 /* ItemAvailabilityController.swift in Sources */,
 				69142D4E2698995E0044D34F /* LoginQRCode.swift in Sources */,
