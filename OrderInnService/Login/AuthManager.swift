@@ -66,7 +66,7 @@ class AuthManager: ObservableObject {
         if let restaurantID = userDefaults.restaurantID, let userID = userDefaults.userID {
             load(restaurant: restaurantID, user: userID)
         } else if let restaurantID = userDefaults.restaurantID {
-            if userDefaults.isAdmin {
+            if userDefaults.isAdmin ?? false {
                 load(adminForRestaurant: restaurantID)
             } else {
                 load(kitchenForRestaurant: restaurantID)
