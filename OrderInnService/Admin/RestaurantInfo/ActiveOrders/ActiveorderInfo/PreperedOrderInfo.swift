@@ -1,5 +1,5 @@
 //
-//  ActiveOrderInfoView.swift
+//  PreperedOrderInfo.swift
 //  OrderInnService
 //
 //  Created by Ivars Ruģelis on 19/07/2021.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ActiveOrderInfoView: View {
+struct PreperedOrderInfo: View {
     @Environment (\.presentationMode) var presentationMode
     @StateObject var orderOverview = ActiveOrderOverviewWork()
     @ObservedObject var activeOrder: ActiveOrders

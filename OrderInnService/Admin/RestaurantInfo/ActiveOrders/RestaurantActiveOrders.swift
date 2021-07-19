@@ -92,7 +92,7 @@ struct RestaurantActiveOrders: View {
                 case .toActiveOrder:
                     ActiveOrderInfoView(activeOrder: activeOrders)
                 case .toPreperedOrder:
-                    Text("There will be prepered Orders")
+                    PreperedOrderInfo(activeOrder: activeOrders)
                 }
             }
         }
