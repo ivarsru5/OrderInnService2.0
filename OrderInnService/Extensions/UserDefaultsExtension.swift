@@ -24,6 +24,10 @@ extension UserDefaults {
         ///     granularly, this needs to be reworked.
         case userID = "user_id"
 
+        /// True if the currently logged-in user is using an admin code and as such the admin interface
+        /// should be presented.
+        case isAdmin = "is_admin"
+
         var key: String {
             return "\(UserDefaults.o6nPrefix).\(self.rawValue)"
         }
@@ -50,6 +54,15 @@ extension UserDefaults {
             self.set(newValue, forKey: Keys.userID.key)
         }
     }
+    var isAdmin: Bool? {
+        get {
+            return self.bool(forKey: Keys.isAdmin.key)
+        }
+        set {
+            self.set(newValue, forKey: Keys.isAdmin.key)
+        }
+    }
+
 
     static func deleteAllValues() {
         Keys.allKeys.forEach { key in

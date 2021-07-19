@@ -66,7 +66,11 @@ class AuthManager: ObservableObject {
         if let restaurantID = userDefaults.restaurantID, let userID = userDefaults.userID {
             load(restaurant: restaurantID, user: userID)
         } else if let restaurantID = userDefaults.restaurantID {
-            load(kitchenForRestaurant: restaurantID)
+            if userDefaults.isAdmin {
+                load(adminForRestaurant: restaurantID)
+            } else {
+                load(kitchenForRestaurant: restaurantID)
+            }
         } else {
             authState = .unauthenticated
         }
@@ -106,6 +110,21 @@ class AuthManager: ObservableObject {
             .sink { [unowned self] restaurant in
                 self.restaurant = restaurant
                 authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
+                if let _ = sub {
+                    sub = nil
+                }
+            }
+    }
+
+    private func load(adminForRestaurant restaurant: Restaurant.ID) {
+        var sub: AnyCancellable?
+        sub = Restaurant.load(withID: restaurant)
+            .mapError { error in
+                fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
+            }
+            .sink { [unowned self] restaurant in
+                self.restaurant = restaurant
+                authState = .authenticatedAdmin(restaurantID: self.restaurant.id, admin: "")
                 if let _ = sub {
                     sub = nil
                 }
@@ -202,6 +221,8 @@ class AuthManager: ObservableObject {
     private func persistAuthState() {
         let restaurantID: Restaurant.ID?
         let userID: Restaurant.Employee.ID?
+        var isAdmin: Bool? = nil
+
         switch authState {
         case .loading:
             fatalError("BUG Tried to persist loading (i.e, undefined) auth state to UserDefaults")
@@ -217,12 +238,16 @@ class AuthManager: ObservableObject {
         case .authenticatedKitchen(restaurantID: let _restaurantID, kitchen: _):
             restaurantID = _restaurantID
             userID = nil
+            isAdmin = false
             
         case .authenticatedAdmin(restaurantID: let _restaurantID, admin: _):
             restaurantID = _restaurantID
             userID = nil
+            isAdmin = true
         }
+
         UserDefaults.standard.restaurantID = restaurantID
         UserDefaults.standard.userID = userID
+        UserDefaults.standard.isAdmin = isAdmin
     }
 }
