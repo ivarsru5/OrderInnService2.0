@@ -49,26 +49,15 @@ struct AdminGeneralSelection: View {
                                 .padding(10)
                         })
                     
-                }
-                
-                Section(header: Text("In app controls")){
                     NavigationLink(
-                        destination: EmptyView(),
+                        destination: MenuAvailability(),
                         label: {
-                            Text("Make an order")
+                            Text("Menu availability")
                                 .bold()
                                 .foregroundColor(Color(UIColor.label))
                                 .padding(10)
                         })
                     
-                    NavigationLink(
-                        destination: EmptyView(),
-                        label: {
-                            Text("Kitchen")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
                 }
             }
             .navigationTitle(Text("General"))
