@@ -25,6 +25,14 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         self.subscriptionPaid = snapshot["subscriptionPaid"] as! Bool
     }
 
+    #if DEBUG
+    init(id: ID, name: String, subscriptionPaid: Bool) {
+        self.id = id
+        self.name = name
+        self.subscriptionPaid = subscriptionPaid
+    }
+    #endif
+
     static func load(withID id: String) -> AnyPublisher<Restaurant, Error> {
         return Firestore.firestore()
             .collection(Restaurant.firestoreCollection)
@@ -43,9 +51,15 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         return TypedDocumentReference(ref)
     }
 
+    var users: TypedCollectionReference<Employee> {
+        firestoreReference.collection(Employee.firestoreCollection, of: Employee.self)
+    }
+    var orders: TypedCollectionReference<RestaurantOrder> {
+        firestoreReference.collection(of: RestaurantOrder.self)
+    }
+
     func loadUsers() -> AnyPublisher<[Employee], Error> {
-        return firestoreReference
-            .collection(Employee.firestoreCollection, of: Employee.self)
+        return users
             .get()
             .collect()
             .eraseToAnyPublisher()
@@ -77,6 +91,18 @@ struct Restaurant: Identifiable, FirestoreInitiable {
             let restaurant = snapshot.reference.parent.parent!
             self.restaurantID = restaurant.documentID
         }
+
+        #if DEBUG
+        init(restaurantID: Restaurant.ID, id: ID, name: String, lastName: String,
+             manager: Bool, isActive: Bool) {
+            self.restaurantID = restaurantID
+            self.id = id
+            self.name = name
+            self.lastName = lastName
+            self.manager = manager
+            self.isActive = isActive
+        }
+        #endif
 
         static func load(forRestaurantID restaurantID: Restaurant.ID,
                          withUserID userID: Employee.ID) -> AnyPublisher<Employee, Error> {

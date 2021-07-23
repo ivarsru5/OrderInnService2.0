@@ -5,109 +5,72 @@
 //  Created by Ivars Ruģelis on 07/06/2021.
 //
 
+import Combine
+import FirebaseFirestore
 import Foundation
-import Firebase
+import SwiftUI
 
-class ItemAvailabilityController: ObservableObject{
-    @Published var menuCategory = [MenuCategory]()
-    @Published var menuDrinks = [MenuDrinks]()
-    let database = Firestore.firestore()
-    
-    func getMenuCategory(){
-        var menu = [MenuCategory]()
-        let group = DispatchGroup()
-        
-        group.enter()
-        database.collection("Restaurants")
-            .document(UserDefaults.standard.kitchenQrStringKey)
-            .collection("MenuCategory")
-            .getDocuments { snapshot, error in
-                guard let documentSnapshot = snapshot?.documents else {
-                    print("There is no categorys")
-                    group.leave()
-                    return
-                }
-                
-                for document in documentSnapshot{
-                    var menuItems = [MenuItem]()
-                    
-                    group.enter()
-                    self.database.collection("Restaurants")
-                        .document(UserDefaults.standard.kitchenQrStringKey)
-                        .collection("MenuCategory")
-                        .document(document.documentID)
-                        .collection("Menu")
-                        .getDocuments { snapshot, error in
-                            guard let documentSnapshot = snapshot?.documents else{
-                                print("There is no menu Items")
-                                group.leave()
-                                return
-                            }
-                            
-                            for item in documentSnapshot{
-                                guard let items = MenuItem(snapshot: item) else{
-                                    return
-                                }
-                                menuItems.append(items)
-                            }
-                            guard let category = MenuCategory(snapshot: document, menuItems: menuItems) else{
-                                return
-                            }
-                            menu.append(category)
-                            group.leave()
-                        }
-                }
-                group.leave()
-            }
-        group.notify(queue: .main){
-            self.menuDrinks = menu.compactMap { item -> MenuDrinks? in
-                guard item.type == "drink" else{
-                    return nil
-                }
-                
-                let drinks = MenuDrinks(name: item.name, drinks: item.menuItems)
-                return drinks
-            }
-            self.menuCategory = menu.filter { $0.type == "food" }
-            self.menuCategory.sort { $0.name < $1.name }
-        }
+class ItemAvailabilityController: ObservableObject {
+    @Published var menuCategories = [MenuCategory]()
+    @Published var categoryItems: [MenuCategory.ID: [MenuItem]] = [:]
+    let restaurant: Restaurant
+
+    init() {
+        restaurant = AuthManager.shared.restaurant
     }
     
-    func changeItemAvailability(inCategory: MenuCategory ,item: MenuItem){
-        
-        if item.available{
-            self.database.collection("Restaurants")
-                .document(UserDefaults.standard.kitchenQrStringKey)
-                .collection("MenuCategory")
-                .document(inCategory.id)
-                .collection("Menu")
-                .document(item.id)
-                .updateData([
-                    "available" : false
-                ]) { error in
-                    if let err = error{
-                        print("Error updating document \(err)")
-                    }else{
-                        print("Item changed to not available!")
-                    }
-                }
-            
-        }else{
-            self.database.collection("Restaurants")
-                .document(UserDefaults.standard.kitchenQrStringKey)
-                .collection("MenuCategory")
-                .document(inCategory.id)
-                .collection("Menu")
-                .document(item.id)
-                .updateData([
-                    "available" : true
-                ]) { error in
-                    if let err = error{
-                        print("Error updating document \(err)")
-                    }else{
-                        print("Item changed to available!")
-                }
+    func getMenuCategory() {
+        var categoryItems: [MenuCategory.ID: [MenuItem]] = [:]
+
+        let categoryPub = restaurant.firestoreReference
+            .collection(of: MenuCategory.self)
+            .get()
+            .catch { error in
+                // TODO[pn 2021-07-16]: Handle error
+                return Empty<MenuCategory, Never>()
             }
-        }
+            .eraseToAnyPublisher()
+
+        categoryPub.collect().assign(to: &$menuCategories)
+
+        var itemSub: AnyCancellable?
+        itemSub = categoryPub
+            .flatMap { category -> AnyPublisher<(MenuCategory, [MenuItem]), Error> in
+                let items = category.firestoreReference
+                    .collection(of: MenuItem.self)
+                    .get()
+                    .collect()
+                return Just(category)
+                    .setFailureType(to: Error.self)
+                    .zip(items)
+                    .eraseToAnyPublisher()
+            }
+            .sink(receiveCompletion: { result in
+                if case .failure(let error) = result {
+                    // TODO[pn 2021-07-16]: Handle error
+                }
+                if let _ = itemSub {
+                    itemSub = nil
+                }
+            }, receiveValue: { tuple in
+                let (category, items) = tuple
+                categoryItems[category.id] = items
+            })
+    }
+    
+    func setAvailable(_ availability: Bool, for item: MenuItem) -> AnyPublisher<MenuItem, Error> {
+        return item.firestoreReference
+            .updateData(["available": !item.isAvailable])
+            .flatMap { reference in
+                reference.get()
+            }
+            .map { [unowned self] item in
+                if let _ = categoryItems[item.categoryID],
+                   let idx = categoryItems[item.categoryID]!.firstIndex(where: { $0.id == item.id }) {
+                    categoryItems[item.categoryID]![idx] = item
+                }
+                return item
+            }
+            .eraseToAnyPublisher()
     }
 }

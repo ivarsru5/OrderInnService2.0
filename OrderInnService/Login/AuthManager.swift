@@ -55,7 +55,13 @@ class AuthManager: ObservableObject {
     }
 
     var restaurant: Restaurant!
-    var waiter: Restaurant.Employee?
+    var waiter: Restaurant.Employee? {
+        didSet {
+            if let waiter = self.waiter {
+                UserDefaults.standard.currentUser = "\(waiter.name) \(waiter.lastName)"
+            }
+        }
+    }
     private(set) var kitchen: String?
 
     init() {
@@ -68,6 +74,21 @@ class AuthManager: ObservableObject {
             authState = .unauthenticated
         }
     }
+
+    #if DEBUG
+    private var disablePersistence = false
+
+    init(debugWithRestaurant restaurant: Restaurant, waiter: Restaurant.Employee?, kitchen: String?) {
+        self.disablePersistence = true
+        self.restaurant = restaurant
+        self.waiter = waiter
+        self.kitchen = kitchen
+    }
+
+    func setAuthState(_ authState: AuthState) {
+        self.authState = authState
+    }
+    #endif
 
     private var subs = Set<AnyCancellable>()
     func sink(_ publisher: AnyPublisher<Void, Never>) {
@@ -198,6 +219,10 @@ class AuthManager: ObservableObject {
     }
 
     private func persistAuthState() {
+        #if DEBUG
+        guard !disablePersistence else { return }
+        #endif
+
         let restaurantID: Restaurant.ID?
         let userID: Restaurant.Employee.ID?
         switch authState {

@@ -9,6 +9,7 @@ import Foundation
 
 enum ModelError: Error {
     case invalidEnumStringEncoding
+    case invalidFormat
 }
 
 // HACK[pn 2021-07-13]: Even though we don't use Double in a non-currency

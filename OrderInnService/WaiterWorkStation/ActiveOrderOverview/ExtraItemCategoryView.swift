@@ -8,6 +8,12 @@
 import SwiftUI
 
 struct ExtraItemCategoryView: View {
+    var body: some View {
+        Text("Stub for refactoring")
+    }
+}
+#if false
+struct ExtraItemCategoryView: View {
     @StateObject var menuOverview = MenuOverViewWork()
     @ObservedObject var activeOrderOverview: ActiveOrderOverviewWork
     @ObservedObject var activeOrder: ActiveOrderWork
@@ -137,3 +143,4 @@ struct ExtraMenuItemView: View{
         }
     }
 }
+#endif

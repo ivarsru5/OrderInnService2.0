@@ -15,7 +15,7 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
     // TODO[pn 2021-07-13]: Pluralisation typo.
     static let firestoreCollection = "MenuCategory"
 
-    enum CategoryType: String, Codable {
+    enum CategoryType: String, Equatable, Codable {
         case food = "food"
         case drink = "drink"
 
@@ -39,7 +39,7 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
         }
     }
 
-    private let restaurantID: Restaurant.ID
+    let restaurantID: Restaurant.ID
     let id: ID
     let name: String
     let type: CategoryType
@@ -54,6 +54,15 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
         restaurantID = restaurant.documentID
     }
 
+    #if DEBUG
+    init(id: ID, name: String, type: CategoryType, restaurantID: Restaurant.ID) {
+        self.id = id
+        self.name = name
+        self.type = type
+        self.restaurantID = restaurantID
+    }
+    #endif
+
     var firestoreReference: TypedDocumentReference<MenuCategory> {
         let ref = Firestore.firestore()
             .collection(Restaurant.firestoreCollection)
@@ -66,7 +75,7 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
     static func create(under restaurant: Restaurant,
                        name: String, type: CategoryType) -> AnyPublisher<MenuCategory, Error> {
         restaurant.firestoreReference
-            .collection(self.firebaseCollection, of: MenuCategory.self)
+            .collection(self.firestoreCollection, of: MenuCategory.self)
             .addDocument(data: [
                 "name": name,
                 "type": type.rawValue,
@@ -105,8 +114,47 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
         }
     }
 
-    private let restaurantID: Restaurant.ID
-    private let categoryID: MenuCategory.ID
+    struct FullID: Hashable, Equatable, Codable {
+        let category: MenuCategory.ID
+        let item: ID
+
+        init(category: MenuCategory.ID, item: ID) {
+            self.category = category
+            self.item = item
+        }
+        init?(string: String) {
+            guard let tuple = FullID.unparse(string: string) else { return nil }
+            self.category = tuple.0
+            self.item = tuple.1
+        }
+        init(from decoder: Decoder) throws {
+            let container = try decoder.singleValueContainer()
+            let string = try container.decode(String.self)
+            guard let tuple = FullID.unparse(string: string) else {
+                throw ModelError.invalidFormat
+            }
+            self.category = tuple.0
+            self.item = tuple.1
+        }
+
+        private static func unparse(string: String) -> (MenuCategory.ID, ID)? {
+            let parts = string.split(separator: "/")
+            guard parts.count == 2 else { return nil }
+            let category = MenuCategory.ID(parts[0])
+            let item = ID(parts[1])
+            return (category, item)
+        }
+
+        var string: String { "\(category)/\(item)" }
+
+        func encode(to encoder: Encoder) throws {
+            var container = encoder.singleValueContainer()
+            try container.encode(self.string)
+        }
+    }
+
+    let restaurantID: Restaurant.ID
+    let categoryID: MenuCategory.ID
     let id: ID
     let name: String
     let price: Double
@@ -118,13 +166,40 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
         id = snapshot.documentID
         name = snapshot["name"] as! String
         price = snapshot["price"] as! Double
-        isAvailable = snapshot["isAvailable"] as! Bool
         destination = try! Destination(from: snapshot["destination"] as! String)
+
+        if let isAvailable = snapshot["isAvailable"] as? Bool {
+            self.isAvailable = isAvailable
+        } else if let isAvailable = snapshot["available"] as? Bool {
+            // TODO[pn 2021-07-16]: Remove old key name once it's no longer
+            // present on any documents in Firestore.
+            self.isAvailable = isAvailable
+        } else {
+            fatalError("FIXME No valid isAvailable key name found for MenuItem: \(snapshot.reference.path)")
+        }
 
         let category = snapshot.reference.parent.parent!
         categoryID = category.documentID
         let restaurant = category.parent.parent!
         restaurantID = restaurant.documentID
+    }
+
+    #if DEBUG
+    init(id: ID, name: String, price: Double, isAvailable: Bool,
+         destination: Destination, restaurantID: Restaurant.ID,
+         categoryID: MenuCategory.ID) {
+        self.id = id
+        self.name = name
+        self.price = price
+        self.isAvailable = isAvailable
+        self.destination = destination
+        self.restaurantID = restaurantID
+        self.categoryID = categoryID
+    }
+    #endif
+
+    var fullID: FullID {
+        return FullID(category: categoryID, item: id)
     }
 
     var firestoreReference: TypedDocumentReference<MenuItem> {

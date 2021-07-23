@@ -11,10 +11,6 @@ import FirebaseFirestore
 
 #if DEBUG
 struct DebugMenu: View {
-    class Model {
-        var subs = Set<AnyCancellable>()
-    }
-
     @EnvironmentObject var authManager: AuthManager
     @State var userDefaultsDumped = false
     @State var promptToResetUserDefaults = false
@@ -63,33 +59,70 @@ struct DebugMenu: View {
         userDefaultsDumped = true
     }
 
+    private func logout() -> AnyPublisher<Void, Error> {
+        guard let waiter = authManager.waiter else {
+            return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+        }
+        return waiter.firestoreReference
+            .updateData(["isActive": true])
+            .map { _ in }
+            .eraseToAnyPublisher()
+    }
+
+    private func clearFirestorePersistence() -> AnyPublisher<Void, Error> {
+        var firestore: Firestore?
+        firestore = Firestore.firestore()
+        return Future<Void, Error>() { resolve in
+            firestore!.terminate(completion: { maybeError in
+                guard maybeError == nil else {
+                    resolve(.failure(maybeError!))
+                    return
+                }
+
+                firestore!.clearPersistence(completion: { maybeError in
+                    guard maybeError == nil else {
+                        resolve(.failure(maybeError!))
+                        return
+                    }
+
+                    if let _ = firestore {
+                        // HACK[pn]: We need to keep the Firestore instance
+                        // alive longer than the clearPersistence call, since
+                        // doing otherwise can apparently cause a deadlock by
+                        // the instance attempting to do cleanup on dealloc
+                        // exactly during clearPersistence running. I guess
+                        // nobody expected that the Firestore instance wouldn't
+                        // actually be kept floating around statically and
+                        // instead be materialised whenever needed ::shrug::
+                    }
+
+                    resolve(.success(()))
+                })
+            })
+        }.eraseToAnyPublisher()
+    }
+
     func resetUserDefaults() {
         // NOTE[pn]: Due to the Firebase model, we need to mark the current user
         // as having effectively logged out, hence we do that here such that
-        // it's possible to log in afterwards. Actual UserDefaults clearing goes
-        // on in actuallyResetUserDefaults.
-        if let waiter = authManager.waiter {
-            var sub: AnyCancellable?
-            sub = waiter.firestoreReference
-                .updateData(["isActive": true])
-                .sink(receiveCompletion: { result in
+        // it's possible to log in afterwards.
+
+        var sub: AnyCancellable?
+        sub = logout()
+            .flatMap { _ in self.clearFirestorePersistence() }
+            .catch { error -> Empty<Void, Never> in
+                print("[Debug] Failed to reset app data: \(String(describing: error))")
+                return Empty()
+            }
+            .sink {
+                if let _ = sub {
                     sub = nil
-                    if case .failure(let error) = result {
-                        print("[Debug] Failed to update current user: \(String(describing: error))")
-                    } else {
-                        actuallyResetUserDefaults()
-                    }
-                }, receiveValue: { _ in })
-        } else {
-            // Technically unreachable since this screen is attached only to
-            // the service workflow, but regardless.
-            actuallyResetUserDefaults()
-        }
-    }
-    func actuallyResetUserDefaults() -> Never {
-        print("=== Resetting user defaults. The app will crash afterwards.")
-        UserDefaults.deleteAllValues()
-        exit(0)
+                }
+
+                print("=== [Debug] Resetting user defaults and quitting.")
+                UserDefaults.deleteAllValues()
+                exit(0)
+            }
     }
 
     var body: some View {
@@ -103,11 +136,19 @@ struct DebugMenu: View {
             Section(header: Text("App Data")) {
                 Button("Dump User Defaults to Console",
                        action: self.dumpUserDefaultsToConsole)
-                Button("Reset App Data",
-                       action: { promptToResetUserDefaults = true })
+
+                if #available(iOS 15.0, *) {
+                    Button("Reset App Data", role: .destructive,
+                           action: { promptToResetUserDefaults = true })
+                } else {
+                    Button(action: {
+                        promptToResetUserDefaults = true
+                    }, label: {
+                        Text("Reset App Data").foregroundColor(.red)
+                    })
+                }
             }
         }
-        .navigationTitle("Debug Actions")
         .alert(isPresented: $userDefaultsDumped) {
             Alert(title: Text("User Defaults Dumped"),
                   message: Text("Please check the console."),
@@ -124,9 +165,11 @@ struct DebugMenu: View {
     }
 
     static var navigationViewWithTabItem: some View {
-        NavigationView {
-            DebugMenu()
-        }
+        return withTabItem
+    }
+
+    static var withTabItem: some View {
+        DebugMenu()
         .tabItem {
             Image(systemName: "wrench.and.screwdriver")
             Text("Debug")
@@ -137,6 +180,7 @@ struct DebugMenu: View {
 struct DebugMenu_Previews: PreviewProvider {
     static var previews: some View {
         DebugMenu()
+        DebugMenu().colorScheme(.dark)
     }
 }
 #endif

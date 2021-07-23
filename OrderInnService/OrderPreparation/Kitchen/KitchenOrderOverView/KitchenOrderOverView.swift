@@ -8,72 +8,92 @@
 import SwiftUI
 
 struct KitchenOrderOverView: View {
-    var order: ClientSubmittedOrder
+    let order: RestaurantOrder
+    let zone: Zone
+    let table: Table
+    let menu: [MenuItem.ID: MenuItem]
+
+    struct OrderPartListing: View {
+        struct Cell: View {
+            let entry: RestaurantOrder.OrderEntry
+
+            var body: some View {
+                HStack {
+                    Text(entry.item.name)
+                        .bold()
+                        .foregroundColor(Color.label)
+                    Text(" ×\(entry.amount)")
+                        .foregroundColor(Color.secondary)
+
+                    Spacer()
+
+                    Text("\(entry.subtotal, specifier: "%.2f") EUR")
+                        .foregroundColor(Color.label)
+                }
+            }
+
+        }
+
+        let partIndex: Int
+        let part: RestaurantOrder.OrderPart
+        var headerText: String {
+            if partIndex == 0 {
+                return "Initial Order"
+            } else {
+                return "Extra Order: \(partIndex)"
+            }
+        }
+
+        var body: some View {
+            Section(header: Text(headerText)) {
+                ForEach(part.entries.indices) { entryIndex in
+                    Cell(entry: part.entries[entryIndex])
+                }
+            }
+        }
+    }
     
     var body: some View {
         ZStack{
-                VStack{
-                    HStack{
-                        HStack{
-                            Text("Table: ")
-                                .bold()
-                            
-                            Text(order.forTable)
-                                .foregroundColor(Color(UIColor.label))
-                            
-                            Spacer()
-                        }
+                VStack {
+                    HStack {
+                        Text("Table: ")
+                            .bold()
+
+                        Text(table.name)
+                            .foregroundColor(Color.label)
+
+                        Spacer()
                     }
                     .padding()
-                    
-                    VStack{
-                        
-                        List{
-                            ForEach(order.withExtraItems, id: \.id) { order in
-                                Section(header: Text("Extra order: \(order.extraOrderPart!)")){
-                                    ForEach(order.withItems, id: \.id){ item in
-                                        HStack{
-                                            Text(item.itemName)
-                                                .bold()
-                                                .foregroundColor(Color(UIColor.label))
 
-                                            Spacer()
-
-                                            Text("\(item.itemPrice, specifier: "%.2f")EUR")
-                                                .italic()
-                                                .foregroundColor(Color(UIColor.label))
-                                        }
-                                    }
-                                }
-                            }
-                            
-                            Section(header: Text("Submited item's")){
-                                ForEach(order.withItems, id: \.id){ item in
-                                    SubmittedOrderCell(itemName: item.itemName, itemPrice: item.itemPrice!)
-                                }
-                            }
+                    List {
+                        ForEach(order.parts.indices) { partIndex in
+                            OrderPartListing(partIndex: partIndex,
+                                             part: order.parts[partIndex])
                         }
-                        .listStyle(InsetGroupedListStyle())
                     }
+                    .listStyle(InsetGroupedListStyle())
+
                     Button(action: {
+                        // TODO[pn 2021-07-16]
 //                        orderOverview.deleteOrder(fromOrder: activeOrder.selectedOrder!)
 //                        activeOrder.collectedOrders.removeAll(where: { $0.id == activeOrder.selectedOrder!.id })
 //                        presetationMode.wrappedValue.dismiss()
                     }, label: {
-                        Text("order completed")
+                        Text("Mark Order as Completed")
                             .bold()
-                            .frame(minWidth: 0, idealWidth: 100, maxWidth: .infinity,
-                                   minHeight: 0, idealHeight: 45, maxHeight: 55,
-                                   alignment: .center)
-                            .foregroundColor(Color(UIColor.systemBackground))
-                            .background(Color(UIColor.label))
+                            .frame(width: nil, height: 45, alignment: .center)
+                            .foregroundColor(Color.systemBackground)
+                            .background(Color.label)
                             .cornerRadius(15)
                     })
                     .padding()
                 }
         }
-        .navigationTitle(order.inZone)
+        .navigationTitle(zone.location)
         .onAppear{
+            // TODO[pn 2021-07-16]
 //            orderOverview.markOrderAsRead(forOrder: activeOrder.selectedOrder!)
         }
     }
