@@ -109,15 +109,17 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         }
         #endif
 
-        static func load(forRestaurantID restaurantID: Restaurant.ID,
-                         withUserID userID: Employee.ID) -> AnyPublisher<Employee, Error> {
-            return Firestore.firestore()
-                .collection("Restaurants")
-                .document(restaurantID)
-                .collection("Users")
-                .document(userID)
-                .getDocumentFuture()
-                .map { snapshot in Employee(from: snapshot) }
+        static func create(under restaurant: Restaurant,
+                           name: String, lastName: String, manager: Bool,
+                           isActive: Bool = true) -> AnyPublisher<Employee, Error> {
+            return restaurant.users
+                .addDocumentAndCommit(data: [
+                    "name": name,
+                    "lastName": lastName,
+                    "manager": manager,
+                    "isActive": isActive,
+                ])
+                .flatMap { ref in ref.get() }
                 .eraseToAnyPublisher()
         }
 

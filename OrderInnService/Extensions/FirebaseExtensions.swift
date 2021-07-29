@@ -63,6 +63,21 @@ extension FirebaseFirestore.Query {
     }
 }
 
+extension FirebaseFirestore.CollectionReference {
+    func addDocumentFuture(data: [String: Any]) -> Future<FirebaseFirestore.DocumentReference, Error> {
+        return Future() { [self] resolve in
+            var ref: FirebaseFirestore.DocumentReference?
+            ref = addDocument(data: data, completion: { maybeError in
+                if let error = maybeError {
+                    resolve(.failure(error))
+                } else {
+                    resolve(.success(ref!))
+                }
+            })
+        }
+    }
+}
+
 protocol FirestoreInitiable {
     static var firestoreCollection: String { get }
     var firestoreReference: TypedDocumentReference<Self> { get }
@@ -330,8 +345,19 @@ struct TypedCollectionReference<Document> where Document : FirestoreInitiable {
         TypedDocumentReference(untyped.document(id))
     }
 
+    /// Adds a document.
+    ///
+    /// The resulting reference may not be valid since this method doesn't wait for confirmation before
+    /// returning it. For that, please use `addDocumentAndCommit`.
     func addDocument(data: [String: Any]) -> TypedDocumentReference<Document> {
         TypedDocumentReference(untyped.addDocument(data: data))
+    }
+
+    /// Adds a document and waits until confirmation from the server.
+    func addDocumentAndCommit(data: [String: Any]) -> AnyPublisher<TypedDocumentReference<Document>, Error> {
+        untyped.addDocumentFuture(data: data)
+            .map { ref in TypedDocumentReference<Document>(ref) }
+            .eraseToAnyPublisher()
     }
 }
 

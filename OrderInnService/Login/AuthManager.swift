@@ -112,7 +112,7 @@ class AuthManager: ObservableObject {
             }
             .flatMap { [unowned self] restaurant -> AnyPublisher<Restaurant.Employee, Error> in
                 self.restaurant = restaurant
-                return Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user)
+                return restaurant.users.document(user).get()
             }
             .map { [unowned self] user in
                 self.waiter = user
