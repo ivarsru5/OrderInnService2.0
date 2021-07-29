@@ -13,6 +13,21 @@ extension Color {
     static let label = Color(UIColor.label)
     static let link = Color(UIColor.link)
     static let systemBackground = Color(UIColor.systemBackground)
+
+    static let secondaryLabel = Color(UIColor.secondaryLabel)
+    static let secondarySystemFill = Color(UIColor.secondarySystemFill)
+    static let secondarySystemBackground = Color(UIColor.secondarySystemBackground)
+    static let tertiaryLabel = Color(UIColor.tertiaryLabel)
+    static let tertiarySystemFill = Color(UIColor.tertiarySystemFill)
+    static let tertiarySystemBackground = Color(UIColor.tertiarySystemBackground)
+    static let quaternaryLabel = Color(UIColor.quaternaryLabel)
+    static let quaternarySystemFill = Color(UIColor.quaternarySystemFill)
+
+    static let gray2 = Color(UIColor.systemGray2)
+    static let gray3 = Color(UIColor.systemGray3)
+    static let gray4 = Color(UIColor.systemGray4)
+    static let gray5 = Color(UIColor.systemGray5)
+    static let gray6 = Color(UIColor.systemGray6)
 }
 
 // https://stackoverflow.com/a/60203901
@@ -72,14 +87,3 @@ extension View {
     }
 }
 
-struct O6NButtonStyle: ButtonStyle {
-    func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .font(.body.bold())
-            .foregroundColor(.systemBackground)
-            .frame(maxWidth: .infinity, minHeight: 54)
-            .background(Color.label)
-            .cornerRadius(16)
-            .padding(16)
-    }
-}
