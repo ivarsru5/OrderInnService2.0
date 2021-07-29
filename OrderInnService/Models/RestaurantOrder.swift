@@ -46,7 +46,6 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     }
     struct OrderPart: Codable {
         let entries: [OrderEntry]
-        var subtotal: Currency { entries.map { $0.subtotal }.sum() }
 
         init(entries: [OrderEntry]) {
             self.entries = entries
@@ -59,21 +58,30 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         func encode(to encoder: Encoder) throws {
             try entries.encode(to: encoder)
         }
+
+        func subtotal(using menu: MenuItem.Menu) -> Currency {
+            return entries.map { $0.subtotal(using: menu) }.sum()
+        }
     }
     struct OrderEntry: Codable {
         let itemID: MenuItem.FullID
-        var item: MenuItem!
         let amount: Int
-        var subtotal: Currency { item.price * amount }
 
-        init(item: MenuItem, amount: Int) {
-            self.itemID = item.fullID
-            self.item = item
+        init(itemID: MenuItem.FullID, amount: Int) {
+            self.itemID = itemID
             self.amount = amount
         }
 
         func with(amount: Int) -> OrderEntry {
-            return OrderEntry(item: item, amount: amount)
+            return OrderEntry(itemID: itemID, amount: amount)
+        }
+
+        func subtotal(using menu: MenuItem.Menu) -> Currency {
+            return menu[itemID]!.price * amount
+        }
+        func subtotal(with item: MenuItem) -> Currency {
+            precondition(item.fullID == itemID)
+            return item.price * amount
         }
 
         enum EntryCodingKey: String, CodingKey {
@@ -89,7 +97,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: EntryCodingKey.self)
-            try container.encode(item.fullID, forKey: .itemID)
+            try container.encode(itemID, forKey: .itemID)
             try container.encode(amount, forKey: .amount)
         }
     }
@@ -115,8 +123,8 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         return false
     }
 
-    var total: Currency {
-        parts.map { part in part.subtotal }.sum()
+    func total(using menu: MenuItem.Menu) -> Currency {
+        return parts.map { part in part.subtotal(using: menu) }.sum()
     }
 
     init(from snapshot: DocumentSnapshot) {

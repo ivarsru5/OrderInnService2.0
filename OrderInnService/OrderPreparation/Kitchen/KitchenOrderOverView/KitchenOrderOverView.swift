@@ -13,15 +13,16 @@ struct KitchenOrderOverView: View {
     let order: RestaurantOrder
     let zone: Zone
     let table: Table
-    let menu: [MenuItem.ID: MenuItem]
+    @Binding var menu: [MenuItem.FullID: MenuItem]
 
     struct OrderPartListing: View {
         struct Cell: View {
             let entry: RestaurantOrder.OrderEntry
+            let item: MenuItem
 
             var body: some View {
                 HStack {
-                    Text(entry.item.name)
+                    Text(item.name)
                         .bold()
                         .foregroundColor(Color.label)
                     Text(" ×\(entry.amount)")
@@ -29,13 +30,14 @@ struct KitchenOrderOverView: View {
 
                     Spacer()
 
-                    Text("\(entry.subtotal, specifier: "%.2f") EUR")
+                    Text("\(entry.subtotal(with: item), specifier: "%.2f") EUR")
                         .foregroundColor(Color.label)
                 }
             }
 
         }
 
+        @Binding var menu: MenuItem.Menu
         let partIndex: Int
         let part: RestaurantOrder.OrderPart
         var headerText: String {
@@ -49,7 +51,9 @@ struct KitchenOrderOverView: View {
         var body: some View {
             Section(header: Text(headerText)) {
                 ForEach(part.entries.indices) { entryIndex in
-                    Cell(entry: part.entries[entryIndex])
+                    let entry = part.entries[entryIndex]
+                    let item = menu[entry.itemID]!
+                    Cell(entry: entry, item: item)
                 }
             }
         }
@@ -87,7 +91,8 @@ struct KitchenOrderOverView: View {
 
                     List {
                         ForEach(order.parts.indices) { partIndex in
-                            OrderPartListing(partIndex: partIndex,
+                            OrderPartListing(menu: $menu,
+                                             partIndex: partIndex,
                                              part: order.parts[partIndex])
                         }
                     }

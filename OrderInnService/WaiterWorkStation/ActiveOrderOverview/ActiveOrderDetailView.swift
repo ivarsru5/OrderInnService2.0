@@ -30,7 +30,7 @@ struct ActiveOrderDetailView: View {
 
                 Spacer()
 
-                Text("EUR \(entry.subtotal, specifier: "%.2f")")
+                Text("EUR \(entry.subtotal(with: item), specifier: "%.2f")")
                     .foregroundColor(.label)
 
                 if remove != nil {
@@ -51,6 +51,7 @@ struct ActiveOrderDetailView: View {
     let order: RestaurantOrder
     let zone: Zone
     let table: Table
+    @Binding var menu: [MenuItem.FullID: MenuItem]
     @State var extraPart: MenuView.PendingOrderPart? = nil
     @State var showPickerOverlay = false
 
@@ -67,7 +68,7 @@ struct ActiveOrderDetailView: View {
                 if extraPart != nil {
                     Section(header: Text("Selected Items")) {
                         ForEach(extraPart!.entries, id: \.itemID) { entry in
-                            EntryCell(entry: entry, item: entry.item, remove: {
+                            EntryCell(entry: entry, item: menu[entry.itemID]!, remove: {
                                 // TODO
                             })
                         }
@@ -80,7 +81,7 @@ struct ActiveOrderDetailView: View {
 
                     Section(header: header) {
                         ForEach(part.entries, id: \.itemID) { entry in
-                            EntryCell(entry: entry, item: entry.item)
+                            EntryCell(entry: entry, item: menu[entry.itemID]!)
                         }
                     }
                 }
@@ -93,7 +94,7 @@ struct ActiveOrderDetailView: View {
 
                 Spacer()
 
-                Text("EUR \(order.total, specifier: "%.2f")")
+                Text("EUR \(order.total(using: menu), specifier: "%.2f")")
                     .bold()
                     .foregroundColor(.label)
             }
@@ -137,19 +138,23 @@ struct ActiveOrderDetailView: View {
 struct ActiveOrderOverview_Previews: PreviewProvider {
     typealias Part = RestaurantOrder.OrderPart
     typealias Entry = RestaurantOrder.OrderEntry
+    typealias ID = MenuItem.FullID
 
-    static let items: [MenuItem.ID: MenuItem] = [
-        "I1": MenuItem(id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        "I2": MenuItem(id: "I2", name: "Item 2", price: 9.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        "I3": MenuItem(id: "I3", name: "Item 3", price: 19.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
+    static let items: MenuItem.Menu = [
+        ID(string: "C/I1")!: MenuItem(
+            id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        ID(string: "C/I2")!: MenuItem(
+            id: "I2", name: "Item 2", price: 9.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        ID(string: "C/I3")!: MenuItem(
+            id: "I3", name: "Item 3", price: 19.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
     ]
     static let part = Part(entries: [
-        Entry(item: items["I1"]!, amount: 2),
-        Entry(item: items["I2"]!, amount: 3),
-        Entry(item: items["I3"]!, amount: 1),
+        Entry(itemID: ID(string: "C/I1")!, amount: 2),
+        Entry(itemID: ID(string: "C/I2")!, amount: 3),
+        Entry(itemID: ID(string: "C/I3")!, amount: 1),
     ])
     static let order = RestaurantOrder(restaurantID: "R", id: "O", state: .open,
                                        table: "T", placedBy: "U", createdAt: Date(),
@@ -157,9 +162,11 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
 
     static var previews: some View {
         NavigationView {
-            ActiveOrderDetailView(order: order,
-                                zone: Zone(id: "Z", location: "Test Zone", restaurantID: "R"),
-                                table: Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"))
+            ActiveOrderDetailView(
+                order: order,
+                zone: Zone(id: "Z", location: "Test Zone", restaurantID: "R"),
+                table: Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"),
+                menu: .constant(items))
         }
     }
 }

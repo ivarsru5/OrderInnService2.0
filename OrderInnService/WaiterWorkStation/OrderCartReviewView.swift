@@ -16,6 +16,7 @@ struct OrderCartReviewView: View {
 
     struct ItemCell: View {
         let entry: RestaurantOrder.OrderEntry
+        let item: MenuItem
         @Binding var amount: Int
 
         var body: some View {
@@ -23,14 +24,14 @@ struct OrderCartReviewView: View {
                 Image(systemName: "circle.fill")
                     .symbolSize(10)
 
-                Text(entry.item.name)
+                Text(item.name)
                     .bold()
                 Text(" ×\(entry.amount)")
                     .foregroundColor(Color.secondary)
 
                 Spacer()
 
-                Text("\(entry.subtotal, specifier: "%.2f") EUR")
+                Text("\(entry.subtotal(with: item), specifier: "%.2f") EUR")
 
                 Button(action: {
                     withAnimation(.easeOut(duration: 0.5)) {
@@ -48,12 +49,13 @@ struct OrderCartReviewView: View {
 
     struct OrderListing: View {
         @ObservedObject var part: PendingOrderPart
+
         var body: some View {
             List {
                 Section(header: Text("Selected Items")) {
                     ForEach(part.entries, id: \.itemID) { entry in
-                        ItemCell(entry: entry,
-                                 amount: part.amountBinding(for: entry.item))
+                        ItemCell(entry: entry, item: part.menu[entry.itemID]!,
+                                 amount: part.amountBinding(for: entry.itemID))
                     }
                 }
             }
@@ -117,6 +119,7 @@ struct OrderCartReviewView: View {
 
     @ObservedObject var part: PendingOrderPart
     @EnvironmentObject var authManager: AuthManager
+    @Binding var menu: MenuItem.Menu
     @StateObject var model = Model()
 
     @ViewBuilder var sendingOverlay: some View {
@@ -138,6 +141,7 @@ struct OrderCartReviewView: View {
 #if DEBUG
 struct OrderCartReviewView_Previews: PreviewProvider {
     typealias Entry = RestaurantOrder.OrderEntry
+    typealias ID = MenuItem.FullID
 
     class MockModel: OrderCartReviewView.Model {
         override func sendOrder(for table: Table, from part: OrderCartReviewView.PendingOrderPart) {
@@ -152,13 +156,16 @@ struct OrderCartReviewView_Previews: PreviewProvider {
         }
     }
 
-    static let items: [MenuItem.ID: MenuItem] = [
-        "I1": MenuItem(id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        "I2": MenuItem(id: "I2", name: "Item 2", price: 4.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        "I3": MenuItem(id: "I3", name: "Item 3", price: 4.99, isAvailable: true,
-                       destination: .kitchen, restaurantID: "R", categoryID: "C"),
+    static let items: MenuItem.Menu = [
+        ID(string: "C/I1")!: MenuItem(
+            id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        ID(string: "C/I2")!: MenuItem(
+            id: "I2", name: "Item 2", price: 4.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        ID(string: "C/I3")!: MenuItem(
+            id: "I3", name: "Item 3", price: 4.99, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "C"),
     ]
 
     static func makeAuthManager() -> AuthManager {
@@ -174,15 +181,15 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     static func makePart() -> MenuView.PendingOrderPart {
         let part = MenuView.PendingOrderPart()
         part.entries = [
-            Entry(item: items["I1"]!, amount: 2),
-            Entry(item: items["I2"]!, amount: 3),
-            Entry(item: items["I3"]!, amount: 1),
+            Entry(itemID: ID(string: "C/I1")!, amount: 2),
+            Entry(itemID: ID(string: "C/I2")!, amount: 3),
+            Entry(itemID: ID(string: "C/I3")!, amount: 1),
         ]
         return part
     }
 
     static var previews: some View {
-        OrderCartReviewView(part: makePart(), model: makeModel())
+        OrderCartReviewView(part: makePart(), menu: .constant(items), model: makeModel())
             .environmentObject(makeAuthManager())
     }
 }

@@ -86,6 +86,7 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
 
 struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
     typealias ID = String
+    typealias Menu = [FullID: MenuItem]
 
     // TODO[pn 2021-07-13]: Nondescript name.
     static let firestoreCollection = "Menu"
@@ -150,6 +151,11 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
         func encode(to encoder: Encoder) throws {
             var container = encoder.singleValueContainer()
             try container.encode(self.string)
+        }
+
+        func hash(into hasher: inout Hasher) {
+            hasher.combine(category)
+            hasher.combine(item)
         }
     }
 

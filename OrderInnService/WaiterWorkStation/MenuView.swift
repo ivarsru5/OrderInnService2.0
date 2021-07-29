@@ -16,38 +16,39 @@ struct MenuView: View {
 
     class PendingOrderPart: ObservableObject {
         @Published var entries: [RestaurantOrder.OrderEntry] = []
+        var menu: MenuItem.Menu = [:]
 
         var isEmpty: Bool { entries.isEmpty }
 
-        func amount(of item: MenuItem) -> Int {
-            if let entry = entries.first(where: { $0.itemID == item.fullID }) {
+        func amount(ofItemWithID itemID: MenuItem.FullID) -> Int {
+            if let entry = entries.first(where: { $0.itemID == itemID }) {
                 return entry.amount
             } else {
                 return 0
             }
         }
 
-        func amountBinding(for item: MenuItem) -> Binding<Int> {
+        func amountBinding(for itemID: MenuItem.FullID) -> Binding<Int> {
             return Binding(get: { [unowned self] in
-                return amount(of: item)
+                return amount(ofItemWithID: itemID)
             }, set: { [unowned self] value in
                 guard value > 0 else {
-                    if let index = entries.firstIndex(where: { $0.itemID == item.fullID }) {
+                    if let index = entries.firstIndex(where: { $0.itemID == itemID }) {
                         entries.remove(at: index)
                     }
                     return
                 }
 
-                if let index = entries.firstIndex(where: { $0.itemID == item.fullID }) {
+                if let index = entries.firstIndex(where: { $0.itemID == itemID }) {
                     entries[index] = entries[index].with(amount: value)
                 } else {
-                    let entry = RestaurantOrder.OrderEntry(item: item, amount: value)
+                    let entry = RestaurantOrder.OrderEntry(itemID: itemID, amount: value)
                     entries.append(entry)
                 }
             })
         }
 
-        var subtotal: Currency { entries.map { $0.subtotal }.sum() }
+        var subtotal: Currency { entries.map { $0.subtotal(using: menu) }.sum() }
 
         func asOrderPart() -> RestaurantOrder.OrderPart {
             return RestaurantOrder.OrderPart(entries: entries)
@@ -57,10 +58,11 @@ struct MenuView: View {
     class Model: ObservableObject {
         @Published var categories: [MenuCategory] = []
         @Published var itemsInCategories: [MenuCategory.ID: [MenuItem]] = [:]
+        @Published var menu: MenuItem.Menu = [:]
         @Published var isLoading = true
 
         var sub: AnyCancellable?
-        func loadCategoriesAndItems() {
+        func loadCategoriesAndItems(_ part: PendingOrderPart) {
             sub = AuthManager.shared.restaurant.firestoreReference
                 .collection(of: MenuCategory.self)
                 .get()
@@ -86,10 +88,14 @@ struct MenuView: View {
                 }
                 .sink(receiveCompletion: { [unowned self] _ in
                     reorderCategories()
+                    part.menu = menu
                     isLoading = false
                 }, receiveValue: { [unowned self] tuple in
                     let (category, items) = tuple
                     itemsInCategories[category.id] = items
+                    items.forEach { item in
+                        menu[item.fullID] = item
+                    }
                 })
         }
 
@@ -197,7 +203,7 @@ struct MenuView: View {
                 if isExpanded {
                     ForEach(items) { item in
                         MenuItemCell(item: item,
-                                     amount: part.amountBinding(for: item))
+                                     amount: part.amountBinding(for: item.fullID))
                     }
 //                    .animation(.linear(duration: 0.1), value: isExpanded)
                 }
@@ -289,12 +295,12 @@ struct MenuView: View {
         }
         .onAppear {
             if model.isLoading {
-                model.loadCategoriesAndItems()
+                model.loadCategoriesAndItems(part)
             }
         }
         .navigationTitle(table?.name ?? "Menu")
         .navigationBarItems(trailing: HStack {
-            NavigationLink(destination: OrderCartReviewView(part: part), isActive: $showOrderCart, label: {
+            NavigationLink(destination: OrderCartReviewView(part: part, menu: $model.menu), isActive: $showOrderCart, label: {
                 Image(systemName: "cart")
 
                 Text("\(part.subtotal, specifier: "%.2f") EUR")
