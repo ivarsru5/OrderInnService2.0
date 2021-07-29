@@ -61,6 +61,18 @@ struct AdminGeneralSelection: View {
                         })
                     
                 }
+
+                #if DEBUG
+                Section(header: Text("Debug Menu")) {
+                    let destination = DebugMenu()
+                        .navigationTitle("Debug Menu")
+                    NavigationLink(destination: destination) {
+                        Text("Debug Menu")
+                            .bold()
+                            .foregroundColor(.label)
+                    }
+                }
+                #endif
             }
             .navigationTitle(Text("General"))
         }

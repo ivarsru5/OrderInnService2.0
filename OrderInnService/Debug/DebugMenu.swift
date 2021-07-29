@@ -48,6 +48,23 @@ struct DebugMenu: View {
         }, receiveValue: { _ in })
     }
 
+    func switchActiveUserToAdmin() {
+        switch authManager.authState {
+        case .authenticatedAdmin(restaurantID: _, admin: _): return
+        default: break
+        }
+
+        let qr = LoginQRCode.admin(restaurantID: authManager.restaurant.id, admin: "")
+
+        var sub: AnyCancellable?
+        sub = authManager.logIn(using: qr)
+            .sink(receiveCompletion: { _ in
+                if let _ = sub {
+                    sub = nil
+                }
+            }, receiveValue: { _ in })
+    }
+
     func dumpUserDefaultsToConsole() {
         print("=== Begin user defaults dump.")
         UserDefaults.standard.dictionaryRepresentation().forEach {
@@ -132,6 +149,8 @@ struct DebugMenu: View {
                        action: self.switchActiveUserToWaiter)
                 Button("Switch to Kitchen",
                        action: self.switchActiveUserToKitchen)
+                Button("Switch to Admin",
+                       action: self.switchActiveUserToAdmin)
             }
             Section(header: Text("App Data")) {
                 Button("Dump User Defaults to Console",
