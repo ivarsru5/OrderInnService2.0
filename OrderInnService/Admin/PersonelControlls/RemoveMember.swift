@@ -83,7 +83,7 @@ struct RemoveMember: View {
 
     @ViewBuilder func userListingIconOverlay(_ isBeingRemoved: Bool) -> some View {
         if isBeingRemoved {
-            ActivityIndicator()
+            ActivityIndicator(style: .medium)
         } else {
             EmptyView()
         }
@@ -96,18 +96,17 @@ struct RemoveMember: View {
                 Button(action: {
                     userToRemove = user
                 }, label: {
-                    HStack {
-                        Image(systemName: "person.circle.fill")
-                            .foregroundColor(.label)
-                            .symbolSize(20)
-                            .padding(.all, 5)
-                            .opacity(isBeingRemoved ? 0.0 : 1.0)
-                            .overlay(userListingIconOverlay(isBeingRemoved))
-
+                    Label(title: {
                         Text(verbatim: user.fullName)
                             .foregroundColor(isBeingRemoved ? .secondaryLabel : .label)
-                            .padding(.all, 10)
-                    }
+                    }, icon: {
+                        Image(systemName: "person.circle.fill")
+                            .foregroundColor(.label)
+                            .symbolSize(24)
+                            .padding(6)
+                            .opacity(isBeingRemoved ? 0.0 : 1.0)
+                            .overlay(userListingIconOverlay(isBeingRemoved))
+                    })
                 })
                 .disabled(isBeingRemoved)
             }
