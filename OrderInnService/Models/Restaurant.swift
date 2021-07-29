@@ -62,6 +62,7 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         return users
             .get()
             .collect()
+            .map { users in users.sorted(by: \.fullName) }
             .eraseToAnyPublisher()
     }
 
@@ -79,6 +80,10 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         let lastName: String
         let manager: Bool
         let isActive: Bool
+
+        var fullName: String {
+            "\(name) \(lastName)"
+        }
 
         init(from snapshot: DocumentSnapshot) {
             precondition(snapshot.exists)

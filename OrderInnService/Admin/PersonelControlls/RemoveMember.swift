@@ -11,101 +11,133 @@ import FirebaseFirestore
 
 struct RemoveMember: View {
     @EnvironmentObject var authManager: AuthManager
-    
-    class Controlls: ObservableObject{
-        @Published var members: [Restaurant.Employee]?
-        @Published var displayActionSheet = false
-        
-        @Published var user: Restaurant.Employee?{
-            didSet{
-                self.displayActionSheet.toggle()
-            }
-        }
-        
-        var _loadUsersCancellable: AnyCancellable!
-        var _finishLoginCancellable: AnyCancellable!
+    @State var isLoading = false
+    @State var users: [Restaurant.Employee]? = nil
 
-        func loadUsers(from authManager: AuthManager) {
-            _loadUsersCancellable = authManager.restaurant.loadUsers().sink(receiveCompletion: {
-                [unowned self] result in
-                self._loadUsersCancellable = nil
-                // TODO: handle case .failure(let error) = result...
-            }, receiveValue: { [unowned self] members in
-                self.members = members
-            })
-        }
-    }
-    
-    @StateObject var controlls = Controlls()
-
-    func deleteUser() {
+    func loadUsers() {
         var sub: AnyCancellable?
-        sub = controlls.user!.delete()
+        sub = authManager.restaurant.loadUsers()
+            .mapError { error in
+                // TODO
+                fatalError("FIXME Failed to load users for deletion: \(String(describing: error))")
+            }
+            .sink { users in
+                if let _ = sub {
+                    sub = nil
+                }
+                self.users = users
+            }
+    }
+
+    @State var userToRemove: Restaurant.Employee? = nil
+    func deleteUser() {
+        guard let user = userToRemove else { return }
+
+        isLoading = true
+        var sub: AnyCancellable?
+        sub = user.delete()
             .mapError { error in
                 // TODO[pn 2021-07-29]
                 fatalError("FIXME Failed to delete user: \(String(describing: error))")
             }
-            .sink {
+            .flatMap { _ -> AnyPublisher<[Restaurant.Employee], Error> in
+                userToRemove = nil
+                isLoading = false
+                users = nil
+                return authManager.restaurant.loadUsers()
+            }
+            .mapError { error in
+                // TODO[pn 2021-07-29]
+                fatalError("FIXME Failed to reload users after deletion: \(String(describing: error))")
+            }
+            .sink { users in
                 if let _ = sub {
                     sub = nil
                 }
+                self.users = users
             }
     }
-    
-    @ViewBuilder func userListing(restaurant: Restaurant, users: [Restaurant.Employee]) -> some View {
-        List{
-            ForEach(users) { user in
+
+    @ViewBuilder func userListing() -> some View {
+        Text(verbatim: authManager.restaurant.name)
+            .bold()
+            .foregroundColor(.label)
+            .font(.largeTitle)
+            .padding(.top)
+
+        List {
+            ForEach(users!) { user in
                 Button(action: {
-                    controlls.user = user
+                    userToRemove = user
                 }, label: {
-                    HStack{
+                    HStack {
                         Image(systemName: "person.circle.fill")
-                            .foregroundColor(Color(UIColor.label))
-                            .font(.custom("SF Symbols", size: 20))
+                            .foregroundColor(.label)
+                            .symbolSize(20)
                             .padding(.all, 5)
 
-                        Text("\(user.name) \(user.lastName)")
-                            .foregroundColor(Color(UIColor.label))
+                        Text(verbatim: user.fullName)
+                            .foregroundColor(.label)
                             .padding(.all, 10)
                     }
                 })
             }
-            .actionSheet(isPresented: $controlls.displayActionSheet) {
-                ActionSheet(title: Text("Revoke access to member"),
-                            message: Text("Are you sure you want to revoke access to this team member?"),
-                            buttons: [
-                                .default(Text("Revoke")){ deleteUser() },
-                                .cancel()
-                            ])
-            }
+        }
+        .actionSheet(isPresented: .constant(userToRemove != nil)) {
+            ActionSheet(title: Text("Revoke Access to Member"),
+                        message: Text("Are you sure you want to revoke access to this team member?"),
+                        buttons: [
+                            .destructive(Text("Revoke"), action: deleteUser),
+                            .cancel(Text("Cancel"), action: { userToRemove = nil }),
+                        ])
         }
         .listStyle(InsetGroupedListStyle())
-        .navigationTitle(restaurant.name)
-        .onReceive(controlls.$members, perform: { _ in
-            controlls.loadUsers(from: authManager)
-        })
     }
     
     var body: some View {
         VStack {
-            IfLet(controlls.members, whenPresent: { users in
-                if users.count == 0 {
-                    Text("You dont have any personel. You can add them in 'Manage personel section'")
-                } else {
-                    userListing(restaurant: authManager.restaurant, users: users)
-                }
-            }, whenAbsent: {
+            if users == nil || isLoading {
                 Spinner()
-            })
+            } else if users!.isEmpty {
+                Text("You dont have any personel. You can add them in 'Manage personel section'")
+            } else {
+                userListing()
+            }
         }
+        .navigationBarTitle("Remove Member", displayMode: .inline)
         .onAppear {
-            controlls.loadUsers(from: authManager)
+            if users == nil {
+                loadUsers()
+            }
         }
     }
 }
 
+#if DEBUG
 struct RemoveMember_Previews: PreviewProvider {
+    static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
+    static let authManager = AuthManager(debugWithRestaurant: restaurant, waiter: nil, kitchen: nil)
+    static let users: [Restaurant.Employee] = [
+        .init(restaurantID: restaurant.id, id: "E1", name: "Testuser", lastName: "1", manager: false, isActive: true),
+        .init(restaurantID: restaurant.id, id: "E2", name: "Testuser", lastName: "2", manager: false, isActive: true),
+        .init(restaurantID: restaurant.id, id: "E3", name: "Testuser", lastName: "3", manager: false, isActive: true),
+    ]
+
     static var previews: some View {
-        RemoveMember()
+        let _ = authManager.setAuthState(.authenticatedAdmin(restaurantID: restaurant.id, admin: ""))
+
+
+        Group {
+            RemoveMember(isLoading: false,
+                         users: users,
+                         userToRemove: nil)
+
+            RemoveMember(isLoading: false,
+                         users: users,
+                         userToRemove: nil)
+                .preferredColorScheme(.dark)
+        }
+            .environmentObject(authManager)
     }
 }
+#endif

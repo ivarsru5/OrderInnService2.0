@@ -86,4 +86,3 @@ extension View {
         return self.modifier(SymbolSize(size))
     }
 }
-
