@@ -7,12 +7,17 @@
 
 import SwiftUI
 import Combine
-import FirebaseFirestore
+#if DEBUG
+import Dispatch
+#endif
 
 struct RemoveMember: View {
     @EnvironmentObject var authManager: AuthManager
-    @State var isLoading = false
     @State var users: [Restaurant.Employee]? = nil
+
+    #if DEBUG
+    var mockRemoval: Bool = false
+    #endif
 
     func loadUsers() {
         var sub: AnyCancellable?
@@ -30,10 +35,26 @@ struct RemoveMember: View {
     }
 
     @State var userToRemove: Restaurant.Employee? = nil
+    @State var isUserBeingRemoved = false
     func deleteUser() {
         guard let user = userToRemove else { return }
+        guard let index = users?.firstIndex(where: { $0.id == user.id }) else { return }
 
-        isLoading = true
+        #if DEBUG
+        if mockRemoval {
+            isUserBeingRemoved = true
+            DispatchQueue.main.asyncAfter(deadline: .now().advanced(by: .seconds(3))) {
+                withAnimation {
+                    userToRemove = nil
+                    isUserBeingRemoved = false
+                    users!.remove(at: index)
+                }
+            }
+            return
+        }
+        #endif
+
+        isUserBeingRemoved = true
         var sub: AnyCancellable?
         sub = user.delete()
             .mapError { error in
@@ -41,9 +62,11 @@ struct RemoveMember: View {
                 fatalError("FIXME Failed to delete user: \(String(describing: error))")
             }
             .flatMap { _ -> AnyPublisher<[Restaurant.Employee], Error> in
-                userToRemove = nil
-                isLoading = false
-                users = nil
+                withAnimation {
+                    userToRemove = nil
+                    isUserBeingRemoved = false
+                    users!.remove(at: index)
+                }
                 return authManager.restaurant.loadUsers()
             }
             .mapError { error in
@@ -58,15 +81,18 @@ struct RemoveMember: View {
             }
     }
 
+    @ViewBuilder func userListingIconOverlay(_ isBeingRemoved: Bool) -> some View {
+        if isBeingRemoved {
+            ActivityIndicator()
+        } else {
+            EmptyView()
+        }
+    }
     @ViewBuilder func userListing() -> some View {
-        Text(verbatim: authManager.restaurant.name)
-            .bold()
-            .foregroundColor(.label)
-            .font(.largeTitle)
-            .padding(.top)
-
         List {
             ForEach(users!) { user in
+                let isBeingRemoved = userToRemove?.id == user.id && isUserBeingRemoved
+
                 Button(action: {
                     userToRemove = user
                 }, label: {
@@ -75,12 +101,15 @@ struct RemoveMember: View {
                             .foregroundColor(.label)
                             .symbolSize(20)
                             .padding(.all, 5)
+                            .opacity(isBeingRemoved ? 0.0 : 1.0)
+                            .overlay(userListingIconOverlay(isBeingRemoved))
 
                         Text(verbatim: user.fullName)
-                            .foregroundColor(.label)
+                            .foregroundColor(isBeingRemoved ? .secondaryLabel : .label)
                             .padding(.all, 10)
                     }
                 })
+                .disabled(isBeingRemoved)
             }
         }
         .actionSheet(isPresented: .constant(userToRemove != nil)) {
@@ -96,10 +125,22 @@ struct RemoveMember: View {
     
     var body: some View {
         VStack {
-            if users == nil || isLoading {
+            Text(verbatim: authManager.restaurant.name)
+                .bold()
+                .foregroundColor(.label)
+                .font(.largeTitle)
+                .frame(maxWidth: .infinity, alignment: .leading)
+                .padding([.leading, .top, .trailing])
+
+            if users == nil {
                 Spinner()
             } else if users!.isEmpty {
-                Text("You dont have any personel. You can add them in 'Manage personel section'")
+                Text("No personnel has been added.\nYou can add personnel in the “Manage Personnel” section.")
+                    .multilineTextAlignment(.center)
+                    .foregroundColor(.secondaryLabel)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity,
+                           alignment: .center)
+                    .padding()
             } else {
                 userListing()
             }
@@ -126,18 +167,13 @@ struct RemoveMember_Previews: PreviewProvider {
     static var previews: some View {
         let _ = authManager.setAuthState(.authenticatedAdmin(restaurantID: restaurant.id, admin: ""))
 
-
         Group {
-            RemoveMember(isLoading: false,
-                         users: users,
-                         userToRemove: nil)
+            RemoveMember(users: [])
 
-            RemoveMember(isLoading: false,
-                         users: users,
-                         userToRemove: nil)
-                .preferredColorScheme(.dark)
+            RemoveMember(users: users,
+                         mockRemoval: true)
         }
-            .environmentObject(authManager)
+        .environmentObject(authManager)
     }
 }
 #endif
