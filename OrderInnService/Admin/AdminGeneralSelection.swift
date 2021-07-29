@@ -8,69 +8,47 @@
 import SwiftUI
 
 struct AdminGeneralSelection: View {
+    func navigationLink<Destination: View>(destination: Destination, label: Text) -> some View {
+        return NavigationLink(destination: destination) {
+            label
+                .bold()
+                .foregroundColor(.label)
+        }
+    }
     var body: some View {
-        NavigationView{
-            List{
-                Section(header: Text("Manage personel")){
-                    NavigationLink(
-                        destination: AddPersonel(),
-                        label: {
-                            Text("Add member to team")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
-                    NavigationLink(
-                        destination: RemoveMember(),
-                        label: {
-                            Text("Revoke access to member")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
+        NavigationView {
+            List {
+                Section(header: Text("Manage Personnel")) {
+                    navigationLink(destination: AddPersonel(),
+                                   label: Text("Add Member"))
+                    navigationLink(destination: RemoveMember(),
+                        label: Text("Revoke Access to Member"))
                 }
                 
-                Section(header: Text("Restaurant info")){
-                    NavigationLink(
+                Section(header: Text("Restaurant Info")) {
+                    navigationLink(
 //                        destination: RestaurantActiveOrders(),
                         destination: EmptyView(),
-                        label: {
-                            Text("Active restaurant orders")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
+                        label: Text("Active Orders"))
                     
-                    NavigationLink(
-                        destination: EmptyView(),
-                        label: {
-                            Text("Closed order history")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
+                    navigationLink(destination: EmptyView(),
+                        label: Text("Closed Order History"))
                     
-                    NavigationLink(
-//                        destination: MenuAvailability(),
-                        destination: EmptyView(),
-                        label: {
-                            Text("Menu availability")
-                                .bold()
-                                .foregroundColor(Color(UIColor.label))
-                                .padding(10)
-                        })
-                    
+                }
+                
+                Section(header: Text("In-App Controls")) {
+                    navigationLink(destination: EmptyView(),
+                        label: Text("Make an Order"))
+
+                    navigationLink(destination: EmptyView(),
+                        label: Text("Kitchen"))
                 }
 
                 #if DEBUG
-                Section(header: Text("Debug Menu")) {
-                    let destination = DebugMenu()
-                        .navigationTitle("Debug Menu")
-                    NavigationLink(destination: destination) {
-                        Text("Debug Menu")
-                            .bold()
-                            .foregroundColor(.label)
-                    }
+                Section {
+                    navigationLink(destination: DebugMenu()
+                                    .navigationBarTitle(Text("Debug Menu"), displayMode: .inline),
+                                   label: Text("Debug Menu"))
                 }
                 #endif
             }
@@ -79,9 +57,10 @@ struct AdminGeneralSelection: View {
     }
 }
 
-
+#if DEBUG
 struct General_Previews: PreviewProvider {
     static var previews: some View {
         AdminGeneralSelection()
     }
 }
+#endif
