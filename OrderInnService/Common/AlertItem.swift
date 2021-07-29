@@ -13,6 +13,10 @@ struct AlertItem: Identifiable{
     let title: Text
     let message: Text
     let dismissButton: Alert.Button
+
+    var alert: Alert {
+        Alert(title: title, message: message, dismissButton: dismissButton)
+    }
 }
 
 struct AlertContext{

@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if false
 struct RestaurantActiveOrders: View {
     @StateObject var activeOrders = ActiveOrders()
     @State var destanation: TargetDestanation? = nil
@@ -98,3 +99,4 @@ struct RestaurantActiveOrders: View {
         }
     }
 }
+#endif

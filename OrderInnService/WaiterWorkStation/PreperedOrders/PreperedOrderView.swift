@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if false
 struct PreperedOrderView: View {
     @Environment (\.presentationMode) var presentationMode
     @ObservedObject var preperedOrders: ActiveOrderWork
@@ -157,3 +158,4 @@ struct PreperedOrderView: View {
         }
     }
 }
+#endif

@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
+#if false
 class ActiveOrderOverviewWork: ObservableObject{
     @Published var collectedOrder = ClientSubmittedOrder()
     @Published var submitedOrder = OrderOverview()
@@ -187,3 +188,4 @@ class ActiveOrderOverviewWork: ObservableObject{
             }
     }
 }
+#endif

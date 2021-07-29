@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
+#if false
 class KitchenWork: ObservableObject{
     @Published var collectedOrders = [ClientSubmittedOrder]()
     @Published var showActiveOrder = false
@@ -17,7 +18,8 @@ class KitchenWork: ObservableObject{
             self.showActiveOrder.toggle()
         }
     }
-    
+
+    let authManager = AuthManager.shared
     var kitchenOrders = [KitchenOrder]()
     var databse = Firestore.firestore()
     
@@ -81,7 +83,7 @@ class KitchenWork: ObservableObject{
     func decodeOrder(order: KitchenOrder) -> ClientSubmittedOrder?{
 
             let formatter = DateFormatter()
-            let date = order.created.dateValue()
+            let date = order.createdAt
             formatter.dateFormat = "yyyy-MM-dd HH:mm:ss ZZZ"
             let formattedStamp = formatter.string(from: date)
 
@@ -137,3 +139,4 @@ class KitchenWork: ObservableObject{
         return restaurant
     }
 }
+#endif

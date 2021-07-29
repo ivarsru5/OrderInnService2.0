@@ -37,6 +37,20 @@ struct RemoveMember: View {
     }
     
     @StateObject var controlls = Controlls()
+
+    func deleteUser() {
+        var sub: AnyCancellable?
+        sub = controlls.user!.delete()
+            .mapError { error in
+                // TODO[pn 2021-07-29]
+                fatalError("FIXME Failed to delete user: \(String(describing: error))")
+            }
+            .sink {
+                if let _ = sub {
+                    sub = nil
+                }
+            }
+    }
     
     @ViewBuilder func userListing(restaurant: Restaurant, users: [Restaurant.Employee]) -> some View {
         List{
@@ -60,7 +74,7 @@ struct RemoveMember: View {
                 ActionSheet(title: Text("Revoke access to member"),
                             message: Text("Are you sure you want to revoke access to this team member?"),
                             buttons: [
-                                .default(Text("Revoke")){ authManager.restaurant.deleteUser(memberID: controlls.user!.id) },
+                                .default(Text("Revoke")){ deleteUser() },
                                 .cancel()
                             ])
             }

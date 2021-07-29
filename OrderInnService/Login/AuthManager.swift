@@ -8,6 +8,8 @@
 import Foundation
 import Combine
 
+fileprivate func noop() { }
+
 class AuthManager: ObservableObject {
     static let shared = AuthManager()
 
@@ -21,7 +23,7 @@ class AuthManager: ObservableObject {
     }
 
     private var _initialised = false
-    @Published private(set) var authState: AuthState {
+    @Published private(set) var authState: AuthState = .loading {
         willSet {
             // HACK[pn]: Since SwiftUI updates views in a weird order that
             // can cause conditionals not to be re-rendered before their children
@@ -35,8 +37,13 @@ class AuthManager: ObservableObject {
         }
         didSet {
             if case .loading = oldValue {
-                _initialised = true
-            } else if _initialised {
+                // Shouldn't persist next state since it was loaded from init.
+            } else if case .authenticatedWaiterUnknownID(restaurantID: _) = authState {
+                // Shouldn't persist this state since it's incomplete. If app
+                // exits at this point, the persisted value will basically
+                // equal not being logged in, even if the user was, in fact,
+                // logged in.
+            } else {
                 persistAuthState()
             }
         }
@@ -56,12 +63,9 @@ class AuthManager: ObservableObject {
              }
          }
      }
-    
     private(set) var kitchen: String?
 
     init() {
-        authState = .loading
-
         let userDefaults = UserDefaults.standard
         if let restaurantID = userDefaults.restaurantID, let userID = userDefaults.userID {
             load(restaurant: restaurantID, user: userID)
@@ -74,14 +78,35 @@ class AuthManager: ObservableObject {
         } else {
             authState = .unauthenticated
         }
-        _initialised = true
     }
 
+    #if DEBUG
+    private var disablePersistence = false
+
+    init(debugWithRestaurant restaurant: Restaurant, waiter: Restaurant.Employee?, kitchen: String?) {
+        self.disablePersistence = true
+        self.restaurant = restaurant
+        self.waiter = waiter
+        self.kitchen = kitchen
+    }
+
+    func setAuthState(_ authState: AuthState) {
+        self.authState = authState
+    }
+    #endif
+
     private var subs = Set<AnyCancellable>()
+    func sink(_ publisher: AnyPublisher<Void, Never>) {
+        var sub: AnyCancellable?
+        sub = publisher.sink(receiveCompletion: { [weak self] _ in
+            if let this = self, let sub_ = sub {
+                this.subs.remove(sub_)
+            }
+        }, receiveValue: noop)
+    }
 
     private func load(restaurant: Restaurant.ID, user: Restaurant.Employee.ID) {
-        var sub: AnyCancellable?
-        sub = Restaurant.load(withID: restaurant)
+        let pub = Restaurant.load(withID: restaurant)
             .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
@@ -89,69 +114,59 @@ class AuthManager: ObservableObject {
                 self.restaurant = restaurant
                 return Restaurant.Employee.load(forRestaurantID: restaurant.id, withUserID: user)
             }
+            .map { [unowned self] user in
+                self.waiter = user
+                authState = .authenticatedWaiter(restaurantID: self.restaurant.id, employeeID: user.id)
+            }
             .mapError { error in
                 fatalError("FIXME Failed to load user: \(String(describing: error))")
             }
-            .sink { [unowned self] user in
-                self.waiter = user
-                authState = .authenticatedWaiter(restaurantID: self.restaurant.id, employeeID: user.id)
-                if let _ = sub {
-                    sub = nil
-                }
-            }
+            .eraseToAnyPublisher()
+        self.sink(pub)
     }
 
     private func load(kitchenForRestaurant restaurant: Restaurant.ID) {
-        var sub: AnyCancellable?
-        sub = Restaurant.load(withID: restaurant)
+        let pub = Restaurant.load(withID: restaurant)
+            .map { [unowned self] restaurant in
+                self.restaurant = restaurant
+                authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
+            }
             .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
-            .sink { [unowned self] restaurant in
-                self.restaurant = restaurant
-                authState = .authenticatedKitchen(restaurantID: self.restaurant.id, kitchen: "")
-                if let _ = sub {
-                    sub = nil
-                }
-            }
+            .eraseToAnyPublisher()
+        self.sink(pub)
     }
 
     private func load(adminForRestaurant restaurant: Restaurant.ID) {
-        var sub: AnyCancellable?
-        sub = Restaurant.load(withID: restaurant)
+        let pub = Restaurant.load(withID: restaurant)
+            .map { [unowned self] restaurant in
+                self.restaurant = restaurant
+                authState = .authenticatedAdmin(restaurantID: restaurant.id, admin: "")
+            }
             .mapError { error in
                 fatalError("FIXME Failed to load restaurant: \(String(describing: error))")
             }
-            .sink { [unowned self] restaurant in
-                self.restaurant = restaurant
-                authState = .authenticatedAdmin(restaurantID: self.restaurant.id, admin: "")
-                if let _ = sub {
-                    sub = nil
-                }
-            }
+            .eraseToAnyPublisher()
+        self.sink(pub)
     }
 
     func resetAuthState() {
         if case .authenticatedWaiter(restaurantID: _, employeeID: _) = authState {
-            var sub: AnyCancellable?
-            sub = logoutWaiter().sink(receiveCompletion: {
-                [unowned self] result in
-                if case .failure(let error) = result {
+            let pub = logoutWaiter()
+                .map { [unowned self] _ in
+                    authState = .unauthenticated
+                }
+                .`catch` { error -> Empty<Void, Never> in
                     print("Failed to log out: \(String(describing: error))")
+                    return Empty()
                 }
-                authState = .unauthenticated
-                if let _ = sub {
-                    sub = nil
-                }
-            }, receiveValue: { })
+                .eraseToAnyPublisher()
+            self.sink(pub)
         } else {
             authState = .unauthenticated
         }
     }
-
-//    func testAsyncReturnBool() async -> Bool {
-//        return true
-//    }
 
     func logIn(using qrCode: LoginQRCode) -> AnyPublisher<AuthState, Error> {
         var logoutPublisher: AnyPublisher<Void, Error>
@@ -160,7 +175,7 @@ class AuthManager: ObservableObject {
             logoutPublisher = logoutWaiter().eraseToAnyPublisher()
         } else {
             logoutPublisher = Just(())
-                .mapError { _ in DummyError.unexpectedError }
+                .setFailureType(to: Error.self)
                 .eraseToAnyPublisher()
         }
 
@@ -190,9 +205,9 @@ class AuthManager: ObservableObject {
             fatalError("AuthManager.logoutWaiter called with improper starting state")
         }
 
-        return waiter!.firebaseReference
-            .updateDataFuture(["isActive": true])
-            .map { [unowned self] in
+        return waiter!.firestoreReference
+            .updateData(["isActive": true])
+            .map { [unowned self] _ in
                 self.waiter = nil
             }
             .eraseToAnyPublisher()
@@ -209,9 +224,10 @@ class AuthManager: ObservableObject {
         // that.
         // TODO[pn 2021-07-09]: Is there a strategy for marking users as
         // available to use afterwards?
-        return user.firebaseReference
-            .updateDataFuture(["isActive": false])
-            .map { [unowned self] in
+        return user.firestoreReference
+            .updateData(["isActive": false])
+            .flatMap { ref in ref.get() }
+            .map { [unowned self] user in
                 self.waiter = user
                 self.authState = .authenticatedWaiter(restaurantID: restaurantID, employeeID: user.id)
             }
@@ -219,14 +235,18 @@ class AuthManager: ObservableObject {
     }
 
     private func persistAuthState() {
+        #if DEBUG
+        guard !disablePersistence else { return }
+        #endif
+
         let restaurantID: Restaurant.ID?
         let userID: Restaurant.Employee.ID?
         var isAdmin: Bool? = nil
 
         switch authState {
-        case .loading:
-            fatalError("BUG Tried to persist loading (i.e, undefined) auth state to UserDefaults")
-        case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _):
+        case .loading, .authenticatedWaiterUnknownID(restaurantID: _):
+            fatalError("BUG Tried to persist an unfinished auth state to UserDefaults")
+        case .unauthenticated:
             restaurantID = nil
             userID = nil
         case .authenticatedWaiter(restaurantID: let _restaurantID, employeeID: let _userID):

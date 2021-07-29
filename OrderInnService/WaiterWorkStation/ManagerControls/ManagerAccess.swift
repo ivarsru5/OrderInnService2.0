@@ -8,6 +8,8 @@
 import Foundation
 import FirebaseFirestore
 
+#if false
 class ManagerAccess: ObservableObject{
     @Published var completedOrders = [ClientSubmittedOrder]()
 }
+#endif

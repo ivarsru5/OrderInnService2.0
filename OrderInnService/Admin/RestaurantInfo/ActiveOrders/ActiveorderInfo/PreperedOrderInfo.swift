@@ -7,6 +7,7 @@
 
 import SwiftUI
 
+#if false
 struct PreperedOrderInfo: View {
     @Environment (\.presentationMode) var presentationMode
     @StateObject var orderOverview = ActiveOrderOverviewWork()
@@ -95,3 +96,4 @@ struct PreperedOrderInfo: View {
         }
     }
 }
+#endif

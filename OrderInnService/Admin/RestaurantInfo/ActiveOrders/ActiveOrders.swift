@@ -8,6 +8,7 @@
 import Foundation
 import FirebaseFirestore
 
+#if false
 class ActiveOrders: ObservableObject{
     @Published var activeOrders = [ActiveOrder]()
     @Published var preperedOrders = [ActiveOrder]()
@@ -41,3 +42,4 @@ class ActiveOrders: ObservableObject{
         }
     }
 }
+#endif
