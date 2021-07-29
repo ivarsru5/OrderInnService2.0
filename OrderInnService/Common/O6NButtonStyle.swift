@@ -10,28 +10,44 @@ import SwiftUI
 
 struct O6NButtonStyle: ButtonStyle {
     let isLoading: Bool
+    let isEnabled: Bool
 
-    init(isLoading: Bool = false) {
+    init(isLoading: Bool = false, isEnabled: Bool = true) {
         self.isLoading = isLoading
+        self.isEnabled = isEnabled
     }
 
     static let transitionAnimation = Animation.easeOut(duration: 0.2)
 
+    private struct Modifier: ViewModifier {
+        let bg: Color
+        let fg: Color
+
+        func body(content: Content) -> some View {
+            // NOTE[pn 2021-07-29]: This specific order of modifiers
+            // has been found to work via a lot of trial-and-error.
+            // If you're thinking of changing it, please make sure
+            // no usage of this button style breaks as a result.
+            content
+                .font(.body.bold())
+                .foregroundColor(fg)
+                .frame(maxWidth: .infinity, minHeight: 54)
+                .background(bg)
+                .cornerRadius(16)
+                .padding(16)
+        }
+    }
+
     @ViewBuilder func makeBody(configuration: Configuration) -> some View {
         if isLoading {
             ActivityIndicator(style: .medium)
-                .frame(maxWidth: .infinity, minHeight: 54)
-                .background(Color.gray3)
-                .cornerRadius(16)
-                .padding(16)
+                .modifier(Modifier(bg: .gray3, fg: .label))
+        } else if !isEnabled {
+            configuration.label
+                .modifier(Modifier(bg: .secondaryLabel, fg: .secondarySystemBackground))
         } else {
             configuration.label
-                .font(.body.bold())
-                .foregroundColor(.systemBackground)
-                .frame(maxWidth: .infinity, minHeight: 54)
-                .background(Color.label)
-                .cornerRadius(16)
-                .padding(16)
+                .modifier(Modifier(bg: .label, fg: .systemBackground))
         }
     }
 }
@@ -75,6 +91,11 @@ struct O6NButtonStylePreviews: PreviewProvider {
                 Text("Loading Button")
             })
                 .buttonStyle(O6NButtonStyle(isLoading: true))
+
+            Button(action: noop, label: {
+                Text("Disabled Button")
+            })
+                .buttonStyle(O6NButtonStyle(isEnabled: false))
 
             TestButton()
         }
