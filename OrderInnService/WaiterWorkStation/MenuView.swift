@@ -292,20 +292,24 @@ struct MenuView: View {
                             items: model.itemsInCategories,
                             part: part)
             }
+
+            NavigationLink(destination: OrderCartReviewView(part: part, menu: $model.menu), isActive: $showOrderCart) {
+                EmptyView()
+            }
         }
         .onAppear {
             if model.isLoading {
                 model.loadCategoriesAndItems(part)
             }
         }
-        .navigationTitle(table?.name ?? "Menu")
-        .navigationBarItems(trailing: HStack {
-            NavigationLink(destination: OrderCartReviewView(part: part, menu: $model.menu), isActive: $showOrderCart, label: {
+        .navigationBarTitle("Menu", displayMode: .inline)
+        .navigationBarItems(
+            trailing: HStack {
                 Image(systemName: "cart")
 
                 Text("\(part.subtotal, specifier: "%.2f") EUR")
                     .bold()
-            })
+            }
             .foregroundColor(part.isEmpty ? Color.secondary : Color.blue)
             .onTapGesture {
                 if part.isEmpty {
@@ -313,8 +317,7 @@ struct MenuView: View {
                 } else {
                     showOrderCart = true
                 }
-            }
-        })
+            })
         .alert(item: $alertItem) { $0.alert }
     }
 }
@@ -392,6 +395,11 @@ struct MenuView_Previews: PreviewProvider {
             .preferredColorScheme(.light)
         Wrapper(part: part, model: model, table: table)
             .preferredColorScheme(.dark)
+
+        NavigationView {
+            MenuView(part: part, model: model,
+                     context: .newOrder(table: table))
+        }
     }
 }
 #endif

@@ -134,7 +134,7 @@ struct OrderCartReviewView: View {
             .opacity(model.isSending ? 0.7 : 1.0)
             .animation(.easeInOut(duration: 0.1), value: model.isSending)
             .overlay(sendingOverlay)
-            .navigationTitle(Text("Order"))
+            .navigationBarTitle("Order", displayMode: .large)
     }
 }
 
