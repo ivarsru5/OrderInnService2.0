@@ -86,7 +86,6 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
 
 struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
     typealias ID = String
-    typealias Menu = [FullID: MenuItem]
 
     // TODO[pn 2021-07-13]: Nondescript name.
     static let firestoreCollection = "Menu"
@@ -231,5 +230,103 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
                 "destination": destination.rawValue,
             ])
             .get()
+    }
+}
+
+class MenuManager: ObservableObject {
+    typealias Menu = [MenuItem.FullID: MenuItem]
+    typealias Categories = [MenuCategory.ID: MenuCategory]
+
+    let restaurant: Restaurant
+    @Published var hasData = false
+    @Published var menu: Menu = [:]
+    @Published var categories: Categories = [:]
+    @Published var categoryItems: [MenuCategory.ID: [MenuItem.FullID]] = [:]
+    @Published var categoryOrder: [MenuCategory.ID] = []
+
+    var orderedCategories: [MenuCategory] {
+        categoryOrder.map { id in categories[id]! }
+    }
+
+    init(for restaurant: Restaurant) {
+        self.restaurant = restaurant
+
+        // TODO[pn 2021-07-30]: Should this actually subscribe to snapshots to
+        // get updates to the menu? This may be particularly relevant when
+        // considering potential availability changes.
+        // TODO, related to above: Research whether changes to subcollection
+        // objects (say, menu items in this case) propagate as snapshot
+        // notifications to their parent subcollections (menu categories).
+
+        var sub: AnyCancellable?
+        sub = restaurant.firestoreReference
+            .collection(of: MenuCategory.self)
+            .get()
+            .flatMap { [unowned self] category -> AnyPublisher<MenuItem, Error> in
+                self.categories[category.id] = category
+                return category.firestoreReference
+                    .collection(of: MenuItem.self)
+                    .get()
+            }
+            .map { [unowned self] item in
+                self.menu[item.fullID] = item
+            }
+            .mapError { error in
+                // TODO[pn 2021-07-29]: We have no good mechanism to report this
+                // failure upstream, so instead we crash.
+                fatalError("FIXME Failed to load menu in manager: \(String(describing: error))")
+            }
+            .sink(receiveCompletion: { [unowned self] _ in
+                if let _ = sub {
+                    sub = nil
+                }
+                orderCategories()
+                buildItemIndex()
+                hasData = true
+            })
+    }
+
+    #if DEBUG
+    init(debugForRestaurant restaurant: Restaurant, withMenu menu: Menu, categories: Categories) {
+        self.restaurant = restaurant
+        self.menu = menu
+        self.categories = categories
+        orderCategories()
+        buildItemIndex()
+        self.hasData = true
+    }
+    #endif
+
+    private func orderCategories() {
+        categoryOrder.removeAll(keepingCapacity: true)
+
+        var mealCategories = [MenuCategory.ID]()
+        var drinkCategories = [MenuCategory.ID]()
+
+        categories.values.forEach { category in
+            switch category.type {
+            case .food: mealCategories.append(category.id)
+            case .drink: drinkCategories.append(category.id)
+            }
+        }
+
+        mealCategories.sort()
+        drinkCategories.sort()
+
+        categoryOrder.reserveCapacity(categories.count)
+        categoryOrder.append(contentsOf: mealCategories)
+        categoryOrder.append(contentsOf: drinkCategories)
+    }
+
+    private func buildItemIndex() {
+        categoryItems.removeAll(keepingCapacity: true)
+        menu.values.forEach { item in
+            var items = categoryItems[item.categoryID, default: []]
+            items.append(item.fullID)
+            categoryItems[item.categoryID] = items
+        }
+        categoryItems.forEach { categoryID, items in
+            categoryItems[categoryID] = items.sorted(by: \.item)
+        }
     }
 }

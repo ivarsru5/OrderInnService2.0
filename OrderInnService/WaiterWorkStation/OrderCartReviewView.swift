@@ -49,12 +49,13 @@ struct OrderCartReviewView: View {
 
     struct OrderListing: View {
         @ObservedObject var part: PendingOrderPart
+        @EnvironmentObject var menuManager: MenuManager
 
         var body: some View {
             List {
                 Section(header: Text("Selected Items")) {
                     ForEach(part.entries, id: \.itemID) { entry in
-                        ItemCell(entry: entry, item: part.menu[entry.itemID]!,
+                        ItemCell(entry: entry, item: menuManager.menu[entry.itemID]!,
                                  amount: part.amountBinding(for: entry.itemID))
                     }
                 }
@@ -119,7 +120,6 @@ struct OrderCartReviewView: View {
 
     @ObservedObject var part: PendingOrderPart
     @EnvironmentObject var authManager: AuthManager
-    @Binding var menu: MenuItem.Menu
     @StateObject var model = Model()
 
     @ViewBuilder var sendingOverlay: some View {
@@ -156,7 +156,7 @@ struct OrderCartReviewView_Previews: PreviewProvider {
         }
     }
 
-    static let items: MenuItem.Menu = [
+    static let items: MenuManager.Menu = [
         ID(string: "C/I1")!: MenuItem(
             id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
             destination: .kitchen, restaurantID: "R", categoryID: "C"),
@@ -168,18 +168,21 @@ struct OrderCartReviewView_Previews: PreviewProvider {
             destination: .kitchen, restaurantID: "R", categoryID: "C"),
     ]
 
-    static func makeAuthManager() -> AuthManager {
-        return AuthManager(debugWithRestaurant: Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true),
-                    waiter: .init(restaurantID: "R", id: "E", name: "Test", lastName: "Employee", manager: false, isActive: false),
-                    kitchen: nil)
-    }
+    static let authManager = AuthManager(debugWithRestaurant: Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true),
+                waiter: .init(restaurantID: "R", id: "E", name: "Test", lastName: "Employee", manager: false, isActive: false),
+                kitchen: nil)
 
     static func makeModel() -> OrderCartReviewView.Model {
         return MockModel()
     }
 
+    static let menuManager = MenuManager(debugForRestaurant: authManager.restaurant,
+                                         withMenu: items, categories: [
+                                            "C": MenuCategory(id: "C", name: "Test Category", type: .food, restaurantID: "R"),
+                                         ])
+
     static func makePart() -> MenuView.PendingOrderPart {
-        let part = MenuView.PendingOrderPart()
+        let part = MenuView.PendingOrderPart(menuManager: menuManager)
         part.entries = [
             Entry(itemID: ID(string: "C/I1")!, amount: 2),
             Entry(itemID: ID(string: "C/I2")!, amount: 3),
@@ -189,8 +192,9 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
-        OrderCartReviewView(part: makePart(), menu: .constant(items), model: makeModel())
-            .environmentObject(makeAuthManager())
+        OrderCartReviewView(part: makePart(), model: makeModel())
+            .environmentObject(authManager)
+            .environmentObject(menuManager)
     }
 }
 #endif

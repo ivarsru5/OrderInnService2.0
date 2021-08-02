@@ -16,9 +16,13 @@ struct MenuView: View {
 
     class PendingOrderPart: ObservableObject {
         @Published var entries: [RestaurantOrder.OrderEntry] = []
-        var menu: MenuItem.Menu = [:]
+        weak var menuManager: MenuManager?
 
         var isEmpty: Bool { entries.isEmpty }
+
+        init(menuManager: MenuManager) {
+            self.menuManager = menuManager
+        }
 
         func amount(ofItemWithID itemID: MenuItem.FullID) -> Int {
             if let entry = entries.first(where: { $0.itemID == itemID }) {
@@ -48,72 +52,10 @@ struct MenuView: View {
             })
         }
 
-        var subtotal: Currency { entries.map { $0.subtotal(using: menu) }.sum() }
+        var subtotal: Currency { entries.map { $0.subtotal(using: menuManager!.menu) }.sum() }
 
         func asOrderPart() -> RestaurantOrder.OrderPart {
             return RestaurantOrder.OrderPart(entries: entries)
-        }
-    }
-
-    class Model: ObservableObject {
-        @Published var categories: [MenuCategory] = []
-        @Published var itemsInCategories: [MenuCategory.ID: [MenuItem]] = [:]
-        @Published var menu: MenuItem.Menu = [:]
-        @Published var isLoading = true
-
-        var sub: AnyCancellable?
-        func loadCategoriesAndItems(_ part: PendingOrderPart) {
-            sub = AuthManager.shared.restaurant.firestoreReference
-                .collection(of: MenuCategory.self)
-                .get()
-                .catch { error in
-                    // TODO[pn 2021-07-16]
-                    return Empty().setFailureType(to: Never.self)
-                }
-                .flatMap { [unowned self] category -> AnyPublisher<(MenuCategory, [MenuItem]), Error> in
-                    categories.append(category)
-
-                    let items = category.firestoreReference
-                        .collection(of: MenuItem.self)
-                        .get()
-                        .collect()
-                    return Just(category)
-                        .setFailureType(to: Error.self)
-                        .zip(items)
-                        .eraseToAnyPublisher()
-                }
-                .catch { error in
-                    // TODO[pn 2021-07-16]
-                    return Empty().setFailureType(to: Never.self)
-                }
-                .sink(receiveCompletion: { [unowned self] _ in
-                    reorderCategories()
-                    part.menu = menu
-                    isLoading = false
-                }, receiveValue: { [unowned self] tuple in
-                    let (category, items) = tuple
-                    itemsInCategories[category.id] = items
-                    items.forEach { item in
-                        menu[item.fullID] = item
-                    }
-                })
-        }
-
-        private func reorderCategories() {
-            var mealCategories = [MenuCategory]()
-            var drinkCategories = [MenuCategory]()
-
-            categories.forEach { category in
-                switch category.type {
-                case .food: mealCategories.append(category)
-                case .drink: drinkCategories.append(category)
-                }
-            }
-            mealCategories.sort(by: { $0.id < $1.id })
-            drinkCategories.sort(by: { $0.id < $1.id })
-            categories.removeAll(keepingCapacity: true)
-            categories.append(contentsOf: mealCategories)
-            categories.append(contentsOf: drinkCategories)
         }
     }
 
@@ -212,23 +154,24 @@ struct MenuView: View {
     }
 
     struct MenuListing: View {
-        let categories: [MenuCategory]
-        let items: [MenuCategory.ID: [MenuItem]]
-        let part: PendingOrderPart
+        let menuManager: MenuManager
+        @ObservedObject var part: PendingOrderPart
 
         private let mealCategories: ArraySlice<MenuCategory>
         private let drinkCategories: ArraySlice<MenuCategory>
 
-        init(categories: [MenuCategory],
-             items: [MenuCategory.ID: [MenuItem]],
-             part: PendingOrderPart) {
-            self.categories = categories
-            self.items = items
-            self.part = part
+        init(menuManager: MenuManager, part: PendingOrderPart) {
+            self.menuManager = menuManager
+            self._part = ObservedObject(wrappedValue: part)
 
+            let categories = menuManager.orderedCategories
             let firstDrinkIndex = categories.firstIndex(where: { $0.type == .drink })!
             mealCategories = categories.prefix(upTo: firstDrinkIndex)
             drinkCategories = categories.suffix(from: firstDrinkIndex)
+        }
+
+        func items(for category: MenuCategory) -> [MenuItem] {
+            return menuManager.categoryItems[category.id]!.map { menuManager.menu[$0]! }
         }
 
         var body: some View {
@@ -236,7 +179,7 @@ struct MenuView: View {
                 Section(header: Text("Meals")) {
                     ForEach(mealCategories) { category in
                         MenuCategoryListing(category: category,
-                                            items: items[category.id]!,
+                                            items: items(for: category),
                                             part: part)
                     }
                 }
@@ -244,7 +187,7 @@ struct MenuView: View {
                 Section(header: Text("Drinks")) {
                     ForEach(drinkCategories) { category in
                         MenuCategoryListing(category: category,
-                                            items: items[category.id]!,
+                                            items: items(for: category),
                                             part: part)
                     }
                 }
@@ -252,26 +195,34 @@ struct MenuView: View {
         }
     }
 
+    let menuManager: MenuManager
     @StateObject var part: PendingOrderPart
-    @StateObject var model = Model()
 
     let context: Context
     @State var alertItem: AlertItem?
     @State var showOrderCart = false
 
-    init(context: Context) {
+    // HACK[pn 2021-08-02]: Similarly to OrderTabView, there appear to be
+    // problems with accessing EnvironmentObjects within init, and given the
+    // way Context is implemented, we cannot build a new PendingOrderPart here
+    // because MenuManager is not yet available. Therefore we require it to be
+    // passed into init from wherever this view is being constructed, similar to
+    // OrderTabView.
+    init(menuManager: MenuManager, context: Context) {
+        self.menuManager = menuManager
         self.context = context
+
         if case .appendedOrder(part: let part) = context {
             self._part = StateObject(wrappedValue: part)
         } else {
-            self._part = StateObject(wrappedValue: PendingOrderPart())
+            self._part = StateObject(wrappedValue: PendingOrderPart(menuManager: menuManager))
         }
     }
 
     #if DEBUG
-    init(part: PendingOrderPart, model: Model, context: Context) {
+    init(menuManager: MenuManager, part: PendingOrderPart, context: Context) {
+        self.menuManager = menuManager
         self._part = StateObject(wrappedValue: part)
-        self._model = StateObject(wrappedValue: model)
         self.context = context
     }
     #endif
@@ -285,21 +236,10 @@ struct MenuView: View {
     
     var body: some View {
         Group {
-            if model.isLoading {
-                Spinner()
-            } else {
-                MenuListing(categories: model.categories,
-                            items: model.itemsInCategories,
-                            part: part)
-            }
+            MenuListing(menuManager: menuManager, part: part)
 
-            NavigationLink(destination: OrderCartReviewView(part: part, menu: $model.menu), isActive: $showOrderCart) {
+            NavigationLink(destination: OrderCartReviewView(part: part), isActive: $showOrderCart) {
                 EmptyView()
-            }
-        }
-        .onAppear {
-            if model.isLoading {
-                model.loadCategoriesAndItems(part)
             }
         }
         .navigationBarTitle("Menu", displayMode: .inline)
@@ -324,56 +264,44 @@ struct MenuView: View {
 
 #if DEBUG
 struct MenuView_Previews: PreviewProvider {
-    static let model = MenuView.Model()
-    static func prepareModel() {
-        guard model.isLoading else { return }
+    typealias ID = MenuItem.FullID
 
-        model.isLoading = false
-        model.categories = [
-            MenuCategory(id: "breakfast", name: "Breakfast", type: .food, restaurantID: "R"),
-            MenuCategory(id: "dinner", name: "Dinner", type: .food, restaurantID: "R"),
-            MenuCategory(id: "drinks", name: "Drinks", type: .drink, restaurantID: "R"),
-        ]
-        model.itemsInCategories = [
-            "breakfast": [
-                MenuItem(id: "breakfast.1", name: "Breakfast Pizza", price: 12.34,
-                         isAvailable: true, destination: .kitchen, restaurantID: "R",
-                         categoryID: "breakfast"),
-                MenuItem(id: "breakfast.2", name: "French Toast", price: 13.57,
-                         isAvailable: true, destination: .kitchen, restaurantID: "R",
-                         categoryID: "breakfast"),
-            ],
-            "dinner": [
-                MenuItem(id: "dinner.1", name: "Dinner Pizza", price: 12.34,
-                         isAvailable: true, destination: .kitchen, restaurantID: "R",
-                         categoryID: "dinner"),
-                MenuItem(id: "dinner.2", name: "Some Spaghetti Or Whatever", price: 13.57,
-                         isAvailable: true, destination: .kitchen, restaurantID: "R",
-                         categoryID: "dinner"),
-            ],
-            "drinks": [
-                MenuItem(id: "drinks.1", name: "Coffee", price: 4.99,
-                         isAvailable: true, destination: .bar, restaurantID: "R",
-                         categoryID: "drinks"),
-                MenuItem(id: "drinks.2", name: "Tea", price: 4.99,
-                         isAvailable: true, destination: .bar, restaurantID: "R",
-                         categoryID: "drinks"),
-            ],
-        ]
-    }
-
+    static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let table = Table(id: "T", name: "Table 1", restaurantID: "R", zoneID: "Z")
-
-    static let part = MenuView.PendingOrderPart()
+    static let menuManager = MenuManager(debugForRestaurant: restaurant, withMenu: [
+        ID(string: "breakfast/1")!: MenuItem(
+            id: "1", name: "Breakfast Pizza", price: 12.34, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "breakfast"),
+        ID(string: "breakfast/2")!: MenuItem(
+            id: "2", name: "French Toast", price: 13.57, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "breakfast"),
+        ID(string: "dinner/1")!: MenuItem(
+            id: "1", name: "Dinner Pizza", price: 12.34, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "dinner"),
+        ID(string: "dinner/2")!: MenuItem(
+            id: "2", name: "Some Spaghetti Or Whatever", price: 13.57, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "dinner"),
+        ID(string: "drinks/1")!: MenuItem(
+            id: "1", name: "Coffee", price: 4.99, isAvailable: true,
+            destination: .bar, restaurantID: "R", categoryID: "drinks"),
+        ID(string: "drinks/2")!: MenuItem(
+            id: "2", name: "Tea", price: 4.99, isAvailable: true,
+            destination: .bar, restaurantID: "R", categoryID: "drinks"),
+    ], categories: [
+        "breakfast": MenuCategory(id: "breakfast", name: "Breakfast", type: .food, restaurantID: "R"),
+        "dinner": MenuCategory(id: "dinner", name: "Dinner", type: .food, restaurantID: "R"),
+        "drinks": MenuCategory(id: "drinks", name: "Drinks", type: .drink, restaurantID: "R"),
+    ])
+    static let part = MenuView.PendingOrderPart(menuManager: menuManager)
 
     struct Wrapper: View {
+        @EnvironmentObject var menuManager: MenuManager
         @ObservedObject var part: MenuView.PendingOrderPart
-        let model: MenuView.Model
-        let table: Table
 
         var body: some View {
             VStack {
-                MenuView(part: part, model: model,
+                MenuView(menuManager: menuManager,
+                         part: part,
                          context: .appendedOrder(part: part))
 
                 HStack {
@@ -389,17 +317,19 @@ struct MenuView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
-        let _ = prepareModel()
+        Group {
+            Wrapper(part: part)
+                .preferredColorScheme(.light)
+            Wrapper(part: part)
+                .preferredColorScheme(.dark)
 
-        Wrapper(part: part, model: model, table: table)
-            .preferredColorScheme(.light)
-        Wrapper(part: part, model: model, table: table)
-            .preferredColorScheme(.dark)
-
-        NavigationView {
-            MenuView(part: part, model: model,
-                     context: .newOrder(table: table))
+            NavigationView {
+                MenuView(menuManager: menuManager,
+                         part: part,
+                         context: .newOrder(table: table))
+            }
         }
+        .environmentObject(menuManager)
     }
 }
 #endif

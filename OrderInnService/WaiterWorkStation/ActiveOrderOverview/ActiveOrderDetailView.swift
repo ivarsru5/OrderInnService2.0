@@ -51,7 +51,7 @@ struct ActiveOrderDetailView: View {
     let order: RestaurantOrder
     let zone: Zone
     let table: Table
-    @Binding var menu: [MenuItem.FullID: MenuItem]
+    @EnvironmentObject var menuManager: MenuManager
     @State var extraPart: MenuView.PendingOrderPart? = nil
     @State var showPickerOverlay = false
 
@@ -68,7 +68,7 @@ struct ActiveOrderDetailView: View {
                 if extraPart != nil {
                     Section(header: Text("Selected Items")) {
                         ForEach(extraPart!.entries, id: \.itemID) { entry in
-                            EntryCell(entry: entry, item: menu[entry.itemID]!, remove: {
+                            EntryCell(entry: entry, item: menuManager.menu[entry.itemID]!, remove: {
                                 // TODO
                             })
                         }
@@ -81,7 +81,7 @@ struct ActiveOrderDetailView: View {
 
                     Section(header: header) {
                         ForEach(part.entries, id: \.itemID) { entry in
-                            EntryCell(entry: entry, item: menu[entry.itemID]!)
+                            EntryCell(entry: entry, item: menuManager.menu[entry.itemID]!)
                         }
                     }
                 }
@@ -94,7 +94,7 @@ struct ActiveOrderDetailView: View {
 
                 Spacer()
 
-                Text("EUR \(order.total(using: menu), specifier: "%.2f")")
+                Text("EUR \(order.total(using: menuManager.menu), specifier: "%.2f")")
                     .bold()
                     .foregroundColor(.label)
             }
@@ -115,7 +115,7 @@ struct ActiveOrderDetailView: View {
 
                 Button(action: {
                     if extraPart == nil {
-                        extraPart = MenuView.PendingOrderPart()
+                        extraPart = MenuView.PendingOrderPart(menuManager: menuManager)
                     }
                     showPickerOverlay = true
                 }, label: {
@@ -129,7 +129,8 @@ struct ActiveOrderDetailView: View {
 //            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
         }
         .popover(isPresented: $showPickerOverlay) {
-            MenuView(context: .appendedOrder(part: extraPart!))
+            MenuView(menuManager: menuManager,
+                     context: .appendedOrder(part: extraPart!))
         }
     }
 }
@@ -140,7 +141,7 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
     typealias Entry = RestaurantOrder.OrderEntry
     typealias ID = MenuItem.FullID
 
-    static let items: MenuItem.Menu = [
+    static let items: MenuManager.Menu = [
         ID(string: "C/I1")!: MenuItem(
             id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
             destination: .kitchen, restaurantID: "R", categoryID: "C"),
@@ -165,8 +166,7 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
             ActiveOrderDetailView(
                 order: order,
                 zone: Zone(id: "Z", location: "Test Zone", restaurantID: "R"),
-                table: Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"),
-                menu: .constant(items))
+                table: Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"))
         }
     }
 }

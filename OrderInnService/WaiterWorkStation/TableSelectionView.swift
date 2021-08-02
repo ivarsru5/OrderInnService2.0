@@ -31,13 +31,15 @@ struct TableSelectionView: View {
         }
     }
 
+    @EnvironmentObject var menuManager: MenuManager
     @StateObject var model = Model()
     let zone: Zone
 
     var tableList: some View {
         List {
             ForEach(model.tables) { table in
-                NavigationLink(destination: MenuView(context: .newOrder(table: table))) {
+                NavigationLink(destination: MenuView(menuManager: menuManager,
+                                                     context: .newOrder(table: table))) {
                     Text(table.name)
                         .bold()
                         .foregroundColor(Color.label)

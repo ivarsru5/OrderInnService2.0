@@ -59,7 +59,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             try entries.encode(to: encoder)
         }
 
-        func subtotal(using menu: MenuItem.Menu) -> Currency {
+        func subtotal(using menu: MenuManager.Menu) -> Currency {
             return entries.map { $0.subtotal(using: menu) }.sum()
         }
     }
@@ -76,7 +76,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             return OrderEntry(itemID: itemID, amount: amount)
         }
 
-        func subtotal(using menu: MenuItem.Menu) -> Currency {
+        func subtotal(using menu: MenuManager.Menu) -> Currency {
             return menu[itemID]!.price * amount
         }
         func subtotal(with item: MenuItem) -> Currency {
@@ -123,7 +123,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         return false
     }
 
-    func total(using menu: MenuItem.Menu) -> Currency {
+    func total(using menu: MenuManager.Menu) -> Currency {
         return parts.map { part in part.subtotal(using: menu) }.sum()
     }
 

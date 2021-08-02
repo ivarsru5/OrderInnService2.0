@@ -15,8 +15,6 @@ struct ActiveOrderListView: View {
         @Published var orders: [RestaurantOrder] = []
         @Published var zones: [Zone.ID: Zone] = [:]
         @Published var tables: [Table.ID: Table] = [:]
-        @Published var menuCategories: [MenuCategory.ID: MenuCategory] = [:]
-        @Published var menuItems: [MenuItem.FullID: MenuItem] = [:]
 
         var sub: AnyCancellable?
         private var orderQuery: TypedQuery<RestaurantOrder> {
@@ -42,7 +40,6 @@ struct ActiveOrderListView: View {
                     print("[ActiveOrderList] Snapshot listener received \(orders.count) orders")
                     self.orders = orders
                     loadUnknownZonesAndTables()
-                    loadUnknownItems()
                 }
         }
 
@@ -103,55 +100,6 @@ struct ActiveOrderListView: View {
                     self.tables[table.id] = table
                 })
         }
-
-        private func loadUnknownItems() {
-            var items = Set<MenuItem.FullID>()
-
-            orders.forEach { order in
-                order.parts.indices.forEach { partIndex in
-                    let part = order.parts[partIndex]
-                    part.entries.indices.forEach { entryIndex in
-                        let entry = part.entries[entryIndex]
-                        guard menuItems[entry.itemID] == nil else { return }
-                        items.insert(entry.itemID)
-                    }
-                }
-            }
-            if items.isEmpty {
-                return
-            }
-
-            var categories = Set<MenuCategory.ID>()
-            items.forEach { id in
-                categories.insert(id.category)
-            }
-
-            var sub: AnyCancellable?
-            sub = AuthManager.shared.restaurant.firestoreReference
-                .collection(of: MenuCategory.self)
-                .query
-                .whereField(.documentID(), in: Array(categories))
-                .get()
-                .flatMap { [unowned self] category -> AnyPublisher<MenuItem, Error> in
-                    self.menuCategories[category.id] = category
-                    let relatedItems = items.filter { $0.category == category.id }.map { $0.item }
-                    return category.firestoreReference
-                        .collection(of: MenuItem.self)
-                        .query
-                        .whereField(.documentID(), in: Array(relatedItems))
-                        .get()
-                }
-                .mapError { error in
-                    // TODO[pn 2021-07-29]
-                    fatalError("[ActiveOrderListView] BUG Failed to fetch menu: \(String(describing: error))")
-                }
-                .sink { item in
-                    self.menuItems[item.fullID] = item
-                    if let _ = sub {
-                        sub = nil
-                    }
-                }
-        }
     }
 
     @StateObject var model = Model()
@@ -161,24 +109,8 @@ struct ActiveOrderListView: View {
         let zone: Zone
         let table: Table
 
-        @Binding var menuItems: [MenuItem.FullID: MenuItem]
-
-        @State var shouldOpenNavigationLink = false
-        var isMenuReady: Bool {
-            !order.parts.contains(where: { part in
-                part.entries.contains(where: { entry in
-                    menuItems[entry.itemID] == nil
-                })
-            })
-        }
-
         @ViewBuilder private var destination: some View {
-            if isMenuReady {
-                ActiveOrderDetailView(order: order, zone: zone, table: table,
-                                      menu: $menuItems)
-            } else {
-                Spinner()
-            }
+            ActiveOrderDetailView(order: order, zone: zone, table: table)
         }
 
         var body: some View {
@@ -196,28 +128,23 @@ struct ActiveOrderListView: View {
         Group {
             if model.isLoading {
                 Spinner()
+            } else if model.orders.isEmpty {
+                Text("There are currently no active orders.")
+                    .font(.headline)
+                    .foregroundColor(.label)
+                    .multilineTextAlignment(.center)
+                    .padding()
             } else {
-                Group {
-                    if model.orders.isEmpty {
-                        Text("There are currently no active orders.")
-                            .font(.headline)
-                            .foregroundColor(.label)
-                            .multilineTextAlignment(.center)
-                            .padding()
-                    } else {
-                        List {
-                            ForEach(model.orders) { order in
-                                Cell(order: order,
-                                     zone: model.zones[model.tables[order.table.documentID]!.zoneID]!,
-                                     table: model.tables[order.table.documentID]!,
-                                     menuItems: $model.menuItems)
-                            }
-                        }
+                List {
+                    ForEach(model.orders) { order in
+                        let table = model.tables[order.table.documentID]!
+                        let zone = model.zones[table.zoneID]!
+                        Cell(order: order, zone: zone, table: table)
                     }
                 }
-                .navigationTitle("Active Orders")
             }
         }
+        .navigationBarTitle("Active Orders")
         .onAppear {
             if model.isLoading {
                 model.subscribeToOrders()

@@ -7,3 +7,9 @@
 
 import Foundation
 import Combine
+
+extension Publisher {
+    func sink(receiveCompletion: @escaping (Subscribers.Completion<Failure>) -> Void) -> AnyCancellable where Output == Void {
+        return self.sink(receiveCompletion: receiveCompletion, receiveValue: { })
+    }
+}
