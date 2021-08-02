@@ -194,11 +194,13 @@ struct MenuView: View {
                     }
                 }
             }
+            .listStyle(InsetGroupedListStyle())
         }
     }
 
     let menuManager: MenuManager
     @StateObject var part: PendingOrderPart
+    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
 
     let context: Context
     @State var alertItem: AlertItem?
@@ -235,18 +237,10 @@ struct MenuView: View {
         case .appendedOrder(part: _): return nil
         }
     }
-    
-    var body: some View {
-        Group {
-            MenuListing(menuManager: menuManager, part: part)
-
-            NavigationLink(destination: OrderCartReviewView(part: part), isActive: $showOrderCart) {
-                EmptyView()
-            }
-        }
-        .navigationBarTitle("Menu", displayMode: .inline)
-        .navigationBarItems(
-            trailing: HStack {
+    @ViewBuilder var navigationBarItem: some View {
+        switch context {
+        case .newOrder(table: _):
+            HStack {
                 Image(systemName: "cart")
 
                 Text("\(part.subtotal, specifier: "%.2f") EUR")
@@ -259,7 +253,28 @@ struct MenuView: View {
                 } else {
                     showOrderCart = true
                 }
+            }
+        case .appendedOrder(part: _):
+            Button(action: {
+                if presentationMode.isPresented {
+                    presentationMode.dismiss()
+                }
+            }, label: {
+                Text("Done")
             })
+        }
+    }
+
+    var body: some View {
+        Group {
+            MenuListing(menuManager: menuManager, part: part)
+
+            NavigationLink(destination: OrderCartReviewView(part: part), isActive: $showOrderCart) {
+                EmptyView()
+            }
+        }
+        .navigationBarTitle("Menu", displayMode: .inline)
+        .navigationBarItems(trailing: navigationBarItem)
         .alert(item: $alertItem) { $0.alert }
     }
 }

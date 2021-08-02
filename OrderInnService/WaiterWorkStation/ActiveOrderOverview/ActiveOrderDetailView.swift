@@ -129,8 +129,10 @@ struct ActiveOrderDetailView: View {
 //            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
         }
         .popover(isPresented: $showPickerOverlay) {
-            MenuView(menuManager: menuManager,
-                     context: .appendedOrder(part: extraPart!))
+            NavigationView {
+                MenuView(menuManager: menuManager,
+                         context: .appendedOrder(part: extraPart!))
+            }
         }
     }
 }
