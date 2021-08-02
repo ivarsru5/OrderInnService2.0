@@ -77,10 +77,9 @@ struct MenuView: View {
 
                 Text(String(amount))
                     .foregroundColor(.secondary)
-                    .font(.headline)
+                    .font(.body.monospacedDigit())
 
                 Button(action: {
-                    print("[AmountSpinner] Update: \(amount)")
                     amount += 1
                 }, label: {
                     Image(systemName: "plus.circle.fill")
