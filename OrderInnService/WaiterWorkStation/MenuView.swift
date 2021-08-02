@@ -100,16 +100,19 @@ struct MenuView: View {
             HStack {
                 Image(systemName: "circle.fill")
                     .symbolSize(10)
-                    .foregroundColor(Color(UIColor.label))
 
                 Text(item.name)
                     .bold()
-                    .foregroundColor(Color(UIColor.label))
 
                 Spacer()
 
-                AmountSpinner(amount: _amount)
+                if item.isAvailable {
+                    AmountSpinner(amount: _amount)
+                } else {
+                    Text("Not Available")
+                }
             }
+            .foregroundColor(item.isAvailable ? .label : .secondary)
             .padding(.leading, 30)
         }
     }
@@ -154,14 +157,14 @@ struct MenuView: View {
     }
 
     struct MenuListing: View {
-        let menuManager: MenuManager
+        @ObservedObject var menuManager: MenuManager
         @ObservedObject var part: PendingOrderPart
 
         private let mealCategories: ArraySlice<MenuCategory>
         private let drinkCategories: ArraySlice<MenuCategory>
 
         init(menuManager: MenuManager, part: PendingOrderPart) {
-            self.menuManager = menuManager
+            self._menuManager = ObservedObject(wrappedValue: menuManager)
             self._part = ObservedObject(wrappedValue: part)
 
             let categories = menuManager.orderedCategories
@@ -274,6 +277,9 @@ struct MenuView_Previews: PreviewProvider {
             destination: .kitchen, restaurantID: "R", categoryID: "breakfast"),
         ID(string: "breakfast/2")!: MenuItem(
             id: "2", name: "French Toast", price: 13.57, isAvailable: true,
+            destination: .kitchen, restaurantID: "R", categoryID: "breakfast"),
+        ID(string: "breakfast/3")!: MenuItem(
+            id: "3", name: "Unobtainium", price: 99.99, isAvailable: false,
             destination: .kitchen, restaurantID: "R", categoryID: "breakfast"),
         ID(string: "dinner/1")!: MenuItem(
             id: "1", name: "Dinner Pizza", price: 12.34, isAvailable: true,

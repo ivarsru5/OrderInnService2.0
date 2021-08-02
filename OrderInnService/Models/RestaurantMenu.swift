@@ -248,6 +248,8 @@ class MenuManager: ObservableObject {
         categoryOrder.map { id in categories[id]! }
     }
 
+    private var categorySubscriptions: [MenuCategory.ID: AnyCancellable] = [:]
+
     init(for restaurant: Restaurant) {
         self.restaurant = restaurant
 
@@ -262,26 +264,20 @@ class MenuManager: ObservableObject {
         sub = restaurant.firestoreReference
             .collection(of: MenuCategory.self)
             .get()
-            .flatMap { [unowned self] category -> AnyPublisher<MenuItem, Error> in
+            .flatMap { [unowned self] category -> AnyPublisher<Never, Error> in
                 self.categories[category.id] = category
-                return category.firestoreReference
-                    .collection(of: MenuItem.self)
-                    .get()
-            }
-            .map { [unowned self] item in
-                self.menu[item.fullID] = item
+                return listen(to: category).ignoreOutput().eraseToAnyPublisher()
             }
             .mapError { error in
                 // TODO[pn 2021-07-29]: We have no good mechanism to report this
                 // failure upstream, so instead we crash.
-                fatalError("FIXME Failed to load menu in manager: \(String(describing: error))")
+                fatalError("FIXME Failed to load categories in manager: \(String(describing: error))")
             }
             .sink(receiveCompletion: { [unowned self] _ in
                 if let _ = sub {
                     sub = nil
                 }
                 orderCategories()
-                buildItemIndex()
                 hasData = true
             })
     }
@@ -292,10 +288,43 @@ class MenuManager: ObservableObject {
         self.menu = menu
         self.categories = categories
         orderCategories()
-        buildItemIndex()
+
+        menu.values.forEach { item in
+            var items = categoryItems[item.categoryID, default: []]
+            items.append(item.fullID)
+            categoryItems[item.categoryID] = items
+        }
+        categoryItems.forEach { categoryID, items in
+            categoryItems[categoryID] = items.sorted(by: \.item)
+        }
+
         self.hasData = true
     }
     #endif
+
+    /// - Returns: The contents of the initial snapshot for this category.
+    private func listen(to category: MenuCategory) -> AnyPublisher<[MenuItem], Error> {
+        let publisher = category.firestoreReference
+            .collection(of: MenuItem.self)
+            .listen()
+
+        let sub = publisher
+            .replaceError(with: [])
+            .sink(receiveValue: { [unowned self] items in
+                items.forEach { item in
+                    self.menu[item.fullID] = item
+
+                    var categoryItems = self.categoryItems[item.categoryID, default: []]
+                    if !categoryItems.contains(item.fullID) {
+                        categoryItems.insert(item.fullID, sortedBy: \.item)
+                        self.categoryItems[item.categoryID] = categoryItems
+                    }
+                }
+            })
+        self.categorySubscriptions[category.id] = sub
+
+        return publisher.first().eraseToAnyPublisher()
+    }
 
     private func orderCategories() {
         categoryOrder.removeAll(keepingCapacity: true)
@@ -316,17 +345,5 @@ class MenuManager: ObservableObject {
         categoryOrder.reserveCapacity(categories.count)
         categoryOrder.append(contentsOf: mealCategories)
         categoryOrder.append(contentsOf: drinkCategories)
-    }
-
-    private func buildItemIndex() {
-        categoryItems.removeAll(keepingCapacity: true)
-        menu.values.forEach { item in
-            var items = categoryItems[item.categoryID, default: []]
-            items.append(item.fullID)
-            categoryItems[item.categoryID] = items
-        }
-        categoryItems.forEach { categoryID, items in
-            categoryItems[categoryID] = items.sorted(by: \.item)
-        }
     }
 }
