@@ -10,7 +10,7 @@ import Combine
 
 struct LoginScreen: View {
     @EnvironmentObject var authManager: AuthManager
-    @State var alertItem: AlertItem?
+    @State var alertTemplate: Alerts.Template?
 
     var isAuthPendingUserSelection: Bool {
         switch authManager.authState {
@@ -24,7 +24,7 @@ struct LoginScreen: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                QRScannerView(alertItem: $alertItem)
+                QRScannerView(alertTemplate: $alertTemplate)
 
                 let maskSize = proxy.size.width * 0.8
                 let mask = RoundedRectangle(cornerRadius: 16.0, style: .circular)
@@ -45,12 +45,7 @@ struct LoginScreen: View {
             }
         }
         .edgesIgnoringSafeArea(.all)
-        .alert(item: $alertItem){ alert in
-            Alert(title: alert.title,
-                  message: alert.message,
-                  dismissButton: alert.dismissButton)
-            
-        }
+        .alert(template: $alertTemplate)
         .fullScreenCover(isPresented: isAuthPendingUserSelectionBinding) {
             EmployeeList()
         }

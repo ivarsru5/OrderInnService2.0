@@ -203,7 +203,7 @@ struct MenuView: View {
     @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
 
     let context: Context
-    @State var alertItem: AlertItem?
+    @State var alertTemplate: Alerts.Template?
     @State var showOrderCart = false
 
     // HACK[pn 2021-08-02]: Similarly to OrderTabView, there appear to be
@@ -249,7 +249,7 @@ struct MenuView: View {
             .foregroundColor(part.isEmpty ? Color.secondary : Color.blue)
             .onTapGesture {
                 if part.isEmpty {
-                    alertItem = UIAlerts.emptyOrder
+                    alertTemplate = Alerts.emptyOrder
                 } else {
                     showOrderCart = true
                 }
@@ -275,7 +275,7 @@ struct MenuView: View {
         }
         .navigationBarTitle("Menu", displayMode: .inline)
         .navigationBarItems(trailing: navigationBarItem)
-        .alert(item: $alertItem) { $0.alert }
+        .alert(template: $alertTemplate)
     }
 }
 

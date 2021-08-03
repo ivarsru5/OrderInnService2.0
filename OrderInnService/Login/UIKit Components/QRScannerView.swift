@@ -11,50 +11,54 @@ import AVFoundation
 
 struct QRScannerView: UIViewControllerRepresentable {
     @EnvironmentObject var authManager: AuthManager
-    @Binding var alertItem: AlertItem?
+    let alertTemplate: Binding<Alerts.Template?>
     
     func makeUIViewController(context: Context) -> QRScannerViewController {
         QRScannerViewController(scannerDelegate: context.coordinator)
     }
     func updateUIViewController(_ uiViewController: QRScannerViewController, context: Context) {
-        if alertItem != nil{
-            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1), execute: {
+        if alertTemplate.wrappedValue != nil {
+            DispatchQueue.main.asyncAfter(deadline: .now() + .seconds(1)) {
                 uiViewController.session.startRunning()
-            })
+            }
         }
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(authManager: authManager, alertItem: $alertItem)
+        Coordinator(authManager: authManager, alertTemplate: alertTemplate)
     }
     
     class Coordinator: NSObject, QRScannerViewControllerDelegate {
         let authManager: AuthManager
-        let alertItem: Binding<AlertItem?>
+        let alertTemplate: Binding<Alerts.Template?>
 
-        init(authManager: AuthManager, alertItem: Binding<AlertItem?>) {
+        init(authManager: AuthManager, alertTemplate: Binding<Alerts.Template?>) {
             self.authManager = authManager
-            self.alertItem = alertItem
+            self.alertTemplate = alertTemplate
         }
 
-        private var _authManagerLoginCancellable: AnyCancellable!
         func didFind(qrCode: LoginQRCode) {
-            _authManagerLoginCancellable = authManager.logIn(using: qrCode).sink(receiveCompletion: {
-                result in
-                if case .failure(_) = result {
-                    // TODO: show error...
+            var sub: AnyCancellable?
+            sub = authManager.logIn(using: qrCode)
+                .mapError { error in
+                    // TODO[pn 2021-08-03]
+                    fatalError("FIXME Failed to use QR code to log in: \(String(describing: error))")
                 }
-            }, receiveValue: { _ in })
+                .sink { _ in
+                    if let _ = sub {
+                        sub = nil
+                    }
+                }
         }
         
         func didSurface(error: QRScannerViewController.CameraError) {
             switch error {
             case .invalidDeviceInput:
-                alertItem.wrappedValue = AlertContext.invalidDevice
+                alertTemplate.wrappedValue = Alerts.invalidDevice
             case .invalidCodeFormat:
-                alertItem.wrappedValue = AlertContext.invalidCodeFormat
+                alertTemplate.wrappedValue = Alerts.invalidCodeFormat
             case .invalidQRCode:
-                alertItem.wrappedValue = AlertContext.invalidQrCode
+                alertTemplate.wrappedValue = Alerts.invalidQrCode
             }
         }
     }

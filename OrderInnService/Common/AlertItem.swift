@@ -8,37 +8,60 @@
 import SwiftUI
 import AVFoundation
 
-struct AlertItem: Identifiable{
+struct AlertItem: Identifiable {
     let id = UUID()
     let title: Text
     let message: Text
-    let dismissButton: Alert.Button
+    let dismissButton: Alert.Button = .default(Text("OK"))
 
     var alert: Alert {
         Alert(title: title, message: message, dismissButton: dismissButton)
     }
 }
 
-struct AlertContext{
-    static let invalidCodeFormat = AlertItem(title: Text("Error"),
-                                         message: Text("This does not look like QR code. Please try again."),
-                                         dismissButton: .default(Text("OK")))
+enum Alerts {
+    struct Template: Identifiable {
+        let id = UUID()
+        let title: Text
+        let message: Text
+        let dismissButton: Alert.Button = .default(Text("OK"))
+
+        var alert: Alert {
+            Alert(title: title, message: message, dismissButton: dismissButton)
+        }
+    }
+
+    static let invalidCodeFormat = Template(
+        title: Text("Invalid Code"),
+        message: Text("The scanned code appears to be invalid. Please try again."))
     
-    static let invalidDevice = AlertItem(title: Text("Something went wrong"),
-                                         message: Text("Something is wrong with camera. We are unable to display it."),
-                                         dismissButton: .default(Text("OK")))
+    static let invalidDevice = Template(
+        title: Text("Something Went Wrong"),
+        message: Text("Could not display camera. Please restart the app and try again."))
     
-    static let invalidQrCode = AlertItem(title: Text("Whoops..."),
-                                         message: Text("This does not look like OrderInn Service qr code. Please try again."),
-                                         dismissButton: .default(Text("OK")))
+    static let invalidQrCode = Template(
+        title: Text("Invalid QR Code"),
+        message: Text("This does not appear to be an OrderInn Service Login QR Code. Please try again."))
+
+    static let emptyOrder = Template(
+        title: Text("No Items Selected"),
+        message: Text("Please add at least one item to the order to continue."))
+
+    static let restrictedAction = Template(
+        title: Text("This Action Is Restricted"),
+        message: Text("You do not have access to this action. Please contact your supervisor."))
 }
 
-struct UIAlerts{
-    static let emptyOrder = AlertItem(title: Text("Whoops..."),
-                                      message: Text("Please add atleast one item to continue."),
-                                      dismissButton: .default(Text("OK")))
-    
-    static let restrictions = AlertItem(title: Text("Error"),
-                                        message: Text("You dont have access to this action, please contact you'r supervisor!"),
-                                        dismissButton: .default(Text("OK")))
+struct AlertTemplate: ViewModifier {
+    let alert: Binding<Alerts.Template?>
+
+    func body(content: Content) -> some View {
+        content
+            .alert(item: alert) { $0.alert }
+    }
+}
+extension View {
+    func alert(template: Binding<Alerts.Template?>) -> some View {
+        modifier(AlertTemplate(alert: template))
+    }
 }
