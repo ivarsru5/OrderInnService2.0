@@ -10,9 +10,16 @@ import Firebase
 
 @main
 struct OrderInnServiceApp: App {
-    
-    init(){
+    init() {
+        #if DEBUG && targetEnvironment(simulator)
+        if ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] == nil {
+            // Skip configuring Firebase if the app is being run as an Xcode Live
+            // Preview so that it starts up slightly faster.
+            FirebaseApp.configure()
+        }
+        #else
         FirebaseApp.configure()
+        #endif
     }
 
     var body: some Scene {
