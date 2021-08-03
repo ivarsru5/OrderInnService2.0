@@ -22,22 +22,29 @@ struct LoginScreen: View {
         return .constant(isAuthPendingUserSelection)
     }
     var body: some View {
-        ZStack {
-            QRScannerView(alertItem: $alertItem)
-                .edgesIgnoringSafeArea(.all)
-            
-            BlurEffectView(effect: UIBlurEffect(style: .dark))
-                .inverseMask(RoundedRectangle(cornerRadius: 16.0, style: .circular).padding())
-                .edgesIgnoringSafeArea(.all)
-            VStack {
+        GeometryReader { proxy in
+            ZStack {
+                QRScannerView(alertItem: $alertItem)
+
+                let maskSize = proxy.size.width * 0.8
+                let mask = RoundedRectangle(cornerRadius: 16.0, style: .circular)
+                    .size(width: maskSize, height: maskSize)
+                    .padding(EdgeInsets(top: (proxy.size.height - maskSize) / 2,
+                                        leading: (proxy.size.width - maskSize) / 2,
+                                        bottom: (proxy.size.height - maskSize) / 2,
+                                        trailing: (proxy.size.width - maskSize) / 2))
+                BlurEffectView(effect: UIBlurEffect(style: .systemThinMaterialDark))
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .inverseMask(mask)
+
                 Text("Please scan QR code.")
-                    .foregroundColor(.white)
                     .font(.headline)
-                    .padding(.top, 60)
-                
-                Spacer()
+                    .foregroundColor(.white)
+                    .padding(.top, proxy.size.height * 0.2)
+                    .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .top)
             }
         }
+        .edgesIgnoringSafeArea(.all)
         .alert(item: $alertItem){ alert in
             Alert(title: alert.title,
                   message: alert.message,
@@ -56,17 +63,22 @@ struct EmployeeList: View {
     class Model: ObservableObject {
         @Published var users: [Restaurant.Employee]?
 
-        var _loadUsersCancellable: AnyCancellable!
-        var _finishLoginCancellable: AnyCancellable!
-
         func loadUsers(from authManager: AuthManager) {
-            _loadUsersCancellable = authManager.restaurant.loadUsers().sink(receiveCompletion: {
-                [unowned self] result in
-                self._loadUsersCancellable = nil
-                // TODO: handle case .failure(let error) = result...
-            }, receiveValue: { [unowned self] users in
-                self.users = users
-            })
+            var sub: AnyCancellable?
+            sub = authManager.restaurant.firestoreReference
+                .collection(of: Restaurant.Employee.self)
+                .get()
+                .mapError { error in
+                    // TODO[pn 2021-08-03]
+                    fatalError("FIXME Failed to load waiter list: \(String(describing: error))")
+                }
+                .collect()
+                .sink { [unowned self] users in
+                    self.users = users
+                    if let _ = sub {
+                        sub = nil
+                    }
+                }
         }
     }
     @StateObject var model = Model()
@@ -102,15 +114,15 @@ struct EmployeeList: View {
                     // TODO: Handle potential error that can arise while marking user as inactive.
                     var sub: AnyCancellable?
                     sub = authManager.finishWaiterLogin(withUser: user)
-                        .sink(receiveCompletion: { result in
-                            if case .failure(let error) = result {
-                                // TODO display error...
-                                print("Failed to finish login: \(String(describing: error))")
-                            }
+                        .mapError { error in
+                            // TODO[pn 2021-08-03]
+                            fatalError("FIXME Failed to finish login: \(String(describing: error))")
+                        }
+                        .sink { _ in
                             if let _ = sub {
                                 sub = nil
                             }
-                        }, receiveValue: { _ in })
+                        }
                 }, label: {
                     HStack{
                         Image(systemName: "person.circle.fill")
@@ -141,7 +153,9 @@ struct EmployeeList: View {
             })
         }
         .onAppear {
-            model.loadUsers(from: authManager)
+            if model.users == nil {
+                model.loadUsers(from: authManager)
+            }
         }
         .navigationBarHidden(true)
     }
