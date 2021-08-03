@@ -355,20 +355,11 @@ class MenuManager: ObservableObject {
     }
 
     func update(item: MenuItem, setAvailability isAvailable: Bool) -> AnyPublisher<MenuItem, Error> {
-        let pub = item.update(isAvailable: isAvailable)
-
-        var sub: AnyCancellable?
-        sub = pub
-            .catch { _ -> Empty<MenuItem, Never> in
-                return Empty()
-            }
-            .sink { [unowned self] item in
+        return item.update(isAvailable: isAvailable)
+            .map { [unowned self] item in
                 self.menu[item.fullID] = item
-                if let _ = sub {
-                    sub = nil
-                }
+                return item
             }
-
-        return pub
+            .eraseToAnyPublisher()
     }
 }
