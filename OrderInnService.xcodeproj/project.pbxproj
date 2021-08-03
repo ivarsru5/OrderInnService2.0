@@ -24,7 +24,6 @@
 		581340C926452152003E9BC6 /* KitchenOrderOverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581340C826452152003E9BC6 /* KitchenOrderOverView.swift */; };
 		5813CC5626309EB700924ED9 /* MenuView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5813CC5526309EB700924ED9 /* MenuView.swift */; };
 		5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */; };
-		581AB020266DF67D0049CD27 /* ItemAvailabilityController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 581AB01F266DF67D0049CD27 /* ItemAvailabilityController.swift */; };
 		582066D82628129400D3BCCA /* OrderInnServiceApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D72628129400D3BCCA /* OrderInnServiceApp.swift */; };
 		582066DA2628129400D3BCCA /* LoginScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 582066D92628129400D3BCCA /* LoginScreen.swift */; };
 		582066DC2628129400D3BCCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DB2628129400D3BCCA /* Assets.xcassets */; };
@@ -45,7 +44,7 @@
 		58F0D7412632E51F0093B6EA /* OrderCartReviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F0D7402632E51F0093B6EA /* OrderCartReviewView.swift */; };
 		58F2895B26384E6200C973DB /* ActiveOrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F2895A26384E6200C973DB /* ActiveOrderDetailView.swift */; };
 		58F91D71265FB87B0059E71A /* KitchenTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D70265FB87B0059E71A /* KitchenTabView.swift */; };
-		58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D73265FC3000059E71A /* ItemAvailability.swift */; };
+		58F91D74265FC3000059E71A /* ItemAvailabilityView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F91D73265FC3000059E71A /* ItemAvailabilityView.swift */; };
 		58FF99B226A158C400A99F38 /* AdminGeneralSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF99B126A158C400A99F38 /* AdminGeneralSelection.swift */; };
 		58FF99B726A168B700A99F38 /* AddPersonel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58FF99B626A168B700A99F38 /* AddPersonel.swift */; };
 		691056B926B3132200E1DE6F /* O6NButtonStyle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 691056B826B3132200E1DE6F /* O6NButtonStyle.swift */; };
@@ -80,7 +79,6 @@
 		581340C826452152003E9BC6 /* KitchenOrderOverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenOrderOverView.swift; sourceTree = "<group>"; };
 		5813CC5526309EB700924ED9 /* MenuView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MenuView.swift; sourceTree = "<group>"; };
 		5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActivityIndicatior.swift; sourceTree = "<group>"; };
-		581AB01F266DF67D0049CD27 /* ItemAvailabilityController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAvailabilityController.swift; sourceTree = "<group>"; };
 		582066D42628129400D3BCCA /* OrderInnService.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = OrderInnService.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		582066D72628129400D3BCCA /* OrderInnServiceApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderInnServiceApp.swift; sourceTree = "<group>"; };
 		582066D92628129400D3BCCA /* LoginScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginScreen.swift; sourceTree = "<group>"; };
@@ -103,7 +101,7 @@
 		58F0D7402632E51F0093B6EA /* OrderCartReviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderCartReviewView.swift; sourceTree = "<group>"; };
 		58F2895A26384E6200C973DB /* ActiveOrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderDetailView.swift; sourceTree = "<group>"; };
 		58F91D70265FB87B0059E71A /* KitchenTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenTabView.swift; sourceTree = "<group>"; };
-		58F91D73265FC3000059E71A /* ItemAvailability.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAvailability.swift; sourceTree = "<group>"; };
+		58F91D73265FC3000059E71A /* ItemAvailabilityView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ItemAvailabilityView.swift; sourceTree = "<group>"; };
 		58FF99B126A158C400A99F38 /* AdminGeneralSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AdminGeneralSelection.swift; sourceTree = "<group>"; };
 		58FF99B626A168B700A99F38 /* AddPersonel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddPersonel.swift; sourceTree = "<group>"; };
 		6562377B875D8068684ABD5E /* Pods-OrderInnService.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnService.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnService/Pods-OrderInnService.debug.xcconfig"; sourceTree = "<group>"; };
@@ -230,7 +228,7 @@
 				58F91D70265FB87B0059E71A /* KitchenTabView.swift */,
 				581340C526452112003E9BC6 /* KitchenOrderOverView */,
 				581340C3264520F9003E9BC6 /* KitchenOrders */,
-				58F91D72265FC2DB0059E71A /* ItemAvailability */,
+				58F91D73265FC3000059E71A /* ItemAvailabilityView.swift */,
 			);
 			path = Kitchen;
 			sourceTree = "<group>";
@@ -359,15 +357,6 @@
 				580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */,
 			);
 			path = ActiveOrderOverview;
-			sourceTree = "<group>";
-		};
-		58F91D72265FC2DB0059E71A /* ItemAvailability */ = {
-			isa = PBXGroup;
-			children = (
-				581AB01F266DF67D0049CD27 /* ItemAvailabilityController.swift */,
-				58F91D73265FC3000059E71A /* ItemAvailability.swift */,
-			);
-			path = ItemAvailability;
 			sourceTree = "<group>";
 		};
 		58FF99B326A1688400A99F38 /* PersonelControlls */ = {
@@ -541,7 +530,6 @@
 				5801CC4026A588A300DD3DEC /* PreperedOrderView.swift in Sources */,
 				5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */,
 				5811F946262DE53000050F2C /* LaunchScreen.swift in Sources */,
-				581AB020266DF67D0049CD27 /* ItemAvailabilityController.swift in Sources */,
 				69142D4E2698995E0044D34F /* LoginQRCode.swift in Sources */,
 				580506F526296723007CF39B /* Restaurant.swift in Sources */,
 				69142D4A26986EA50044D34F /* SwiftUIExtensions.swift in Sources */,
@@ -554,7 +542,7 @@
 				695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				58FF99B726A168B700A99F38 /* AddPersonel.swift in Sources */,
-				58F91D74265FC3000059E71A /* ItemAvailability.swift in Sources */,
+				58F91D74265FC3000059E71A /* ItemAvailabilityView.swift in Sources */,
 				58F0D7412632E51F0093B6EA /* OrderCartReviewView.swift in Sources */,
 				58F2895B26384E6200C973DB /* ActiveOrderDetailView.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,

@@ -222,7 +222,7 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
                        name: String, price: Double, destination: Destination,
                        isAvailable: Bool = true) -> AnyPublisher<MenuItem, Error> {
         category.firestoreReference
-            .collection(self.firestoreCollection, of: MenuItem.self)
+            .collection(of: MenuItem.self)
             .addDocument(data: [
                 "name": name,
                 "price": price,
@@ -230,6 +230,13 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
                 "destination": destination.rawValue,
             ])
             .get()
+    }
+
+    func update(isAvailable: Bool) -> AnyPublisher<MenuItem, Error> {
+        self.firestoreReference
+            .updateData(["isAvailable": isAvailable])
+            .flatMap { ref in ref.get() }
+            .eraseToAnyPublisher()
     }
 }
 
@@ -345,5 +352,23 @@ class MenuManager: ObservableObject {
         categoryOrder.reserveCapacity(categories.count)
         categoryOrder.append(contentsOf: mealCategories)
         categoryOrder.append(contentsOf: drinkCategories)
+    }
+
+    func update(item: MenuItem, setAvailability isAvailable: Bool) -> AnyPublisher<MenuItem, Error> {
+        let pub = item.update(isAvailable: isAvailable)
+
+        var sub: AnyCancellable?
+        sub = pub
+            .catch { _ -> Empty<MenuItem, Never> in
+                return Empty()
+            }
+            .sink { [unowned self] item in
+                self.menu[item.fullID] = item
+                if let _ = sub {
+                    sub = nil
+                }
+            }
+
+        return pub
     }
 }
