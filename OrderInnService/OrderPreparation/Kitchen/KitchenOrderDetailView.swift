@@ -58,9 +58,12 @@ struct KitchenOrderDetailView: View {
 
     var body: some View {
         VStack {
-            (Text("Table: ").bold() + Text(table.name))
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding()
+            HStack {
+                Text("Zone: ").bold() + Text(zone.location)
+                Spacer()
+                Text("Table: ").bold() + Text(table.name)
+            }
+            .padding()
 
             List {
                 ForEach(order.parts.indices) { partIndex in
