@@ -5,7 +5,6 @@
 //  Created by Ivars Ruģelis on 16/04/2021.
 //
 
-import SwiftUI
 import Combine
 import FirebaseFirestore
 
@@ -137,3 +136,17 @@ struct Restaurant: Identifiable, FirestoreInitiable {
         }
     }
 }
+
+#if canImport(SwiftUI)
+import SwiftUI
+struct CurrentRestaurant: EnvironmentKey {
+    typealias Value = Restaurant?
+    static var defaultValue: Restaurant? = nil
+}
+extension EnvironmentValues {
+    var currentRestaurant: Restaurant? {
+        get { self[CurrentRestaurant.self] }
+        set { self[CurrentRestaurant.self] = newValue }
+    }
+}
+#endif

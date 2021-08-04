@@ -173,20 +173,38 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
             return try! json.decode(OrderPart.self, from: partData)
         }
+
+        #if DEBUG
+        self._tableFullID = nil
+        #endif
     }
 
     #if DEBUG
-    init(restaurantID: Restaurant.ID, id: ID, state: OrderState, table: Table.ID,
+    private let _tableFullID: Table.FullID?
+    init(restaurantID: Restaurant.ID, id: ID, state: OrderState, table: Table.FullID,
          placedBy: Restaurant.Employee.ID, createdAt: Date, parts: [OrderPart]) {
         self.restaurantID = restaurantID
         self.id = id
         self.state = state
-        self.table = TypedDocumentReference(nil, idOverride: table)
+        self.table = TypedDocumentReference(nil, idOverride: table.table)
+        self._tableFullID = table
         self.placedBy = TypedDocumentReference(nil, idOverride: placedBy)
         self.createdAt = createdAt
         self.parts = parts
     }
     #endif
+
+    var tableFullID: Table.FullID {
+        #if DEBUG
+        if _tableFullID != nil {
+            return _tableFullID!
+        }
+        #endif
+        let path = table.untyped.path.split(separator: "/")
+        let tableID = Table.ID(path.last!)
+        let zoneID = Zone.ID(path[path.endIndex - 3])
+        return Table.FullID(zone: zoneID, table: tableID)
+    }
 
     static func create(under restaurant: Restaurant,
                        placedBy user: Restaurant.Employee,

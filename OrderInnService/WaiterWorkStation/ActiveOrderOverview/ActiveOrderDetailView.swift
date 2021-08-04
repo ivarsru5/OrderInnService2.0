@@ -160,8 +160,8 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
         Entry(itemID: ID(string: "C/I3")!, amount: 1),
     ])
     static let order = RestaurantOrder(restaurantID: "R", id: "O", state: .open,
-                                       table: "T", placedBy: "U", createdAt: Date(),
-                                       parts: [part])
+                                       table: Table.FullID(zone: "Z", table: "T"),
+                                       placedBy: "U", createdAt: Date(), parts: [part])
 
     static var previews: some View {
         NavigationView {

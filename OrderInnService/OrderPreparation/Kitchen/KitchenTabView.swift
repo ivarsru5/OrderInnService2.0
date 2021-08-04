@@ -9,17 +9,21 @@ import SwiftUI
 
 struct KitchenTabView: View {
     @StateObject var menuManager: MenuManager
+    @StateObject var orderManager: OrderManager
+    let restaurant: Restaurant
 
     // HACK[pn 2021-08-03]: See Waiter/TabView.
     init(restaurant: Restaurant) {
+        self.restaurant = restaurant
         self._menuManager = StateObject(wrappedValue: MenuManager(for: restaurant))
+        self._orderManager = StateObject(wrappedValue: OrderManager(for: restaurant))
     }
 
 
     var body: some View {
         TabView {
             NavigationView {
-                KitchenView()
+                KitchenOrderListView()
             }
             .navigationViewStyle(StackNavigationViewStyle())
             .tabItem {
@@ -40,6 +44,8 @@ struct KitchenTabView: View {
             DebugMenu.navigationViewWithTabItem
             #endif
         }
+        .environment(\.currentRestaurant, restaurant)
         .environmentObject(menuManager)
+        .environmentObject(orderManager)
     }
 }

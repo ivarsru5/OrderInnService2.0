@@ -48,6 +48,11 @@ struct Zone: FirestoreInitiable, Identifiable {
 struct Table: FirestoreInitiable, Identifiable {
     typealias ID = String
 
+    struct FullID: Hashable, Equatable {
+        let zone: Zone.ID
+        let table: ID
+    }
+
     static let firestoreCollection = "Tables"
 
     let restaurantID: Restaurant.ID
@@ -82,6 +87,10 @@ struct Table: FirestoreInitiable, Identifiable {
         self.zoneID = zoneID
     }
     #endif
+
+    var fullID: FullID {
+        FullID(zone: zoneID, table: id)
+    }
 
     var firestoreReference: TypedDocumentReference<Table> {
         let ref = Firestore.firestore()

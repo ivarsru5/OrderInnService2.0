@@ -10,6 +10,7 @@ import Foundation
 
 class OrderManager: ObservableObject {
     let restaurant: Restaurant
+    @Published var hasData = false
     @Published var orders: [RestaurantOrder] = []
 
     private var orderListenerSub: AnyCancellable?
@@ -28,6 +29,9 @@ class OrderManager: ObservableObject {
                 fatalError("FIXME Failed to subscribe to order updates: \(String(describing: error))")
             }
             .sink { [unowned self] orders in
+                if !self.hasData {
+                    self.hasData = true
+                }
                 self.orders = orders.sorted(by: OrderManager.orderComparator)
             }
     }
@@ -44,6 +48,7 @@ class OrderManager: ObservableObject {
         self.restaurant = restaurant
         self.orders = orders.sorted(by: OrderManager.orderComparator)
         self.orderListenerSub = nil
+        self.hasData = true
     }
     #endif
 }

@@ -194,7 +194,8 @@ struct ActiveOrderView_Previews: PreviewProvider {
 
                     Button(action: {
                         let order = RestaurantOrder(restaurantID: "R", id: "O.\(nextOrderID)",
-                                                    state: .open, table: "T",
+                                                    state: .open,
+                                                    table: Table.FullID(zone: "Z", table: "T"),
                                                     placedBy: "U", createdAt: Date(),
                                                     parts: [])
                         model.orders.append(order)
