@@ -22,6 +22,17 @@ struct OrderInnServiceApp: App {
         #endif
     }
 
+    #if O6N_TEST
+    // HACK[pn 2021-08-04]: In order to not have to include _all the views_ in
+    // the unit test target, we instead hollow out the app so that no views are
+    // rendered here.
+    struct LaunchScreen: View {
+        var body: some View {
+            EmptyView()
+        }
+    }
+    #endif
+
     var body: some Scene {
         WindowGroup {
             LaunchScreen()

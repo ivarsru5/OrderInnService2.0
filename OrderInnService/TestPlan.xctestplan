@@ -1,0 +1,24 @@
+{
+  "configurations" : [
+    {
+      "id" : "7645D384-CC29-45D0-A704-03B45B9C19C1",
+      "name" : "Configuration 1",
+      "options" : {
+
+      }
+    }
+  ],
+  "defaultOptions" : {
+    "testTimeoutsEnabled" : true
+  },
+  "testTargets" : [
+    {
+      "target" : {
+        "containerPath" : "container:OrderInnService.xcodeproj",
+        "identifier" : "69766FD626B99C3B00DBD18C",
+        "name" : "OrderInnServiceTests"
+      }
+    }
+  ],
+  "version" : 1
+}

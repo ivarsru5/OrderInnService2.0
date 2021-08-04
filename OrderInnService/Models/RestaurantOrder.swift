@@ -14,7 +14,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
     static let firestoreCollection = "Orders"
 
-    enum OrderState: String, Equatable, Codable {
+    enum OrderState: String, Equatable, Comparable, Codable {
         /// Order is submitted and hasn't been seen.
         case new = "new"
 
@@ -43,7 +43,24 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             var container = encoder.singleValueContainer()
             try container.encode(self.rawValue)
         }
+
+        static func < (_ lhs: OrderState, _ rhs: OrderState) -> Bool {
+            /*
+               < ?  | new | open | closed
+             -------+-----+------+--------
+                new |  F  |  T   |   T
+               open |  F  |  F   |   T
+             closed |  F  |  F   |   F
+             (rows are lhs, columns are rhs.)
+             */
+            switch lhs {
+            case .new: return rhs != .new
+            case .open: return rhs == .closed
+            case .closed: return false
+            }
+        }
     }
+
     struct OrderPart: Codable {
         let entries: [OrderEntry]
 
