@@ -51,6 +51,20 @@ class OrderManager: ObservableObject {
         self.hasData = true
     }
     #endif
+
+    func update(order: RestaurantOrder, setState state: RestaurantOrder.OrderState) -> AnyPublisher<RestaurantOrder, Error> {
+        return order.updateState(state)
+            .map { [unowned self] order in
+                if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
+                    self.orders[index] = order
+                } else {
+                    self.orders.append(order)
+                }
+                self.orders.sort(by: OrderManager.orderComparator)
+                return order
+            }
+            .eraseToAnyPublisher()
+    }
 }
 
 #if O6N_TEST
