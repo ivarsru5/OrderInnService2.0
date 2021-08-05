@@ -251,7 +251,7 @@ struct MenuView: View {
                 Text("\(part.subtotal, specifier: "%.2f") EUR")
                     .bold()
             }
-            .foregroundColor(part.isEmpty ? Color.secondary : Color.blue)
+            .foregroundColor(part.isEmpty ? .secondary : .link)
             .onTapGesture {
                 if part.isEmpty {
                     alertTemplate = Alerts.emptyOrder
@@ -267,6 +267,7 @@ struct MenuView: View {
             }, label: {
                 Text("Done")
             })
+            .foregroundColor(.link)
         }
     }
 
