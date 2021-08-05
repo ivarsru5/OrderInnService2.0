@@ -9,34 +9,12 @@ import Combine
 import SwiftUI
 
 struct ZoneSelection: View {
-    class Model: ObservableObject {
-        @Published var zones: [Zone] = []
-        @Published var isLoading = true
-        var sub: AnyCancellable?
-
-        func loadZones() {
-            sub = AuthManager.shared.restaurant.firestoreReference
-                .collection(of: Zone.self)
-                .get()
-                .catch { error in
-                    // TODO[pn 2021-07-16]
-                    return Empty().setFailureType(to: Never.self)
-                }
-                .collect()
-                .sink(receiveValue: { [unowned self] zones in
-                    self.zones = zones.sorted(by: \.location)
-                    self.isLoading = false
-                    self.sub = nil
-                })
-        }
-    }
-
+    @Environment(\.currentLayout) @Binding var layout: Layout
     @EnvironmentObject var authManager: AuthManager
-    @StateObject var model = Model()
 
-    var zoneList: some View {
+    var body: some View {
         List {
-            ForEach(model.zones) { zone in
+            ForEach(layout.orderedZones) { zone in
                 NavigationLink(destination: TableSelectionView(zone: zone)) {
                     Text(zone.location)
                         .bold()
@@ -46,29 +24,14 @@ struct ZoneSelection: View {
         }
         .listStyle(InsetGroupedListStyle())
         .navigationTitle(Text("Zones"))
-    }
-
-    var body: some View {
-        Group {
-            if model.isLoading {
-                Spinner()
-            } else {
-                zoneList
-            }
-        }
         .navigationBarItems(trailing: HStack {
             if authManager.waiter?.manager ?? false {
-                NavigationLink(destination: Text("Hello world! (Please replace with admin view)")) {
+                NavigationLink(destination: Text("Hello world! (Please replace with manager view)")) {
                     Image(systemName: "folder")
                         .foregroundColor(.link)
                 }
             }
         })
-        .onAppear {
-            if model.isLoading {
-                model.loadZones()
-            }
-        }
     }
 
     static var navigationViewWithTabItem: some View {

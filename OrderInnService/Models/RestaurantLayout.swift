@@ -112,3 +112,90 @@ struct Table: FirestoreInitiable, Identifiable {
         return TypedDocumentReference(ref)
     }
 }
+
+struct Layout {
+    var zones: [Zone.ID: Zone] = [:]
+    var tables: [Table.FullID: Table] = [:]
+
+    var orderedZones: [Zone] {
+        return Array(zones.values).sorted(by: \.location)
+    }
+    func orderedTables(in zone: Zone) -> [Table] {
+        let tables = Array(tables.values.filter({ $0.zoneID == zone.id }))
+        return tables.sorted(by: \.name)
+    }
+}
+
+#if canImport(SwiftUI)
+import SwiftUI
+struct CurrentLayout: EnvironmentKey {
+    static var defaultValue = Binding<Layout>.constant(Layout())
+}
+extension EnvironmentValues {
+    var currentLayout: Binding<Layout> {
+        get { self[CurrentLayout.self] }
+        set { self[CurrentLayout.self] = newValue }
+    }
+}
+
+#if canImport(Combine)
+import Combine
+
+struct RestaurantLayoutLoader<Content: View>: View {
+    let restaurant: Restaurant
+    let content: () -> Content
+
+    init(restaurant: Restaurant, @ViewBuilder content: @escaping () -> Content) {
+        self.restaurant = restaurant
+        self.content = content
+    }
+
+    @State var layout = Layout()
+    @State var hasLayoutData = false
+
+    var body: some View {
+        Group {
+            if hasLayoutData {
+                content()
+            } else {
+                Spinner()
+            }
+        }
+        .environment(\.currentLayout, $layout)
+        .onAppear {
+            if !hasLayoutData {
+                loadLayoutData()
+            }
+        }
+    }
+
+    func loadLayoutData() {
+        var sub: AnyCancellable?
+        sub = restaurant.firestoreReference
+            .collection(of: Zone.self)
+            .get()
+            .flatMap { zone -> AnyPublisher<Table, Error> in
+                layout.zones[zone.id] = zone
+                return zone.firestoreReference
+                    .collection(of: Table.self)
+                    .get()
+            }
+            .map { table in
+                layout.tables[table.fullID] = table
+            }
+            .mapError { error in
+                // TODO[pn 2021-08-05]: Should probably expose this to
+                // downstream? Or have an alternate ErrorContent?
+                fatalError("FIXME Failed to load layout in wrapper: \(String(describing: error))")
+            }
+            .ignoreOutput()
+            .sink(receiveCompletion: { _ in
+                hasLayoutData = true
+                if let _ = sub {
+                    sub = nil
+                }
+            })
+    }
+}
+#endif // canImport(Combine)
+#endif // canImport(SwiftUI)

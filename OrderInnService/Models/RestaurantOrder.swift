@@ -66,6 +66,16 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             case .cancelled: return false
             }
         }
+
+        var isOpen: Bool {
+            switch self {
+            case .new, .open: return true
+            case .fulfilled, .cancelled: return false
+            }
+        }
+        var isClosed: Bool {
+            !isOpen
+        }
     }
 
     struct OrderPart: Codable {

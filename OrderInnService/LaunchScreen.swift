@@ -17,7 +17,7 @@ struct LaunchScreen: View {
         case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _):
             LoginScreen()
         case .authenticatedWaiter(restaurantID: _, employeeID: _):
-            OrderTabView(restaurant: authManager.restaurant)
+            OrderTabView(authManager: authManager)
         case .authenticatedKitchen(restaurantID: _, kitchen: _):
             KitchenTabView(restaurant: authManager.restaurant)
         case .authenticatedAdmin(restaurantID: _, admin: _):

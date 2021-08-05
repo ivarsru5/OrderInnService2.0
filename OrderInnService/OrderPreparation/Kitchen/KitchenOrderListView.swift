@@ -9,119 +9,30 @@ import Combine
 import SwiftUI
 
 struct KitchenOrderListView: View {
-    struct Cell: View {
-        let zone: Zone
-        let table: Table
-        let order: RestaurantOrder
-
-        static let maxStatusIconWidth: CGFloat = 14
-        @ViewBuilder var statusIcon: some View {
-            switch order.state {
-            case .new, .open:
-                Image(systemName: "circle.fill")
-                    .bodyFont(size: 10)
-
-            case .fulfilled:
-                Image(systemName: "checkmark")
-                    .bodyFont(size: 14, weight: .bold)
-
-            case .cancelled:
-                Image(systemName: "xmark")
-                    .bodyFont(size: 14, weight: .bold)
-            }
-        }
-        var statusIconColor: Color {
-            switch order.state {
-            case .new: return Color.blue
-            case .open: return Color.label
-            case .fulfilled, .cancelled: return Color.secondary
-            }
-        }
-        var isOrderActive: Bool {
-            switch order.state {
-            case .new, .open: return true
-            case .fulfilled, .cancelled: return false
-            }
-        }
-
-        var body: some View {
-            let destination = KitchenOrderDetailView(order: order, zone: zone, table: table)
-            NavigationLink(destination: destination) {
-                HStack {
-                    statusIcon
-                        .foregroundColor(statusIconColor)
-                        .frame(width: Cell.maxStatusIconWidth, alignment: .center)
-
-                    Group {
-                        Text("Zone: ").bold() + Text(zone.location)
-                        Spacer()
-                        Text("Table: ").bold() + Text(table.name)
-                    }
-                    .foregroundColor(isOrderActive ? .label : .secondary)
-                }
-            }
-        }
-    }
-
-    class Model: ObservableObject {
-        @Published var hasData = false
-        @Published var zones: [Zone.ID: Zone] = [:]
-        @Published var tables: [Table.FullID: Table] = [:]
-
-        func loadLayout(for restaurant: Restaurant) {
-            var sub: AnyCancellable?
-            sub = restaurant.firestoreReference
-                .collection(of: Zone.self)
-                .get()
-                .flatMap { [unowned self] zone -> AnyPublisher<Table, Error> in
-                    self.zones[zone.id] = zone
-                    return zone.firestoreReference
-                        .collection(of: Table.self)
-                        .get()
-                }
-                .mapError { error in
-                    // TODO[pn 2021-08-04]
-                    fatalError("FIXME Failed to load restaurant layout for kitchen: \(String(describing: error))")
-                }
-                .map { [unowned self] table in
-                    self.tables[table.fullID] = table
-                }
-                .ignoreOutput()
-                .sink(receiveCompletion: { [unowned self] _ in
-                    self.hasData = true
-                    if let _ = sub {
-                        sub = nil
-                    }
-                })
-        }
-    }
-
     @Environment(\.currentRestaurant) var restaurant: Restaurant?
+    @Environment(\.currentLayout) @Binding var layout: Layout
     @EnvironmentObject var menuManager: MenuManager
     @EnvironmentObject var orderManager: OrderManager
-    @StateObject var model = Model()
 
     var body: some View {
         Group {
-            if !orderManager.hasData || !model.hasData {
+            if !orderManager.hasData {
                 Spinner()
             } else {
                 List {
                     ForEach(orderManager.orders) { order in
-                        let table = model.tables[order.tableFullID]!
-                        let zone = model.zones[table.zoneID]!
-                        Cell(zone: zone, table: table, order: order)
+                        let table = layout.tables[order.tableFullID]!
+                        let zone = layout.zones[table.zoneID]!
+                        NavigationLink(destination: KitchenOrderDetailView(order: order, zone: zone, table: table)) {
+                            OrderListCell(order: order, zone: zone, table: table)
+                        }
                     }
                 }
                 .listStyle(InsetGroupedListStyle())
             }
         }
-        .navigationTitle("Received Orders")
-        .onAppear {
-            if !model.hasData {
-                model.loadLayout(for: restaurant!)
-            }
-        }
+        .navigationTitle("Orders")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -143,22 +54,17 @@ struct KitchenOrderListView_Previews: PreviewProvider {
                         table: Table.FullID(zone: "Z", table: "T"), placedBy: "E",
                         createdAt: Date(), parts: []),
     ])
-    static var model: KitchenOrderListView.Model {
-        let model = KitchenOrderListView.Model()
-        model.zones = [
-            "Z": Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id),
-        ]
-        model.tables = [
-            Table.FullID(zone: "Z", table: "T"):
-                Table(id: "T", name: "Test Table", restaurantID: restaurant.id, zoneID: "Z"),
-        ]
-        model.hasData = true
-        return model
-    }
+    static var layout = Layout(zones: [
+        "Z": Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id),
+    ], tables:  [
+        Table.FullID(zone: "Z", table: "T"):
+            Table(id: "T", name: "Test Table", restaurantID: restaurant.id, zoneID: "Z"),
+    ])
 
     static var previews: some View {
-        KitchenOrderListView(model: model)
+        KitchenOrderListView()
             .environment(\.currentRestaurant, restaurant)
+            .environment(\.currentLayout, .constant(layout))
             .environmentObject(menuManager)
             .environmentObject(orderManager)
     }

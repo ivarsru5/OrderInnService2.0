@@ -5,6 +5,7 @@
 //  Created by Ivars Ruģelis on 27/05/2021.
 //
 
+import Combine
 import SwiftUI
 
 struct KitchenTabView: View {
@@ -16,33 +17,34 @@ struct KitchenTabView: View {
     init(restaurant: Restaurant) {
         self.restaurant = restaurant
         self._menuManager = StateObject(wrappedValue: MenuManager(for: restaurant))
-        self._orderManager = StateObject(wrappedValue: OrderManager(for: restaurant))
+        self._orderManager = StateObject(wrappedValue: OrderManager(for: restaurant, scope: .all))
     }
 
-
     var body: some View {
-        TabView {
-            NavigationView {
-                KitchenOrderListView()
-            }
-            .navigationViewStyle(StackNavigationViewStyle())
-            .tabItem {
-                Image(systemName: "tray")
-                Text("Orders")
-            }
-            
-            NavigationView {
-                ItemAvailabilityView()
-            }
-            .navigationViewStyle(StackNavigationViewStyle())
-            .tabItem {
-                Image(systemName: "tray")
-                Text("Availability")
-            }
+        RestaurantLayoutLoader(restaurant: restaurant) {
+            TabView {
+                NavigationView {
+                    KitchenOrderListView()
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+                .tabItem {
+                    Image(systemName: "tray")
+                    Text("Orders")
+                }
 
-            #if DEBUG
-            DebugMenu.navigationViewWithTabItem
-            #endif
+                NavigationView {
+                    ItemAvailabilityView()
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+                .tabItem {
+                    Image(systemName: "tray")
+                    Text("Availability")
+                }
+
+                #if DEBUG
+                DebugMenu.navigationViewWithTabItem
+                #endif
+            }
         }
         .environment(\.currentRestaurant, restaurant)
         .environmentObject(menuManager)

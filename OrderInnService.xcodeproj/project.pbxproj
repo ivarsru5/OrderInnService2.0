@@ -79,6 +79,7 @@
 		69766FF426B9A56800DBD18C /* HalfModalView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AB626284ED500574D4F /* HalfModalView.swift */; };
 		69766FF526B9A57400DBD18C /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4B2698966E0044D34F /* AuthManager.swift */; };
 		69766FF726B9A78800DBD18C /* LoginQRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4D2698995E0044D34F /* LoginQRCode.swift */; };
+		69766FFA26BC140200DBD18C /* OrderListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69766FF926BC140100DBD18C /* OrderListCell.swift */; };
 		8D81E1853CD596EA1AD61F7F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B64BE591241ED14AE64DDE46 /* Pods_OrderInnServiceTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC7AE4945C1CF960FDF68DCB /* Pods_OrderInnServiceTests.framework */; };
 		FD19E44F74DCADA16DCE6ADF /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */; };
@@ -151,6 +152,7 @@
 		69766FCC26B993E900DBD18C /* OrderManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderManager.swift; sourceTree = "<group>"; };
 		69766FCE26B999BC00DBD18C /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		69766FD726B99C3B00DBD18C /* OrderInnServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrderInnServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		69766FF926BC140100DBD18C /* OrderListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderListCell.swift; sourceTree = "<group>"; };
 		79E3E77C8AD17E641637F661 /* Pods-OrderInnServiceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.release.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.release.xcconfig"; sourceTree = "<group>"; };
 		991BDBB5F4F5DB2C244FC62A /* Pods-OrderInnServiceTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -230,6 +232,7 @@
 				695C3DD8269DE8980084E449 /* RestaurantLayout.swift */,
 				695C3DDA269DE8D90084E449 /* RestaurantMenu.swift */,
 				5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */,
+				69766FCC26B993E900DBD18C /* OrderManager.swift */,
 			);
 			path = Models;
 			sourceTree = "<group>";
@@ -242,6 +245,7 @@
 				58F07AB2262830D400574D4F /* BlurEffect.swift */,
 				5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */,
 				691056B826B3132200E1DE6F /* O6NButtonStyle.swift */,
+				69766FF926BC140100DBD18C /* OrderListCell.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -273,7 +277,6 @@
 		581340C2264520D6003E9BC6 /* Kitchen */ = {
 			isa = PBXGroup;
 			children = (
-				69766FCC26B993E900DBD18C /* OrderManager.swift */,
 				58F91D70265FB87B0059E71A /* KitchenTabView.swift */,
 				580FEE3C26412C07006ED835 /* KitchenOrderListView.swift */,
 				581340C826452152003E9BC6 /* KitchenOrderDetailView.swift */,
@@ -318,12 +321,12 @@
 				5811F945262DE53000050F2C /* LaunchScreen.swift */,
 				580506F32629670B007CF39B /* Models */,
 				69142D42269740A50044D34F /* Debug */,
+				580509162629AAEA007CF39B /* Common */,
 				5838DB2D262820A2001698D7 /* Login */,
 				5815FA3526A0072B0079D90B /* Admin */,
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
 				580FEE3B26412BF3006ED835 /* OrderPreparation */,
 				58F07AAE26282FC300574D4F /* Extensions */,
-				580509162629AAEA007CF39B /* Common */,
 				582066DB2628129400D3BCCA /* Assets.xcassets */,
 				582066E02628129400D3BCCA /* Info.plist */,
 				582066E82628166900D3BCCA /* GoogleService-Info.plist */,
@@ -612,6 +615,7 @@
 				5801CC4426A59F2C00DD3DEC /* PreperedOrderInfo.swift in Sources */,
 				581340C926452152003E9BC6 /* KitchenOrderDetailView.swift in Sources */,
 				583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */,
+				69766FFA26BC140200DBD18C /* OrderListCell.swift in Sources */,
 				5801CC3426A5557E00DD3DEC /* RemoveMember.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */,
 				695C3DD9269DE8980084E449 /* RestaurantLayout.swift in Sources */,

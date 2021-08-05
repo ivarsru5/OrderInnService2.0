@@ -15,12 +15,40 @@ class OrderManager: ObservableObject {
 
     private var orderListenerSub: AnyCancellable?
 
-    init(for restaurant: Restaurant) {
+    enum SubscriptionScope {
+        /// Listen for orders only where the `placedBy` attribute equals that of this employee.
+        case onlyPlacedBy(employee: Restaurant.Employee)
+
+        /// Listen for all orders within the given restaurant.
+        case all
+
+        init(defaultFor employee: Restaurant.Employee) {
+            if employee.manager {
+                self = .all
+            } else {
+                self = .onlyPlacedBy(employee: employee)
+            }
+        }
+
+        func makeQuery(restaurant: Restaurant) -> TypedQuery<RestaurantOrder> {
+            var query = restaurant.firestoreReference
+                .collection(of: RestaurantOrder.self)
+                .query
+
+            if case let .onlyPlacedBy(employee) = self {
+                query = query.whereField("placedBy", isEqualTo: employee.firestoreReference.untyped)
+            }
+
+            query = query.order(by: "createdAt", descending: true)
+
+            return query
+        }
+    }
+
+    init(for restaurant: Restaurant, scope: SubscriptionScope) {
         self.restaurant = restaurant
 
-        orderListenerSub = restaurant.firestoreReference
-            .collection(of: RestaurantOrder.self)
-            .query
+        orderListenerSub = scope.makeQuery(restaurant: restaurant)
             .listen()
             .mapError { error in
                 // TODO[pn 2021-08-03] Similarly to MenuManager, there's no good

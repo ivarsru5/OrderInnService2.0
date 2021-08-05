@@ -76,30 +76,32 @@ struct KitchenOrderDetailView: View {
             }
             .listStyle(InsetGroupedListStyle())
 
-            Button(action: {
-                // TODO[pn 2021-08-05]: This isn't fully correct, given that
-                // closing orders is done by the manager, not the kitchen. This
-                // should instead ask which part to mark as fulfilled and do
-                // that instead. As is, this is intended for demonstration
-                // purposes only.
-                markOrderCompleteCancellable = orderManager.update(order: order, setState: .fulfilled)
-                    .mapError { error in
-                        // TODO[pn 2021-08-05]
-                        fatalError("FIXME Failed to mark order as completed: \(String(describing: error))")
-                    }
-                    .sink { _ in
-                        if let _ = markOrderCompleteCancellable {
-                            markOrderCompleteCancellable = nil
+            if order.state.isOpen {
+                Button(action: {
+                    // TODO[pn 2021-08-05]: This isn't fully correct, given that
+                    // closing orders is done by the manager, not the kitchen. This
+                    // should instead ask which part to mark as fulfilled and do
+                    // that instead. As is, this is intended for demonstration
+                    // purposes only.
+                    markOrderCompleteCancellable = orderManager.update(order: order, setState: .fulfilled)
+                        .mapError { error in
+                            // TODO[pn 2021-08-05]
+                            fatalError("FIXME Failed to mark order as completed: \(String(describing: error))")
                         }
-                        if presentationMode.isPresented {
-                            presentationMode.dismiss()
+                        .sink { _ in
+                            if let _ = markOrderCompleteCancellable {
+                                markOrderCompleteCancellable = nil
+                            }
+                            if presentationMode.isPresented {
+                                presentationMode.dismiss()
+                            }
                         }
-                    }
 
-            }, label: {
-                Text("Mark Order as Completed")
-            })
-            .buttonStyle(O6NButtonStyle(isLoading: markOrderCompleteCancellable != nil))
+                }, label: {
+                    Text("Mark Order as Completed")
+                })
+                .buttonStyle(O6NButtonStyle(isLoading: markOrderCompleteCancellable != nil))
+            }
         }
         .navigationBarTitle(Text("Review Order"), displayMode: .inline)
         .onAppear {
