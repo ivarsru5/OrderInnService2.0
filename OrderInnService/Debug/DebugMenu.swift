@@ -16,11 +16,6 @@ struct DebugMenu: View {
     @State var promptToResetUserDefaults = false
 
     func switchActiveUserToWaiter() {
-        switch authManager.authState {
-        case .authenticatedWaiter(restaurantID: _, employeeID: _): return
-        default: break
-        }
-
         let qr = LoginQRCode.waiter(restaurantID: authManager.restaurant.id)
         var sub: AnyCancellable?
         sub = authManager.logIn(using: qr).sink(receiveCompletion: {
@@ -142,15 +137,30 @@ struct DebugMenu: View {
             }
     }
 
+    var isCurrentlyKitchen: Bool {
+        switch authManager.authState {
+        case .authenticatedKitchen(_, _): return true
+        default: return false
+        }
+    }
+    var isCurrentlyAdmin: Bool {
+        switch authManager.authState {
+        case .authenticatedAdmin(_, _): return true
+        default: return false
+        }
+    }
+
     var body: some View {
         List {
             Section(header: Text("Active User")) {
-                Button("Switch to Waiter",
+                Button(authManager.waiter == nil ? "Switch to Waiter" : "Switch to Different Waiter",
                        action: self.switchActiveUserToWaiter)
                 Button("Switch to Kitchen",
                        action: self.switchActiveUserToKitchen)
+                    .disabled(isCurrentlyKitchen)
                 Button("Switch to Admin",
                        action: self.switchActiveUserToAdmin)
+                    .disabled(isCurrentlyAdmin)
             }
             Section(header: Text("App Data")) {
                 Button("Dump User Defaults to Console",
