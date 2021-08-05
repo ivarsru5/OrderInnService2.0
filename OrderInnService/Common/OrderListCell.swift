@@ -8,15 +8,8 @@
 import SwiftUI
 
 struct OrderListCell: View {
+    @Environment(\.currentLayout) @Binding var layout: Layout
     let order: RestaurantOrder
-    let zone: Zone
-    let table: Table
-
-    init(order: RestaurantOrder, zone: Zone, table: Table) {
-        self.order = order
-        self.zone = zone
-        self.table = table
-    }
 
     typealias IconConfiguration = (name: String, size: CGFloat, weight: Font.Weight, color: Color)
     var iconConfiguration: IconConfiguration {
@@ -39,6 +32,9 @@ struct OrderListCell: View {
     }
 
     var body: some View {
+        let table = layout.tables[order.tableFullID]!
+        let zone = layout.zones[table.zoneID]!
+
         HStack {
             statusIcon
 
@@ -57,6 +53,7 @@ struct OrderListCell_Previews: PreviewProvider {
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let zone = Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id)
     static let table = Table(id: "T", name: "Test Table", restaurantID: restaurant.id, zoneID: zone.id)
+    static let layout = Layout(zones: [ zone.id: zone ], tables: [ table.fullID: table ])
     static let orders = [
         RestaurantOrder(restaurantID: restaurant.id, id: "O1", state: .new,
                         table: table.fullID, placedBy: "E", createdAt: Date(), parts: []),
@@ -71,9 +68,10 @@ struct OrderListCell_Previews: PreviewProvider {
     static var previews: some View {
         List {
             ForEach(orders) { order in
-                OrderListCell(order: order, zone: zone, table: table)
+                OrderListCell(order: order)
             }
         }
+        .environment(\.currentLayout, .constant(layout))
     }
 }
 #endif

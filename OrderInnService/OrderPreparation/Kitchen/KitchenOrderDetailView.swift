@@ -53,15 +53,17 @@ struct KitchenOrderDetailView: View {
     }
 
     @EnvironmentObject var orderManager: OrderManager
-    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
+    @Environment(\.currentLayout) @Binding var layout: Layout
     let order: RestaurantOrder
-    let zone: Zone
-    let table: Table
     @State var markOrderCompleteCancellable: AnyCancellable?
+    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
 
     var body: some View {
         VStack {
             HStack {
+                let table = layout.tables[order.tableFullID]!
+                let zone = layout.zones[table.zoneID]!
+
                 Text("Zone: ").bold() + Text(zone.location)
                 Spacer()
                 Text("Table: ").bold() + Text(table.name)
@@ -153,6 +155,7 @@ struct KitchenOrderDetailView_Previews: PreviewProvider {
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let zone = Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id)
     static let table = Table(id: "T", name: "Test Table", restaurantID: restaurant.id, zoneID: "Z")
+    static let layout = Layout(zones: [ zone.id: zone ], tables: [ table.fullID: table ])
     static let order = Order(
         restaurantID: restaurant.id, id: "O", state: .open, table: table.fullID,
         placedBy: "E", createdAt: Date(),
@@ -185,26 +188,12 @@ struct KitchenOrderDetailView_Previews: PreviewProvider {
     static let menuManager = MenuManager(debugForRestaurant: restaurant, withMenu: menu, categories: categories)
     static let orderManager = OrderManagerMock(debugForRestaurant: restaurant, withOrders: [order])
 
-    struct Wrapper: View {
-        @ObservedObject var orderManager: OrderManager
-        let restaurant: Restaurant
-        let zone: Zone
-        let table: Table
-        let menuManager: MenuManager
-
-        var body: some View {
-            KitchenOrderDetailView(order: orderManager.orders.first!,
-                                   zone: zone, table: table)
-                .environment(\.currentRestaurant, restaurant)
-                .environmentObject(menuManager)
-                .environmentObject(orderManager)
-        }
-    }
-
     static var previews: some View {
-        Wrapper(orderManager: orderManager as OrderManager,
-                restaurant: restaurant, zone: zone, table: table,
-                menuManager: menuManager)
+        KitchenOrderDetailView(order: orderManager.orders.first!)
+            .environment(\.currentRestaurant, restaurant)
+            .environment(\.currentLayout, .constant(layout))
+            .environmentObject(menuManager)
+            .environmentObject(orderManager)
     }
 }
 #endif
