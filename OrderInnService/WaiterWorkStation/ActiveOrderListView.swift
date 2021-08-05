@@ -25,10 +25,8 @@ struct ActiveOrderListView: View {
             } else {
                 List {
                     ForEach(orderManager.orders) { order in
-                        let table = layout.tables[order.tableFullID]!
-                        let zone = layout.zones[table.zoneID]!
-                        NavigationLink(destination: ActiveOrderDetailView(order: order, zone: zone, table: table)) {
-                            OrderListCell(order: order, zone: zone, table: table)
+                        NavigationLink(destination: ActiveOrderDetailView.Wrapper(order: order)) {
+                            OrderListCell(order: order)
                         }
                     }
                 }

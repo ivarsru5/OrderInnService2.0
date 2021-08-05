@@ -32,23 +32,28 @@ struct MenuView: View {
             }
         }
 
+        func setAmount(_ amount: Int, forItemWithID itemID: MenuItem.FullID) {
+            let maybeIndex = entries.firstIndex(where: { $0.itemID == itemID })
+            guard amount > 0 else {
+                if let index = maybeIndex {
+                    entries.remove(at: index)
+                }
+                return
+            }
+
+            if let index = maybeIndex {
+                entries[index] = entries[index].with(amount: amount)
+            } else {
+                let entry = RestaurantOrder.OrderEntry(itemID: itemID, amount: amount)
+                entries.append(entry)
+            }
+        }
+
         func amountBinding(for itemID: MenuItem.FullID) -> Binding<Int> {
             return Binding(get: { [unowned self] in
                 return amount(ofItemWithID: itemID)
             }, set: { [unowned self] value in
-                guard value > 0 else {
-                    if let index = entries.firstIndex(where: { $0.itemID == itemID }) {
-                        entries.remove(at: index)
-                    }
-                    return
-                }
-
-                if let index = entries.firstIndex(where: { $0.itemID == itemID }) {
-                    entries[index] = entries[index].with(amount: value)
-                } else {
-                    let entry = RestaurantOrder.OrderEntry(itemID: itemID, amount: value)
-                    entries.append(entry)
-                }
+                setAmount(value, forItemWithID: itemID)
             })
         }
 

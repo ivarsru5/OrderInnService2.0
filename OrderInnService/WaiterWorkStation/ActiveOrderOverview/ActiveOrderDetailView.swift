@@ -49,11 +49,31 @@ struct ActiveOrderDetailView: View {
     }
 
     let order: RestaurantOrder
+    @Environment(\.currentLayout) @Binding var layout: Layout
+    @EnvironmentObject var menuManager: MenuManager
+    @State var nextExtraPartActive = false
+    @StateObject var nextExtraPart: MenuView.PendingOrderPart
+    @State var showPickerOverlay = false
     let zone: Zone
     let table: Table
-    @EnvironmentObject var menuManager: MenuManager
-    @State var extraPart: MenuView.PendingOrderPart? = nil
-    @State var showPickerOverlay = false
+
+    private init(order: RestaurantOrder, menuManager: MenuManager, layout: Layout) {
+        self.order = order
+        let table = layout.tables[order.tableFullID]!
+        self.table = table
+        self.zone = layout.zones[table.zoneID]!
+        self._nextExtraPart = StateObject(wrappedValue: MenuView.PendingOrderPart(menuManager: menuManager))
+    }
+
+    struct Wrapper: View {
+        @Environment(\.currentLayout) @Binding var layout: Layout
+        @EnvironmentObject var menuManager: MenuManager
+        let order: RestaurantOrder
+
+        var body: some View {
+            ActiveOrderDetailView(order: order, menuManager: menuManager, layout: layout)
+        }
+    }
 
     var body: some View {
         VStack {
@@ -65,11 +85,11 @@ struct ActiveOrderDetailView: View {
             .padding([.leading, .trailing])
 
             List {
-                if extraPart != nil {
+                if !nextExtraPart.isEmpty {
                     Section(header: Text("Selected Items")) {
-                        ForEach(extraPart!.entries, id: \.itemID) { entry in
+                        ForEach(nextExtraPart.entries, id: \.itemID) { entry in
                             EntryCell(entry: entry, item: menuManager.menu[entry.itemID]!, remove: {
-                                // TODO
+                                nextExtraPart.setAmount(0, forItemWithID: entry.itemID)
                             })
                         }
                     }
@@ -101,37 +121,33 @@ struct ActiveOrderDetailView: View {
             .padding()
 
             HStack {
-                if extraPart != nil {
+                if nextExtraPartActive {
                     Button(action: {
-                        withAnimation(.easeOut(duration: 0.5)){
+                        withAnimation(.easeOut(duration: 0.5)) {
 //                            orderOverview.submitExtraOrder(from: activeOrder.selectedOrder!)
                             // TODO
                         }
                     }, label: {
                         Text("Submit Extra Order")
                     })
-                    .buttonStyle(O6NButtonStyle())
                 }
 
                 Button(action: {
-                    if extraPart == nil {
-                        extraPart = MenuView.PendingOrderPart(menuManager: menuManager)
+                    withAnimation {
+                        nextExtraPartActive = true
                     }
                     showPickerOverlay = true
                 }, label: {
                     Text("Add Items to Order")
                 })
-                .buttonStyle(O6NButtonStyle())
             }
+            .buttonStyle(O6NButtonStyle())
         }
         .navigationTitle("Review Order")
-        .onAppear {
-//            orderOverview.retreveSubmitedItems(from: activeOrder.selectedOrder!)
-        }
         .popover(isPresented: $showPickerOverlay) {
             NavigationView {
                 MenuView(menuManager: menuManager,
-                         context: .appendedOrder(part: extraPart!))
+                         context: .appendedOrder(part: nextExtraPart))
             }
         }
     }
@@ -143,7 +159,8 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
     typealias Entry = RestaurantOrder.OrderEntry
     typealias ID = MenuItem.FullID
 
-    static let items: MenuManager.Menu = [
+    static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
+    static let menuManager = MenuManager(debugForRestaurant: restaurant, withMenu: [
         ID(string: "C/I1")!: MenuItem(
             id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
             destination: .kitchen, restaurantID: "R", categoryID: "C"),
@@ -153,11 +170,19 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
         ID(string: "C/I3")!: MenuItem(
             id: "I3", name: "Item 3", price: 19.99, isAvailable: true,
             destination: .kitchen, restaurantID: "R", categoryID: "C"),
-    ]
+    ], categories: [
+        "C": MenuCategory(id: "C", name: "Test Category", type: .food, restaurantID: restaurant.id),
+    ])
     static let part = Part(entries: [
         Entry(itemID: ID(string: "C/I1")!, amount: 2),
         Entry(itemID: ID(string: "C/I2")!, amount: 3),
         Entry(itemID: ID(string: "C/I3")!, amount: 1),
+    ])
+    static let layout = Layout(zones: [
+        "Z": Zone(id: "Z", location: "Test Zone", restaurantID: "R"),
+    ], tables: [
+        Table.FullID(zone: "Z", table: "T"):
+            Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"),
     ])
     static let order = RestaurantOrder(restaurantID: "R", id: "O", state: .open,
                                        table: Table.FullID(zone: "Z", table: "T"),
@@ -165,10 +190,9 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
 
     static var previews: some View {
         NavigationView {
-            ActiveOrderDetailView(
-                order: order,
-                zone: Zone(id: "Z", location: "Test Zone", restaurantID: "R"),
-                table: Table(id: "T", name: "Test Table", restaurantID: "R", zoneID: "Z"))
+            ActiveOrderDetailView.Wrapper(order: order)
+                .environment(\.currentLayout, .constant(layout))
+                .environmentObject(menuManager)
         }
     }
 }
