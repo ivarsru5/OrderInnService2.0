@@ -14,11 +14,33 @@ struct KitchenOrderListView: View {
         let table: Table
         let order: RestaurantOrder
 
+        static let maxStatusIconWidth: CGFloat = 14
+        @ViewBuilder var statusIcon: some View {
+            switch order.state {
+            case .new, .open:
+                Image(systemName: "circle.fill")
+                    .bodyFont(size: 10)
+
+            case .fulfilled:
+                Image(systemName: "checkmark")
+                    .bodyFont(size: 14, weight: .bold)
+
+            case .cancelled:
+                Image(systemName: "xmark")
+                    .bodyFont(size: 14, weight: .bold)
+            }
+        }
         var statusIconColor: Color {
             switch order.state {
             case .new: return Color.blue
             case .open: return Color.label
-            case .closed: return Color.secondary
+            case .fulfilled, .cancelled: return Color.secondary
+            }
+        }
+        var isOrderActive: Bool {
+            switch order.state {
+            case .new, .open: return true
+            case .fulfilled, .cancelled: return false
             }
         }
 
@@ -26,14 +48,17 @@ struct KitchenOrderListView: View {
             let destination = KitchenOrderDetailView(order: order, zone: zone, table: table)
             NavigationLink(destination: destination) {
                 HStack {
-                    Image(systemName: "circle.fill")
-                        .symbolSize(10)
+                    statusIcon
                         .foregroundColor(statusIconColor)
-                    Text("Zone: ").bold() + Text(zone.location)
-                    Spacer()
-                    Text("Table: ").bold() + Text(table.name)
+                        .frame(width: Cell.maxStatusIconWidth, alignment: .center)
+
+                    Group {
+                        Text("Zone: ").bold() + Text(zone.location)
+                        Spacer()
+                        Text("Table: ").bold() + Text(table.name)
+                    }
+                    .foregroundColor(isOrderActive ? .label : .secondary)
                 }
-                .foregroundColor(.label)
             }
         }
     }
@@ -111,7 +136,10 @@ struct KitchenOrderListView_Previews: PreviewProvider {
         RestaurantOrder(restaurantID: restaurant.id, id: "O2", state: .open,
                         table: Table.FullID(zone: "Z", table: "T"), placedBy: "E",
                         createdAt: Date(), parts: []),
-        RestaurantOrder(restaurantID: restaurant.id, id: "O3", state: .closed,
+        RestaurantOrder(restaurantID: restaurant.id, id: "O3", state: .fulfilled,
+                        table: Table.FullID(zone: "Z", table: "T"), placedBy: "E",
+                        createdAt: Date(), parts: []),
+        RestaurantOrder(restaurantID: restaurant.id, id: "O4", state: .cancelled,
                         table: Table.FullID(zone: "Z", table: "T"), placedBy: "E",
                         createdAt: Date(), parts: []),
     ])

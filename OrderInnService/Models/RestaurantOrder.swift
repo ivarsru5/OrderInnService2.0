@@ -22,13 +22,17 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         case `open` = "open"
 
         /// Order has been fully fulfilled.
-        case closed = "closed"
+        case fulfilled = "fulfilled"
+
+        /// Order has been cancelled.
+        case cancelled = "cancelled"
 
         init(from string: String) throws {
             switch string {
             case OrderState.new.rawValue: self = .new
             case OrderState.open.rawValue: self = .open
-            case OrderState.closed.rawValue: self = .closed
+            case OrderState.fulfilled.rawValue: self = .fulfilled
+            case OrderState.cancelled.rawValue: self = .cancelled
             default: throw ModelError.invalidEnumStringEncoding
             }
         }
@@ -46,17 +50,20 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
         static func < (_ lhs: OrderState, _ rhs: OrderState) -> Bool {
             /*
-               < ?  | new | open | closed
-             -------+-----+------+--------
-                new |  F  |  T   |   T
-               open |  F  |  F   |   T
-             closed |  F  |  F   |   F
+                 < ?   | new | open | fulfilled | cancelled
+             ----------+-----+------+-----------+-----------
+                   new |  F  |  T   |     T     |     T
+                  open |  F  |  F   |     T     |     T
+             fulfilled |  F  |  F   |     F     |     T
+             cancelled |  F  |  F   |     F     |     F
+
              (rows are lhs, columns are rhs.)
              */
             switch lhs {
             case .new: return rhs != .new
-            case .open: return rhs == .closed
-            case .closed: return false
+            case .open: return rhs == .fulfilled || rhs == .cancelled
+            case .fulfilled: return rhs == .cancelled
+            case .cancelled: return false
             }
         }
     }
