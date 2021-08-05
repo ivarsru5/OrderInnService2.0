@@ -102,7 +102,7 @@ struct RemoveMember: View {
                     }, icon: {
                         Image(systemName: "person.circle.fill")
                             .foregroundColor(.label)
-                            .symbolSize(24)
+                            .bodyFont(size: 24)
                             .padding(6)
                             .opacity(isBeingRemoved ? 0.0 : 1.0)
                             .overlay(userListingIconOverlay(isBeingRemoved))

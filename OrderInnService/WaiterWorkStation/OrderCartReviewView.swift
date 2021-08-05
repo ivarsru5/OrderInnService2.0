@@ -22,7 +22,7 @@ struct OrderCartReviewView: View {
         var body: some View {
             HStack {
                 Image(systemName: "circle.fill")
-                    .symbolSize(10)
+                    .bodyFont(size: 10)
 
                 Text(item.name)
                     .bold()
@@ -39,7 +39,7 @@ struct OrderCartReviewView: View {
                     }
                 }, label: {
                     Image(systemName: "xmark.circle")
-                        .symbolSize(20)
+                        .bodyFont(size: 20)
                         .foregroundColor(.blue)
                 })
                 .buttonStyle(PlainButtonStyle())

@@ -70,7 +70,7 @@ struct MenuView: View {
                     }
                 }, label: {
                     Image(systemName: "minus.circle.fill")
-                        .symbolSize(30)
+                        .bodyFont(size: 30)
                         .foregroundColor(Color.label)
                 })
                 .buttonStyle(PlainButtonStyle())
@@ -83,7 +83,7 @@ struct MenuView: View {
                     amount += 1
                 }, label: {
                     Image(systemName: "plus.circle.fill")
-                        .symbolSize(30)
+                        .bodyFont(size: 30)
                         .foregroundColor(Color.label)
                 })
                 .buttonStyle(PlainButtonStyle())
@@ -98,7 +98,7 @@ struct MenuView: View {
         var body: some View {
             HStack {
                 Image(systemName: "circle.fill")
-                    .symbolSize(10)
+                    .bodyFont(size: 10)
 
                 Text(item.name)
                     .bold()
@@ -136,7 +136,7 @@ struct MenuView: View {
 
                         Image(systemName: "arrowtriangle.right.fill")
                             .foregroundColor(Color.label)
-                            .symbolSize(20)
+                            .bodyFont(size: 20)
                             .rotationEffect(Angle(degrees: isExpanded ? 90 : 0))
                             .animation(.linear(duration: 0.1), value: isExpanded)
                     }

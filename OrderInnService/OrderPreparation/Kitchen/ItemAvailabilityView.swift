@@ -65,7 +65,7 @@ struct ItemAvailabilityView: View {
                 HStack {
                     Group {
                         Image(systemName: "circle.fill")
-                            .symbolSize(10)
+                            .bodyFont(size: 10)
 
                         Text(item.name)
                             .bold()
@@ -105,7 +105,7 @@ struct ItemAvailabilityView: View {
 
                     Image(systemName: "arrowtriangle.right.fill")
                         .foregroundColor(.label)
-                        .symbolSize(20)
+                        .bodyFont(size: 20)
                         .rotationEffect(Angle(degrees: isExpanded ? 90 : 0))
                         .animation(.linear(duration: 0.1), value: isExpanded)
                 }
