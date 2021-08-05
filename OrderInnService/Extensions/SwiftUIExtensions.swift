@@ -68,21 +68,45 @@ extension IfLet where NilContent == EmptyView {
     }
 }
 
-struct SymbolSize: ViewModifier {
-    let size: CGFloat
+struct BodyFont: ViewModifier {
+    let size: CGFloat?
+    let weight: Font.Weight?
 
-    init(_ size: CGFloat) {
+    init(size: CGFloat? = nil, weight: Font.Weight? = nil) {
         self.size = size
+        self.weight = weight
+    }
+
+    var font: Font {
+        if let size = self.size, let weight = self.weight {
+            return Font.system(size: size, weight: weight)
+        } else if let size = self.size, self.weight == nil {
+            return Font.system(size: size)
+        } else if let weight = self.weight, self.size == nil {
+            return Font.body.weight(weight)
+        } else {
+            return Font.body
+        }
     }
 
     func body(content: Content) -> some View {
-        return content
-            .font(Font.custom("SF Symbols", size: size))
+        return content.font(self.font)
     }
 }
 
 extension View {
+    func bodyFont(size: CGFloat) -> some View {
+        modifier(BodyFont(size: size))
+    }
+    func bodyFont(weight: Font.Weight) -> some View {
+        modifier(BodyFont(weight: weight))
+    }
+    func bodyFont(size: CGFloat, weight: Font.Weight) -> some View {
+        modifier(BodyFont(size: size, weight: weight))
+    }
+
+    @available(*, deprecated, message: "Use bodyFont(size:) instead")
     func symbolSize(_ size: CGFloat) -> some View {
-        return self.modifier(SymbolSize(size))
+        bodyFont(size: size)
     }
 }
