@@ -12,6 +12,7 @@ class OrderManager: ObservableObject {
     let restaurant: Restaurant
     @Published var hasData = false
     @Published var orders: [RestaurantOrder] = []
+    private var updatingOrders = Set<RestaurantOrder.ID>()
 
     private var orderListenerSub: AnyCancellable?
 
@@ -60,7 +61,7 @@ class OrderManager: ObservableObject {
                 if !self.hasData {
                     self.hasData = true
                 }
-                self.orders = orders.sorted(by: OrderManager.orderComparator)
+                self.replaceOrders(with: orders)
             }
     }
 
@@ -80,7 +81,29 @@ class OrderManager: ObservableObject {
     }
     #endif
 
+    private func replaceOrders(with newOrders: [RestaurantOrder]) {
+        var orders = newOrders.sorted(by: OrderManager.orderComparator)
+
+        // Preserve any orders that are in process of being updated. The
+        // snapshot listener will be fired locally before the changes are synced
+        // with the server, so given that we initiated the update, allow it to
+        // settle, and until then, keep the old version in memory.
+        var deletedOrders = Set<RestaurantOrder.ID>()
+        updatingOrders.forEach { id in
+            if let newIndex = orders.firstIndex(where: { $0.id == id }) {
+                let oldIndex = self.orders.firstIndex(where: { $0.id == id })!
+                orders[newIndex] = self.orders[oldIndex]
+            } else {
+                deletedOrders.insert(id)
+            }
+        }
+        updatingOrders.formSymmetricDifference(deletedOrders)
+
+        self.orders = orders
+    }
+
     func update(order: RestaurantOrder, setState state: RestaurantOrder.OrderState) -> AnyPublisher<RestaurantOrder, Error> {
+        updatingOrders.insert(order.id)
         return order.updateState(state)
             .map { [unowned self] order in
                 if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
@@ -89,12 +112,14 @@ class OrderManager: ObservableObject {
                     self.orders.append(order)
                 }
                 self.orders.sort(by: OrderManager.orderComparator)
+                self.updatingOrders.remove(order.id)
                 return order
             }
             .eraseToAnyPublisher()
     }
 
     func addPart(_ part: RestaurantOrder.OrderPart, to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
+        updatingOrders.insert(order.id)
         return order.addPart(part)
             .map { [unowned self] order in
                 if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
@@ -103,6 +128,7 @@ class OrderManager: ObservableObject {
                     self.orders.append(order)
                 }
                 self.orders.sort(by: OrderManager.orderComparator)
+                self.updatingOrders.remove(order.id)
                 return order
             }
             .eraseToAnyPublisher()
