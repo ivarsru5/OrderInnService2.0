@@ -111,7 +111,9 @@ struct ActiveOrderDetailView: View {
                     Section(header: Text("Selected Items")) {
                         ForEach(nextExtraPart.entries, id: \.itemID) { entry in
                             EntryCell(entry: entry, item: menuManager.menu[entry.itemID]!, remove: {
-                                nextExtraPart.setAmount(0, forItemWithID: entry.itemID)
+                                withAnimation {
+                                    nextExtraPart.setAmount(0, forItemWithID: entry.itemID)
+                                }
                             })
                         }
                         .animation(.default)
@@ -128,7 +130,7 @@ struct ActiveOrderDetailView: View {
                         }
                     }
                 }
-                .animation(.default)
+                .animation(.default, value: order.parts.count)
             }
             .listStyle(InsetGroupedListStyle())
 
@@ -170,6 +172,7 @@ struct ActiveOrderDetailView: View {
                         Text("Submit Extra Part")
                     })
                     .buttonStyle(O6NButtonStyle(isLoading: submittingExtraPartCancellable != nil))
+//                    .animation(.default, value: nextExtraPartActive && !nextExtraPart.isEmpty)
                 }
             }
         }
