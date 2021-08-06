@@ -10,9 +10,9 @@ import FirebaseFirestore
 import Combine
 
 extension FirebaseFirestore.DocumentReference {
-    func getDocumentFuture() -> Future<DocumentSnapshot, Error> {
+    func getDocumentFuture(source: FirestoreSource = .default) -> Future<DocumentSnapshot, Error> {
         return Future() { [self] resolve in
-            getDocument { maybeSnapshot, error in
+            getDocument(source: source) { maybeSnapshot, error in
                 guard let snapshot = maybeSnapshot else {
                     resolve(.failure(error!))
                     return
@@ -49,9 +49,9 @@ extension FirebaseFirestore.DocumentReference {
 }
 
 extension FirebaseFirestore.Query {
-    func getDocumentsFuture() -> Future<QuerySnapshot, Error> {
+    func getDocumentsFuture(source: FirestoreSource = .default) -> Future<QuerySnapshot, Error> {
         return Future() { [self] resolve in
-            getDocuments { maybeSnapshot, error in
+            getDocuments(source: source) { maybeSnapshot, error in
                 guard let snapshot = maybeSnapshot else {
                     resolve(.failure(error!))
                     return
@@ -114,8 +114,8 @@ struct TypedDocumentReference<Document> where Document : FirestoreInitiable {
         #endif
     }
 
-    func get() -> AnyPublisher<Document, Error> {
-        return untyped.getDocumentFuture()
+    func get(forceReload: Bool = false) -> AnyPublisher<Document, Error> {
+        return untyped.getDocumentFuture(source: forceReload ? .server : .default)
             .map { snapshot in Document.init(from: snapshot) }
             .eraseToAnyPublisher()
     }
