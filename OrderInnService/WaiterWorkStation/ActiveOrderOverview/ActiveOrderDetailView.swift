@@ -5,6 +5,7 @@
 //  Created by Ivars Ruģelis on 27/04/2021.
 //
 
+import Combine
 import SwiftUI
 
 struct ActiveOrderDetailView: View {
@@ -33,15 +34,9 @@ struct ActiveOrderDetailView: View {
                 Text("EUR \(entry.subtotal(with: item), specifier: "%.2f")")
                     .foregroundColor(.label)
 
-                if remove != nil {
-                    Button(action: {
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            remove!()
-                        }
-                    }, label: {
+                IfLet(remove) { remove in
+                    Button(action: remove, label: {
                         Image(systemName: "xmark.circle")
-//                            .symbolSize(20)
-//                            .foregroundColor(.blue)
                     })
                 }
             }
@@ -51,9 +46,11 @@ struct ActiveOrderDetailView: View {
     let order: RestaurantOrder
     @Environment(\.currentLayout) @Binding var layout: Layout
     @EnvironmentObject var menuManager: MenuManager
+    @EnvironmentObject var orderManager: OrderManager
     @State var nextExtraPartActive = false
     @StateObject var nextExtraPart: MenuView.PendingOrderPart
     @State var showPickerOverlay = false
+    @State var submittingExtraPartCancellable: AnyCancellable?
     let zone: Zone
     let table: Table
 
@@ -75,6 +72,31 @@ struct ActiveOrderDetailView: View {
         }
     }
 
+    func submitExtraPart() {
+        let part = nextExtraPart.asOrderPart()
+        nextExtraPart.clear()
+        nextExtraPartActive = false
+        submittingExtraPartCancellable = orderManager.addPart(part, to: order)
+            .mapError { error in
+                // TODO[pn 2021-08-06]
+                fatalError("FIXME Failed to add new order part: \(String(describing: error))")
+            }
+            .ignoreOutput()
+            .sink(receiveCompletion: { _ in
+                if let _ = submittingExtraPartCancellable {
+                    submittingExtraPartCancellable = nil
+                }
+            })
+    }
+
+    @ViewBuilder var submittingExtraPartOverlay: some View {
+        if submittingExtraPartCancellable != nil {
+            Spinner()
+        } else {
+            EmptyView()
+        }
+    }
+
     var body: some View {
         VStack {
             HStack {
@@ -92,6 +114,7 @@ struct ActiveOrderDetailView: View {
                                 nextExtraPart.setAmount(0, forItemWithID: entry.itemID)
                             })
                         }
+                        .animation(.default)
                     }
                 }
 
@@ -105,6 +128,7 @@ struct ActiveOrderDetailView: View {
                         }
                     }
                 }
+                .animation(.default)
             }
             .listStyle(InsetGroupedListStyle())
 
@@ -121,17 +145,6 @@ struct ActiveOrderDetailView: View {
             .padding()
 
             HStack {
-                if nextExtraPartActive {
-                    Button(action: {
-                        withAnimation(.easeOut(duration: 0.5)) {
-//                            orderOverview.submitExtraOrder(from: activeOrder.selectedOrder!)
-                            // TODO
-                        }
-                    }, label: {
-                        Text("Submit Extra Order")
-                    })
-                }
-
                 Button(action: {
                     withAnimation {
                         nextExtraPartActive = true
@@ -140,9 +153,19 @@ struct ActiveOrderDetailView: View {
                 }, label: {
                     Text("Add Items to Order")
                 })
+
+                if nextExtraPartActive {
+                    Button(action: submitExtraPart, label: {
+                        Text("Submit Extra Part")
+                    })
+                }
             }
             .buttonStyle(O6NButtonStyle())
         }
+        .disabled(submittingExtraPartCancellable != nil)
+        .overlay(submittingExtraPartOverlay)
+        .opacity(submittingExtraPartCancellable == nil ? 1.0 : 0.7)
+        .animation(.default, value: submittingExtraPartCancellable != nil)
         .navigationTitle("Review Order")
         .popover(isPresented: $showPickerOverlay) {
             NavigationView {

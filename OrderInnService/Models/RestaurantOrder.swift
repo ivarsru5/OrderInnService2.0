@@ -144,19 +144,6 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     let createdAt: Date
     let parts: [OrderPart]
 
-    var isOpened: Bool { true } // [pn] ?
-    var isSeen: Bool {
-        switch state {
-        case .new: return false
-        default: return true
-        }
-    }
-    var isReady: Bool {
-        // TODO[pn 2021-07-13]: This is not meaningful if the order can be
-        // fulfilled partially.
-        return false
-    }
-
     func total(using menu: MenuManager.Menu) -> Currency {
         return parts.map { part in part.subtotal(using: menu) }.sum()
     }
@@ -260,6 +247,21 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     func updateState(_ newState: OrderState) -> AnyPublisher<RestaurantOrder, Error> {
         return firestoreReference
             .updateData(["state": newState.rawValue])
+            .flatMap { ref in ref.get() }
+            .eraseToAnyPublisher()
+    }
+
+    func addPart(_ newPart: OrderPart) -> AnyPublisher<RestaurantOrder, Error> {
+        // NOTE[pn]: FieldValue.arrayUnion is explicitly used here so that we
+        // avoid a potential race condition if two parties were to add a new
+        // OrderPart to the same Order without either knowing about the other's
+        // changes.
+        return firestoreReference
+            .updateData([
+                "parts": FieldValue.arrayUnion([
+                    try! JSONEncoder().encode(newPart),
+                ]),
+            ])
             .flatMap { ref in ref.get() }
             .eraseToAnyPublisher()
     }

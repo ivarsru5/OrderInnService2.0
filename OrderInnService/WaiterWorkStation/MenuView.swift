@@ -57,6 +57,10 @@ struct MenuView: View {
             })
         }
 
+        func clear() {
+            entries.removeAll()
+        }
+
         var subtotal: Currency { entries.map { $0.subtotal(using: menuManager!.menu) }.sum() }
 
         func asOrderPart() -> RestaurantOrder.OrderPart {

@@ -93,6 +93,20 @@ class OrderManager: ObservableObject {
             }
             .eraseToAnyPublisher()
     }
+
+    func addPart(_ part: RestaurantOrder.OrderPart, to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
+        return order.addPart(part)
+            .map { [unowned self] order in
+                if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
+                    self.orders[index] = order
+                } else {
+                    self.orders.append(order)
+                }
+                self.orders.sort(by: OrderManager.orderComparator)
+                return order
+            }
+            .eraseToAnyPublisher()
+    }
 }
 
 #if O6N_TEST
