@@ -165,7 +165,7 @@ struct ActiveOrderDetailView: View {
                 })
                 .buttonStyle(O6NButtonStyle())
 
-                if nextExtraPartActive {
+                if nextExtraPartActive && !nextExtraPart.isEmpty {
                     Button(action: submitExtraPart, label: {
                         Text("Submit Extra Part")
                     })
