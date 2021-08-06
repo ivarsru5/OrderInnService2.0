@@ -74,8 +74,6 @@ struct ActiveOrderDetailView: View {
 
     func submitExtraPart() {
         let part = nextExtraPart.asOrderPart()
-        nextExtraPart.clear()
-        nextExtraPartActive = false
         submittingExtraPartCancellable = orderManager.addPart(part, to: order)
             .mapError { error in
                 // TODO[pn 2021-08-06]
@@ -83,6 +81,8 @@ struct ActiveOrderDetailView: View {
             }
             .ignoreOutput()
             .sink(receiveCompletion: { _ in
+                nextExtraPart.clear()
+                nextExtraPartActive = false
                 if let _ = submittingExtraPartCancellable {
                     submittingExtraPartCancellable = nil
                 }
@@ -153,14 +153,15 @@ struct ActiveOrderDetailView: View {
                 }, label: {
                     Text("Add Items to Order")
                 })
+                .buttonStyle(O6NButtonStyle())
 
                 if nextExtraPartActive {
                     Button(action: submitExtraPart, label: {
                         Text("Submit Extra Part")
                     })
+                    .buttonStyle(O6NButtonStyle(isLoading: submittingExtraPartCancellable != nil))
                 }
             }
-            .buttonStyle(O6NButtonStyle())
         }
         .disabled(submittingExtraPartCancellable != nil)
         .overlay(submittingExtraPartOverlay)
