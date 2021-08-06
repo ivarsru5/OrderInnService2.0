@@ -138,9 +138,19 @@ struct ActiveOrderDetailView: View {
 
                 Spacer()
 
-                Text("EUR \(order.total(using: menuManager.menu), specifier: "%.2f")")
-                    .bold()
-                    .foregroundColor(.label)
+                if !nextExtraPart.isEmpty {
+                    let oldTotal = order.total(using: menuManager.menu)
+                    let newTotal = oldTotal + nextExtraPart.subtotal
+                    Group {
+                        Text("EUR \(oldTotal, specifier: "%.2f")")
+                        Image(systemName: "arrow.right")
+                    }
+                    .foregroundColor(.secondaryLabel)
+                    Text("EUR \(newTotal, specifier: "%.2f")").bold()
+                } else {
+                    let total = order.total(using: menuManager.menu)
+                    Text("EUR \(total, specifier: "%.2f")").bold()
+                }
             }
             .padding()
 
