@@ -13,14 +13,18 @@ struct OrderDetailView<Buttons: View>: View {
     @EnvironmentObject var menuManager: MenuManager
 
     let order: RestaurantOrder
+    @ObservedObject var extraPart: MenuView.PendingOrderPart
     let buttons: () -> Buttons
 
     private let zone: Zone
     private let table: Table
 
-    fileprivate init(layout: Layout, order: RestaurantOrder, buttons: @escaping () -> Buttons) {
+    fileprivate init(layout: Layout, menuManager: MenuManager,
+                     order: RestaurantOrder, extraPart: MenuView.PendingOrderPart,
+                     buttons: @escaping () -> Buttons) {
         self.order = order
         self.buttons = buttons
+        self._extraPart = ObservedObject(wrappedValue: extraPart)
 
         let table = layout.tables[order.tableFullID]!
         let zone = layout.zones[table.zoneID]!
@@ -30,41 +34,73 @@ struct OrderDetailView<Buttons: View>: View {
     }
     struct Wrapper: View {
         @Environment(\.currentLayout) @Binding var layout: Layout
+        @EnvironmentObject var menuManager: MenuManager
+
+        @State var dummyPart: MenuView.PendingOrderPart?
         let order: RestaurantOrder
+        let extraPart: MenuView.PendingOrderPart?
         let buttons: () -> Buttons
 
-        init(order: RestaurantOrder) where Buttons == EmptyView {
-            self.order = order
-            self.buttons = { EmptyView() }
+        init(order: RestaurantOrder,
+             extraPart: MenuView.PendingOrderPart? = nil) where Buttons == EmptyView {
+            self.init(order: order, extraPart: extraPart,
+                      buttons: { EmptyView() })
         }
         init(order: RestaurantOrder,
+             extraPart: MenuView.PendingOrderPart? = nil,
              @ViewBuilder buttons: @escaping () -> Buttons) {
             self.order = order
+            self.extraPart = extraPart
             self.buttons = buttons
         }
 
+        var part: MenuView.PendingOrderPart {
+            if extraPart == nil && dummyPart == nil {
+                dummyPart = MenuView.PendingOrderPart(menuManager: menuManager)
+            }
+            return extraPart ?? dummyPart!
+        }
+
         var body: OrderDetailView {
-            OrderDetailView(layout: layout, order: order, buttons: buttons)
+            OrderDetailView(layout: layout, menuManager: menuManager,
+                            order: order, extraPart: part, buttons: buttons)
         }
     }
 
     struct EntryCell: View {
         let item: MenuItem
         let entry: RestaurantOrder.OrderEntry
+        let remove: (() -> ())?
+
+        init(item: MenuItem, entry: RestaurantOrder.OrderEntry,
+             remove: (() -> ())? = nil) {
+            precondition(item.fullID == entry.itemID)
+            self.item = item
+            self.entry = entry
+            self.remove = remove
+        }
 
         var body: some View {
             HStack {
                 Image(systemName: "circle.fill")
                     .bodyFont(size: 10)
-                    .foregroundColor(entry.isFulfilled ? .green : .label)
+                    .foregroundColor(remove != nil ? .secondary :
+                                        entry.isFulfilled ? .green : .label)
 
                 Group {
                     Text(item.name).bold()
                     Text(" ×\(entry.amount)").foregroundColor(.secondary)
                     Spacer()
-                    Text("\(entry.subtotal(with: item), specifier: "%.2f") EUR")
+                    Text("EUR \(entry.subtotal(with: item), specifier: "%.2f")")
                 }
                 .foregroundColor(entry.isFulfilled ? .secondary : .label)
+
+                IfLet(remove) { remove in
+                    Button(action: remove, label: {
+                        Image(systemName: "xmark.circle")
+                    })
+                    .buttonStyle(DefaultButtonStyle())
+                }
             }
         }
     }
@@ -79,7 +115,36 @@ struct OrderDetailView<Buttons: View>: View {
             .padding([.leading, .trailing])
 
             List {
-                ForEach(order.parts.indices) { index in
+                if !extraPart.entries.isEmpty {
+                    Section(header: Text("Selected Items")) {
+                        // HACK[pn]: Though it may seem more idiomatic to
+                        // iterate over the indices instead of the entries
+                        // themselves, apparently that's dangerous because any
+                        // shift in the index range can cause the subscript
+                        // operation to fail because SwiftUI tries to render
+                        // from stale data? Which leads to an assertion failure
+                        // and a crash.
+                        // Therefore we iterate over the entries themselves
+                        // under the invariant that each item ID appears in only
+                        // one entry in this section.
+                        // (Followup [pn]: Appears that, indeed, passing a
+                        // range to ForEach implies that the range is constant
+                        // and so SwiftUI won't check if the range ever changes.
+                        // Which is exactly what we don't want. So we iterate
+                        // over a dynamic entry list instead. Thanks, SwiftUI!)
+                        ForEach(extraPart.entries, id: \.itemID) { entry in
+                            let item = menuManager.menu[entry.itemID]!
+                            EntryCell(item: item, entry: entry, remove: {
+                                withAnimation {
+                                    extraPart.setAmount(0, forItemWithID: entry.itemID)
+                                }
+                            })
+                        }
+                    }
+                }
+
+                let partIndices = Array(order.parts.indices)
+                ForEach(partIndices, id: \.self) { index in
                     let part = order.parts[index]
                     let header = index == 0 ? Text("Initial Order") : Text("Extra Order \(index)")
                     Section(header: header) {
@@ -91,6 +156,28 @@ struct OrderDetailView<Buttons: View>: View {
                 }
             }
             .listStyle(InsetGroupedListStyle())
+
+            HStack {
+                Text("Total Order Amount:").foregroundColor(.secondary)
+                Spacer()
+                if extraPart.entries.isEmpty {
+                    let total = order.total(using: menuManager.menu)
+                    Text("EUR \(total, specifier: "%.2f")").bold()
+                } else if order.parts.isEmpty {
+                    Text("EUR \(extraPart.subtotal, specifier: "%.2f")").bold()
+                } else {
+                    let oldTotal = order.total(using: menuManager.menu)
+                    let newTotal = oldTotal + extraPart.subtotal
+
+                    Group {
+                        Text("EUR \(oldTotal, specifier: "%.2f")")
+                        Image(systemName: "arrow.right")
+                    }
+                    .foregroundColor(.secondaryLabel)
+                    Text("EUR \(newTotal, specifier: "%.2f")").bold()
+                }
+            }
+            .padding([.leading, .top, .trailing])
 
             if Buttons.self != EmptyView.self {
                 HStack {
@@ -123,12 +210,12 @@ struct OrderDetailView_Previews: PreviewProvider {
     ], autoCategories: [
         MenuCategory(id: "C", name: "Test Category", type: .food, restaurantID: restaurant.id),
     ])
+    static let entries = Array(menuManager.menu.values)
+        .sorted(by: \.id)
+        .map { item in
+            return Entry(itemID: item.fullID, amount: 1, isFulfilled: false)
+        }
     static var order: Order {
-        let entries = Array(menuManager.menu.values)
-            .sorted(by: \.id)
-            .map { item in
-                return Entry(itemID: item.fullID, amount: 1, isFulfilled: false)
-            }
         let parts = [
             Part(entries: entries),
             Part(entries: entries.map { $0.with(isFulfilled: true) }),
@@ -138,16 +225,21 @@ struct OrderDetailView_Previews: PreviewProvider {
                      table: Table.FullID(zone: "Z", table: "T"), placedBy: "E",
                      createdAt: Date(), parts: parts)
     }
+    static var extraPart: MenuView.PendingOrderPart {
+        let part = MenuView.PendingOrderPart(menuManager: menuManager)
+        part.entries.append(contentsOf: entries)
+        return part
+    }
 
     static var previews: some View {
         Group {
-            OrderDetailView.Wrapper(order: order, buttons: {
+            OrderDetailView.Wrapper(order: order, extraPart: extraPart, buttons: {
                 Button(action: { }, label: { Text("Action 1") })
                 Button(action: { }, label: { Text("Action 2") })
             })
             .previewDisplayName("With Buttons")
 
-            OrderDetailView.Wrapper(order: order)
+            OrderDetailView.Wrapper(order: order, extraPart: extraPart)
                 .previewDisplayName("Without Buttons")
         }
         .buttonStyle(O6NButtonStyle())

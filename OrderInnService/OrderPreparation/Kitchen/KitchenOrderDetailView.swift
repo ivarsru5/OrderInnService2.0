@@ -9,75 +9,14 @@ import Combine
 import SwiftUI
 
 struct KitchenOrderDetailView: View {
-    struct EntryCell: View {
-        @EnvironmentObject var menuManager: MenuManager
-        let entry: RestaurantOrder.OrderEntry
-
-        var body: some View {
-            let item = menuManager.menu[entry.itemID]!
-            HStack {
-                Text(item.name)
-                    .bold()
-                    .foregroundColor(Color.label)
-                Text(" ×\(entry.amount)")
-                    .foregroundColor(Color.secondary)
-
-                Spacer()
-
-                Text("\(entry.subtotal(with: item), specifier: "%.2f") EUR")
-                    .foregroundColor(Color.label)
-            }
-        }
-    }
-
-    struct OrderPartListing: View {
-        let partIndex: Int
-        let part: RestaurantOrder.OrderPart
-
-        var headerText: Text {
-            if partIndex == 0 {
-                return Text("Initial Order")
-            } else {
-                return Text("Extra Order: \(partIndex)")
-            }
-        }
-
-        var body: some View {
-            Section(header: headerText) {
-                ForEach(part.entries.indices) { entryIndex in
-                    let entry = part.entries[entryIndex]
-                    EntryCell(entry: entry)
-                }
-            }
-        }
-    }
-
+    @EnvironmentObject var menuManager: MenuManager
     @EnvironmentObject var orderManager: OrderManager
-    @Environment(\.currentLayout) @Binding var layout: Layout
     let order: RestaurantOrder
     @State var markOrderCompleteCancellable: AnyCancellable?
     @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
 
     var body: some View {
-        VStack {
-            HStack {
-                let table = layout.tables[order.tableFullID]!
-                let zone = layout.zones[table.zoneID]!
-
-                Text("Zone: ").bold() + Text(zone.location)
-                Spacer()
-                Text("Table: ").bold() + Text(table.name)
-            }
-            .padding()
-
-            List {
-                ForEach(order.parts.indices) { partIndex in
-                    OrderPartListing(partIndex: partIndex,
-                                     part: order.parts[partIndex])
-                }
-            }
-            .listStyle(InsetGroupedListStyle())
-
+        OrderDetailView.Wrapper(order: order, extraPart: nil, buttons: {
             if order.state.isOpen {
                 Button(action: {
                     // TODO[pn 2021-08-05]: This isn't fully correct, given that
@@ -104,7 +43,7 @@ struct KitchenOrderDetailView: View {
                 })
                 .buttonStyle(O6NButtonStyle(isLoading: markOrderCompleteCancellable != nil))
             }
-        }
+        })
         .navigationBarTitle(Text("Review Order"), displayMode: .inline)
         .onAppear {
             if order.state == .new {
@@ -189,11 +128,13 @@ struct KitchenOrderDetailView_Previews: PreviewProvider {
     static let orderManager = OrderManagerMock(debugForRestaurant: restaurant, withOrders: [order])
 
     static var previews: some View {
-        KitchenOrderDetailView(order: orderManager.orders.first!)
-            .environment(\.currentRestaurant, restaurant)
-            .environment(\.currentLayout, .constant(layout))
-            .environmentObject(menuManager)
-            .environmentObject(orderManager)
+        Group {
+            KitchenOrderDetailView(order: orderManager.orders.first!)
+        }
+        .environment(\.currentRestaurant, restaurant)
+        .environment(\.currentLayout, .constant(layout))
+        .environmentObject(menuManager)
+        .environmentObject(orderManager as OrderManager)
     }
 }
 #endif

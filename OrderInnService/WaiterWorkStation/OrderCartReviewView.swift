@@ -14,83 +14,6 @@ import SwiftUI
 struct OrderCartReviewView: View {
     typealias PendingOrderPart = MenuView.PendingOrderPart
 
-    struct ItemCell: View {
-        let entry: RestaurantOrder.OrderEntry
-        let item: MenuItem
-        @Binding var amount: Int
-
-        var body: some View {
-            HStack {
-                Image(systemName: "circle.fill")
-                    .bodyFont(size: 10)
-
-                Text(item.name)
-                    .bold()
-                Text(" ×\(entry.amount)")
-                    .foregroundColor(Color.secondary)
-
-                Spacer()
-
-                Text("\(entry.subtotal(with: item), specifier: "%.2f") EUR")
-
-                Button(action: {
-                    withAnimation(.easeOut(duration: 0.5)) {
-                        amount = 0
-                    }
-                }, label: {
-                    Image(systemName: "xmark.circle")
-                        .bodyFont(size: 20)
-                        .foregroundColor(.blue)
-                })
-                .buttonStyle(PlainButtonStyle())
-            }
-        }
-    }
-
-    struct OrderListing: View {
-        @ObservedObject var part: PendingOrderPart
-        @EnvironmentObject var menuManager: MenuManager
-
-        var body: some View {
-            List {
-                Section(header: Text("Selected Items")) {
-                    ForEach(part.entries, id: \.itemID) { entry in
-                        ItemCell(entry: entry, item: menuManager.menu[entry.itemID]!,
-                                 amount: part.amountBinding(for: entry.itemID))
-                    }
-                }
-            }
-            .listStyle(InsetGroupedListStyle())
-        }
-    }
-
-    struct OrderView: View {
-        @ObservedObject var part: PendingOrderPart
-        let sendOrder: () -> ()
-
-        var body: some View {
-            VStack {
-                OrderListing(part: part)
-
-                HStack {
-                    Text("Total Order Amount:")
-                        .foregroundColor(.secondary)
-
-                    Spacer()
-
-                    Text("\(part.subtotal, specifier: "%.2f") EUR")
-                        .bold()
-                }
-                .padding()
-
-                Button(action: sendOrder, label: {
-                    Text("Send Order")
-                })
-                .buttonStyle(O6NButtonStyle())
-            }
-        }
-    }
-
     class Model: ObservableObject {
         @Published var isSending = false
         @Published var createdOrder: RestaurantOrder?
@@ -120,7 +43,30 @@ struct OrderCartReviewView: View {
 
     @ObservedObject var part: PendingOrderPart
     @EnvironmentObject var authManager: AuthManager
+    let table: Table
+    @Environment(\.currentRestaurant) var restaurant: Restaurant!
+
+    #if DEBUG
+    @StateObject var model: Model
+    #else
     @StateObject var model = Model()
+    #endif
+
+    init(part: PendingOrderPart, table: Table) {
+        self._part = ObservedObject(wrappedValue: part)
+        self.table = table
+        #if DEBUG
+        self._model = StateObject(wrappedValue: Model())
+        #endif
+    }
+
+    #if DEBUG
+    init(part: PendingOrderPart, table: Table, model: Model) {
+        self._part = ObservedObject(wrappedValue: part)
+        self.table = table
+        self._model = StateObject(wrappedValue: model)
+    }
+    #endif
 
     @ViewBuilder var sendingOverlay: some View {
         if model.isSending {
@@ -130,11 +76,23 @@ struct OrderCartReviewView: View {
         }
     }
     var body: some View {
-        OrderView(part: part, sendOrder: { })
-            .opacity(model.isSending ? 0.7 : 1.0)
-            .animation(.easeInOut(duration: 0.1), value: model.isSending)
-            .overlay(sendingOverlay)
-            .navigationBarTitle("Order", displayMode: .large)
+        let dummyOrder = RestaurantOrder(
+            restaurantID: restaurant.id, id: "(dummy)", state: .open,
+            table: table.fullID, placedBy: authManager.waiter!.id,
+            createdAt: Date(), parts: [])
+
+        OrderDetailView.Wrapper(order: dummyOrder, extraPart: part, buttons: {
+            Button(action: {
+                model.sendOrder(for: table, from: part)
+            }, label: {
+                Text("Send Order")
+            })
+            .buttonStyle(O6NButtonStyle())
+        })
+        .opacity(model.isSending ? 0.7 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: model.isSending)
+        .overlay(sendingOverlay)
+        .navigationBarTitle("Order", displayMode: .large)
     }
 }
 
@@ -146,42 +104,37 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     class MockModel: OrderCartReviewView.Model {
         override func sendOrder(for table: Table, from part: OrderCartReviewView.PendingOrderPart) {
             isSending = true
-//            DispatchQueue.main.asyncAfter(deadline: .now().advanced(by: .seconds(3))) {
-//                [self] in
-//                createdOrder = RestaurantOrder(restaurantID: "R", id: "O", state: .new,
-//                                               table: table.id, placedBy: "E",
-//                                               createdAt: Date(), parts: [part.asOrderPart()])
-//                isSending = false
-//            }
         }
     }
 
-    static let items: MenuManager.Menu = [
-        ID(string: "C/I1")!: MenuItem(
-            id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
-            destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        ID(string: "C/I2")!: MenuItem(
-            id: "I2", name: "Item 2", price: 4.99, isAvailable: true,
-            destination: .kitchen, restaurantID: "R", categoryID: "C"),
-        ID(string: "C/I3")!: MenuItem(
-            id: "I3", name: "Item 3", price: 4.99, isAvailable: true,
-            destination: .kitchen, restaurantID: "R", categoryID: "C"),
-    ]
+    static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
+    static let employee = Restaurant.Employee(restaurantID: restaurant.id, id: "E",
+                                              name: "Test", lastName: "Employee",
+                                              manager: false, isActive: false)
 
-    static let authManager = AuthManager(debugWithRestaurant: Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true),
-                waiter: .init(restaurantID: "R", id: "E", name: "Test", lastName: "Employee", manager: false, isActive: false),
-                kitchen: nil)
+    static let layout = Layout(autoZones: [
+        Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id),
+    ], autoTables: [
+        Table(id: "T", name: "Test Table", restaurantID: restaurant.id, zoneID: "Z")
+    ])
 
-    static func makeModel() -> OrderCartReviewView.Model {
-        return MockModel()
-    }
+    static let menuManager = MenuManager(debugForRestaurant: restaurant, withAutoMenu: [
+        MenuItem(id: "I1", name: "Item 1", price: 4.99, isAvailable: true,
+                 destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        MenuItem(id: "I2", name: "Item 2", price: 4.99, isAvailable: true,
+                 destination: .kitchen, restaurantID: "R", categoryID: "C"),
+        MenuItem(id: "I3", name: "Item 3", price: 4.99, isAvailable: true,
+                 destination: .kitchen, restaurantID: "R", categoryID: "C"),
+    ], autoCategories: [
+        MenuCategory(id: "C", name: "Test Category", type: .food, restaurantID: restaurant.id),
+    ])
 
-    static let menuManager = MenuManager(debugForRestaurant: authManager.restaurant,
-                                         withMenu: items, categories: [
-                                            "C": MenuCategory(id: "C", name: "Test Category", type: .food, restaurantID: "R"),
-                                         ])
+    static let authManager = AuthManager(debugWithRestaurant: restaurant,
+                                         waiter: employee, kitchen: nil)
 
-    static func makePart() -> MenuView.PendingOrderPart {
+    static let model = MockModel()
+
+    static var part: MenuView.PendingOrderPart {
         let part = MenuView.PendingOrderPart(menuManager: menuManager)
         part.entries = [
             Entry(itemID: ID(string: "C/I1")!, amount: 2),
@@ -192,7 +145,9 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     }
 
     static var previews: some View {
-        OrderCartReviewView(part: makePart(), model: makeModel())
+        OrderCartReviewView(part: part, table: layout.tables.first!.value, model: model)
+            .environment(\.currentRestaurant, restaurant)
+            .environment(\.currentLayout, .constant(layout))
             .environmentObject(authManager)
             .environmentObject(menuManager)
     }
