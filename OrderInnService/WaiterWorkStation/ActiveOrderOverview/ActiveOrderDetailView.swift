@@ -183,8 +183,7 @@ struct ActiveOrderDetailView: View {
         .navigationTitle("Review Order")
         .popover(isPresented: $showPickerOverlay) {
             NavigationView {
-                MenuView(menuManager: menuManager,
-                         context: .appendedOrder(part: nextExtraPart))
+                MenuView.Wrapper(context: .appendedOrder(part: nextExtraPart))
             }
         }
     }

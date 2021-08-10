@@ -16,8 +16,7 @@ struct TableSelectionView: View {
     var body: some View {
         List {
             ForEach(layout.orderedTables(in: zone)) { table in
-                NavigationLink(destination: MenuView(menuManager: menuManager,
-                                                     context: .newOrder(table: table))) {
+                NavigationLink(destination: MenuView.Wrapper(context: .newOrder(table: table))) {
                     Text(table.name)
                         .bold()
                         .foregroundColor(Color.label)

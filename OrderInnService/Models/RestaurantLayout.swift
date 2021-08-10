@@ -51,6 +51,8 @@ struct Table: FirestoreInitiable, Identifiable {
     struct FullID: Hashable, Equatable {
         let zone: Zone.ID
         let table: ID
+
+        var string: String { "\(zone)/\(table)" }
     }
 
     static let firestoreCollection = "Tables"

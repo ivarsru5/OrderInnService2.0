@@ -221,7 +221,7 @@ struct MenuView: View {
     // because MenuManager is not yet available. Therefore we require it to be
     // passed into init from wherever this view is being constructed, similar to
     // OrderTabView.
-    init(menuManager: MenuManager, context: Context) {
+    fileprivate init(menuManager: MenuManager, context: Context) {
         self.menuManager = menuManager
         self.context = context
 
@@ -233,12 +233,21 @@ struct MenuView: View {
     }
 
     #if DEBUG
-    init(menuManager: MenuManager, part: PendingOrderPart, context: Context) {
+    fileprivate init(menuManager: MenuManager, part: PendingOrderPart, context: Context) {
         self.menuManager = menuManager
         self._part = StateObject(wrappedValue: part)
         self.context = context
     }
     #endif
+
+    struct Wrapper: View {
+        @EnvironmentObject var menuManager: MenuManager
+        let context: MenuView.Context
+
+        var body: MenuView {
+            MenuView(menuManager: menuManager, context: context)
+        }
+    }
 
     var table: Table? {
         switch context {
