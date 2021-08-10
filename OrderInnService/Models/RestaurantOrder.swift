@@ -96,14 +96,20 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         func subtotal(using menu: MenuManager.Menu) -> Currency {
             return entries.map { $0.subtotal(using: menu) }.sum()
         }
+
+        var isFulfilled: Bool {
+            return entries.allSatisfy { entry in entry.isFulfilled }
+        }
     }
     struct OrderEntry: Codable {
         let itemID: MenuItem.FullID
         let amount: Int
+        let isFulfilled: Bool
 
-        init(itemID: MenuItem.FullID, amount: Int) {
+        init(itemID: MenuItem.FullID, amount: Int, isFulfilled: Bool = false) {
             self.itemID = itemID
             self.amount = amount
+            self.isFulfilled = isFulfilled
         }
 
         func with(amount: Int) -> OrderEntry {
@@ -121,18 +127,21 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         enum EntryCodingKey: String, CodingKey {
             case itemID = "id"
             case amount = "amt"
+            case isFulfilled = "done"
         }
 
         init(from decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: EntryCodingKey.self)
             itemID = try container.decode(MenuItem.FullID.self, forKey: .itemID)
             amount = try container.decode(Int.self, forKey: .amount)
+            isFulfilled = try container.decodeIfPresent(Bool.self, forKey: .isFulfilled) ?? false
         }
 
         func encode(to encoder: Encoder) throws {
             var container = encoder.container(keyedBy: EntryCodingKey.self)
             try container.encode(itemID, forKey: .itemID)
             try container.encode(amount, forKey: .amount)
+            try container.encode(isFulfilled, forKey: .isFulfilled)
         }
     }
 
