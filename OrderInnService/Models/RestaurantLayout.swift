@@ -116,8 +116,31 @@ struct Table: FirestoreInitiable, Identifiable {
 }
 
 struct Layout {
-    var zones: [Zone.ID: Zone] = [:]
-    var tables: [Table.FullID: Table] = [:]
+    var zones: [Zone.ID: Zone]
+    var tables: [Table.FullID: Table]
+
+    init() {
+        self.zones = [:]
+        self.tables = [:]
+    }
+
+    init(zones: [Zone.ID: Zone], tables: [Table.FullID: Table]) {
+        self.zones = zones
+        self.tables = tables
+    }
+
+    #if DEBUG
+    init(autoZones: [Zone], autoTables: [Table]) {
+        self.zones = Dictionary(minimumCapacity: autoZones.count)
+        self.tables = Dictionary(minimumCapacity: autoTables.count)
+        autoZones.forEach { zone in
+            zones[zone.id] = zone
+        }
+        autoTables.forEach { table in
+            tables[table.fullID] = table
+        }
+    }
+    #endif
 
     var orderedZones: [Zone] {
         return Array(zones.values).sorted(by: \.location)

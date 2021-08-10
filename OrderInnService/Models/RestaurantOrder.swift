@@ -113,8 +113,13 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         }
 
         func with(amount: Int) -> OrderEntry {
-            return OrderEntry(itemID: itemID, amount: amount)
+            return OrderEntry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
         }
+        #if DEBUG
+        func with(isFulfilled: Bool) -> OrderEntry {
+            return OrderEntry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
+        }
+        #endif
 
         func subtotal(using menu: MenuManager.Menu) -> Currency {
             return menu[itemID]!.price * amount

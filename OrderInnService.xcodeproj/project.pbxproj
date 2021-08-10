@@ -80,6 +80,7 @@
 		69766FF526B9A57400DBD18C /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4B2698966E0044D34F /* AuthManager.swift */; };
 		69766FF726B9A78800DBD18C /* LoginQRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4D2698995E0044D34F /* LoginQRCode.swift */; };
 		69766FFA26BC140200DBD18C /* OrderListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69766FF926BC140100DBD18C /* OrderListCell.swift */; };
+		69FA30EC26C2BF810078FD89 /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30EB26C2BF810078FD89 /* OrderDetailView.swift */; };
 		8D81E1853CD596EA1AD61F7F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B64BE591241ED14AE64DDE46 /* Pods_OrderInnServiceTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC7AE4945C1CF960FDF68DCB /* Pods_OrderInnServiceTests.framework */; };
 		FD19E44F74DCADA16DCE6ADF /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */; };
@@ -153,6 +154,7 @@
 		69766FCE26B999BC00DBD18C /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		69766FD726B99C3B00DBD18C /* OrderInnServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrderInnServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		69766FF926BC140100DBD18C /* OrderListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderListCell.swift; sourceTree = "<group>"; };
+		69FA30EB26C2BF810078FD89 /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
 		79E3E77C8AD17E641637F661 /* Pods-OrderInnServiceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.release.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.release.xcconfig"; sourceTree = "<group>"; };
 		991BDBB5F4F5DB2C244FC62A /* Pods-OrderInnServiceTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -246,6 +248,7 @@
 				5818DF8F262DA50000352CE9 /* ActivityIndicatior.swift */,
 				691056B826B3132200E1DE6F /* O6NButtonStyle.swift */,
 				69766FF926BC140100DBD18C /* OrderListCell.swift */,
+				69FA30EB26C2BF810078FD89 /* OrderDetailView.swift */,
 			);
 			path = Common;
 			sourceTree = "<group>";
@@ -625,6 +628,7 @@
 				5801CC4026A588A300DD3DEC /* PreperedOrderView.swift in Sources */,
 				5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */,
 				5811F946262DE53000050F2C /* LaunchScreen.swift in Sources */,
+				69FA30EC26C2BF810078FD89 /* OrderDetailView.swift in Sources */,
 				69142D4E2698995E0044D34F /* LoginQRCode.swift in Sources */,
 				580506F526296723007CF39B /* Restaurant.swift in Sources */,
 				69142D4A26986EA50044D34F /* SwiftUIExtensions.swift in Sources */,

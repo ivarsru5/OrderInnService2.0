@@ -307,6 +307,18 @@ class MenuManager: ObservableObject {
 
         self.hasData = true
     }
+    convenience init(debugForRestaurant restaurant: Restaurant, withAutoMenu autoMenu: [MenuItem],
+                     autoCategories: [MenuCategory]) {
+        var menu = Menu()
+        autoMenu.forEach { item in
+            menu[item.fullID] = item
+        }
+        var categories = Categories()
+        autoCategories.forEach { category in
+            categories[category.id] = category
+        }
+        self.init(debugForRestaurant: restaurant, withMenu: menu, categories: categories)
+    }
     #endif
 
     /// - Returns: The contents of the initial snapshot for this category.
