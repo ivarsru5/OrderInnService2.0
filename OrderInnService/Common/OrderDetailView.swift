@@ -36,7 +36,6 @@ struct OrderDetailView<Buttons: View>: View {
         @Environment(\.currentLayout) @Binding var layout: Layout
         @EnvironmentObject var menuManager: MenuManager
 
-        @State var dummyPart: MenuView.PendingOrderPart?
         let order: RestaurantOrder
         let extraPart: MenuView.PendingOrderPart?
         let buttons: () -> Buttons
@@ -55,19 +54,12 @@ struct OrderDetailView<Buttons: View>: View {
         }
 
         var part: MenuView.PendingOrderPart {
-            if extraPart == nil && dummyPart == nil {
-                dummyPart = MenuView.PendingOrderPart(menuManager: menuManager)
-            }
-            return extraPart ?? dummyPart!
+            extraPart ?? MenuView.PendingOrderPart(menuManager: menuManager)
         }
 
-        var body: OrderDetailView {
+        var body: some View {
             OrderDetailView(layout: layout, menuManager: menuManager,
                             order: order, extraPart: part, buttons: buttons)
-            .onAppear {
-                // create the dummy part if needed
-                let _ = part
-            }
         }
     }
 
@@ -181,7 +173,7 @@ struct OrderDetailView<Buttons: View>: View {
                     Text("EUR \(newTotal, specifier: "%.2f")").bold()
                 }
             }
-            .padding([.leading, .top, .trailing])
+            .padding()
 
             if Buttons.self != EmptyView.self {
                 HStack {

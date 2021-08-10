@@ -58,12 +58,14 @@ struct ActiveOrderDetailView: View {
         let isSubmitting = submittingExtraPartCancellable != nil
 
         OrderDetailView.Wrapper(order: order, extraPart: extraPart, buttons: {
-            Button(action: {
-                showPickerOverlay = true
-            }, label: {
-                Text("Add Items to Order")
-            })
-            .buttonStyle(O6NButtonStyle())
+            if order.state.isOpen {
+                Button(action: {
+                    showPickerOverlay = true
+                }, label: {
+                    Text("Add Items to Order")
+                })
+                .buttonStyle(O6NButtonStyle())
+            }
 
             if !extraPart.entries.isEmpty {
                 Button(action: submitExtraPart, label: {
