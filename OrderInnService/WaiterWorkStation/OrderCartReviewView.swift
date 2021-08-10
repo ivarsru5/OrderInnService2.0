@@ -18,7 +18,8 @@ struct OrderCartReviewView: View {
         @Published var isSending = false
         @Published var createdOrder: RestaurantOrder?
 
-        func sendOrder(for table: Table, from part: PendingOrderPart) {
+        func sendOrder(for table: Table, from part: PendingOrderPart,
+                       dismiss: @escaping () -> ()) {
             let authManager = AuthManager.shared
             let restaurant = authManager.restaurant!
             let waiter = authManager.waiter!
@@ -33,7 +34,7 @@ struct OrderCartReviewView: View {
                 .sink { [unowned self] order in
                     isSending = false
                     createdOrder = order
-                    // ...?
+                    dismiss()
                     if let _ = sub {
                         sub = nil
                     }
@@ -68,6 +69,8 @@ struct OrderCartReviewView: View {
     }
     #endif
 
+    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
+
     @ViewBuilder var sendingOverlay: some View {
         if model.isSending {
             Spinner()
@@ -83,7 +86,14 @@ struct OrderCartReviewView: View {
 
         OrderDetailView.Wrapper(order: dummyOrder, extraPart: part, buttons: {
             Button(action: {
-                model.sendOrder(for: table, from: part)
+                model.sendOrder(for: table, from: part, dismiss: {
+                    if presentationMode.isPresented {
+                        presentationMode.dismiss()
+                        NotificationCenter.default.post(
+                            name: OrderTabView.switchToActiveOrdersFlow,
+                            object: nil)
+                    }
+                })
             }, label: {
                 Text("Send Order")
             })
@@ -102,7 +112,9 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     typealias ID = MenuItem.FullID
 
     class MockModel: OrderCartReviewView.Model {
-        override func sendOrder(for table: Table, from part: OrderCartReviewView.PendingOrderPart) {
+        override func sendOrder(for table: Table,
+                                from part: OrderCartReviewView.PendingOrderPart,
+                                dismiss: @escaping () -> ()) {
             isSending = true
         }
     }

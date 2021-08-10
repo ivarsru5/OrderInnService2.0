@@ -64,6 +64,10 @@ struct OrderDetailView<Buttons: View>: View {
         var body: OrderDetailView {
             OrderDetailView(layout: layout, menuManager: menuManager,
                             order: order, extraPart: part, buttons: buttons)
+            .onAppear {
+                // create the dummy part if needed
+                let _ = part
+            }
         }
     }
 

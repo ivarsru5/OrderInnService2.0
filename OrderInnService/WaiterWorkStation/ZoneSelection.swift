@@ -55,11 +55,16 @@ struct ZoneSelection: View {
         return layout.orderedZones.map { CellData(zone: $0, layout: layout) }
     }
 
+    @State var hasNavigated = false
+    @State var dismissNotificationPublisher = NotificationCenter.default.publisher(
+        for: OrderTabView.switchToActiveOrdersFlow, object: nil)
+
     var body: some View {
         List(cells, children: \.descendants) { cell in
             let view = Text(cell.label).bold()
             if case .table(let table) = cell.value {
                 NavigationLink(destination: MenuView.Wrapper(context: .newOrder(table: table)),
+                               isActive: $hasNavigated,
                                label: { view })
             } else {
                 view
@@ -75,16 +80,8 @@ struct ZoneSelection: View {
                 }
             }
         })
-    }
-
-    static var navigationViewWithTabItem: some View {
-        NavigationView {
-            ZoneSelection()
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .tabItem {
-            Image(systemName: "tray")
-            Text("Place Order")
+        .onReceive(dismissNotificationPublisher) { _ in
+            hasNavigated = false
         }
     }
 }

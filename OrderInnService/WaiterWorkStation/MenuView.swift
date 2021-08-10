@@ -288,8 +288,10 @@ struct MenuView: View {
         Group {
             MenuListing(menuManager: menuManager, part: part)
 
-            NavigationLink(destination: OrderCartReviewView(part: part), isActive: $showOrderCart) {
-                EmptyView()
+            IfLet(table) { table in
+                NavigationLink(destination: OrderCartReviewView(part: part, table: table), isActive: $showOrderCart) {
+                    EmptyView()
+                }
             }
         }
         .navigationBarTitle("Menu", displayMode: .inline)

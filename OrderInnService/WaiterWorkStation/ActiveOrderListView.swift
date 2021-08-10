@@ -34,17 +34,6 @@ struct ActiveOrderListView: View {
         }
         .navigationBarTitle("Active Orders")
     }
-
-    static var navigationViewWithTabItem: some View {
-        NavigationView {
-            ActiveOrderListView()
-        }
-        .navigationViewStyle(StackNavigationViewStyle())
-        .tabItem {
-            Image(systemName: "scroll")
-            Text("Active Orders")
-        }
-    }
 }
 
 #if DEBUG
