@@ -65,10 +65,10 @@ struct OrderDetailView<Buttons: View>: View {
 
     struct EntryCell: View {
         let item: MenuItem
-        let entry: RestaurantOrder.OrderEntry
+        let entry: RestaurantOrder.Entry
         let remove: (() -> ())?
 
-        init(item: MenuItem, entry: RestaurantOrder.OrderEntry,
+        init(item: MenuItem, entry: RestaurantOrder.Entry,
              remove: (() -> ())? = nil) {
             precondition(item.fullID == entry.itemID)
             self.item = item
@@ -103,6 +103,10 @@ struct OrderDetailView<Buttons: View>: View {
 
     var body: some View {
         VStack {
+            #if DEBUG
+            Text("ID: \(order.id)").foregroundColor(.secondary)
+            #endif
+
             HStack {
                 Text("Zone: ").bold() + Text(zone.location)
                 Spacer()
@@ -187,8 +191,8 @@ struct OrderDetailView<Buttons: View>: View {
 #if DEBUG
 struct OrderDetailView_Previews: PreviewProvider {
     typealias Order = RestaurantOrder
-    typealias Part = Order.OrderPart
-    typealias Entry = Order.OrderEntry
+    typealias Part = Order.Part
+    typealias Entry = Order.Entry
 
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let layout = Layout(autoZones: [

@@ -15,7 +15,7 @@ struct MenuView: View {
     }
 
     class PendingOrderPart: ObservableObject {
-        @Published var entries: [RestaurantOrder.OrderEntry] = []
+        @Published var entries: [RestaurantOrder.Entry] = []
         weak var menuManager: MenuManager?
 
         var isEmpty: Bool { entries.isEmpty }
@@ -44,7 +44,7 @@ struct MenuView: View {
             if let index = maybeIndex {
                 entries[index] = entries[index].with(amount: amount)
             } else {
-                let entry = RestaurantOrder.OrderEntry(itemID: itemID, amount: amount)
+                let entry = RestaurantOrder.Entry(itemID: itemID, amount: amount)
                 entries.append(entry)
             }
         }
@@ -63,8 +63,8 @@ struct MenuView: View {
 
         var subtotal: Currency { entries.map { $0.subtotal(using: menuManager!.menu) }.sum() }
 
-        func asOrderPart(withIndex index: Int) -> RestaurantOrder.OrderPart {
-            return RestaurantOrder.OrderPart(index: index, entries: entries)
+        func asOrderPart(withIndex index: Int) -> RestaurantOrder.Part {
+            return RestaurantOrder.Part(index: index, entries: entries)
         }
     }
 

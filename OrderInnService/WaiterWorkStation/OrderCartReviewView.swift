@@ -108,7 +108,7 @@ struct OrderCartReviewView: View {
 
 #if DEBUG
 struct OrderCartReviewView_Previews: PreviewProvider {
-    typealias Entry = RestaurantOrder.OrderEntry
+    typealias Entry = RestaurantOrder.Entry
     typealias ID = MenuItem.FullID
 
     class MockModel: OrderCartReviewView.Model {

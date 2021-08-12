@@ -118,7 +118,7 @@ class OrderManager: ObservableObject {
             .eraseToAnyPublisher()
     }
 
-    func addPart(withEntries entries: [RestaurantOrder.OrderEntry], to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
+    func addPart(withEntries entries: [RestaurantOrder.Entry], to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
         updatingOrders.insert(order.id)
         return order.addPart(withEntries: entries)
             .map { [unowned self] order in
@@ -145,7 +145,7 @@ class OrderManagerTests: XCTestCase {
     private func makeOrder(id: String? = nil,
                            state: RestaurantOrder.OrderState,
                            createdAt: Date,
-                           parts: [RestaurantOrder.OrderPart] = []) -> RestaurantOrder {
+                           parts: [RestaurantOrder.Part] = []) -> RestaurantOrder {
         defer {
             orderSequence += 1
         }

@@ -89,8 +89,8 @@ struct ActiveOrderDetailView: View {
 
 #if DEBUG
 struct ActiveOrderOverview_Previews: PreviewProvider {
-    typealias Part = RestaurantOrder.OrderPart
-    typealias Entry = RestaurantOrder.OrderEntry
+    typealias Part = RestaurantOrder.Part
+    typealias Entry = RestaurantOrder.Entry
     typealias ID = MenuItem.FullID
 
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)

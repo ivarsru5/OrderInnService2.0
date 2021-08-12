@@ -66,8 +66,8 @@ struct KitchenOrderDetailView: View {
 #if DEBUG
 struct KitchenOrderDetailView_Previews: PreviewProvider {
     typealias Order = RestaurantOrder
-    typealias Part = RestaurantOrder.OrderPart
-    typealias Entry = RestaurantOrder.OrderEntry
+    typealias Part = RestaurantOrder.Part
+    typealias Entry = RestaurantOrder.Entry
     typealias ItemID = MenuItem.FullID
 
     class OrderManagerMock: OrderManager {

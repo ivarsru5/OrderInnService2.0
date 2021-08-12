@@ -81,11 +81,11 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         }
     }
 
-    struct OrderPart: Codable {
+    struct Part: Codable {
         let index: Int
-        let entries: [OrderEntry]
+        let entries: [Entry]
 
-        init(index: Int, entries: [OrderEntry]) {
+        init(index: Int, entries: [Entry]) {
             self.index = index
             self.entries = entries
         }
@@ -97,13 +97,13 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
         private init(legacyFrom decoder: Decoder) throws {
             self.index = -1
-            self.entries = try [OrderEntry](from: decoder)
+            self.entries = try [Entry](from: decoder)
         }
 
         private init(modernFrom decoder: Decoder) throws {
             let container = try decoder.container(keyedBy: Key.self)
             index = try container.decode(Int.self, forKey: .index)
-            entries = try container.decode([OrderEntry].self, forKey: .entries)
+            entries = try container.decode([Entry].self, forKey: .entries)
         }
 
         init(from decoder: Decoder) throws {
@@ -117,8 +117,8 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             }
         }
 
-        fileprivate func with(index: Int) -> OrderPart {
-            return OrderPart(index: index, entries: self.entries)
+        fileprivate func with(index: Int) -> Part {
+            return Part(index: index, entries: self.entries)
         }
 
         func encode(to encoder: Encoder) throws {
@@ -135,7 +135,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             return entries.allSatisfy { entry in entry.isFulfilled }
         }
     }
-    struct OrderEntry: Codable {
+    struct Entry: Codable {
         let itemID: MenuItem.FullID
         let amount: Int
         let isFulfilled: Bool
@@ -146,12 +146,12 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             self.isFulfilled = isFulfilled
         }
 
-        func with(amount: Int) -> OrderEntry {
-            return OrderEntry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
+        func with(amount: Int) -> Entry {
+            return Entry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
         }
         #if DEBUG
-        func with(isFulfilled: Bool) -> OrderEntry {
-            return OrderEntry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
+        func with(isFulfilled: Bool) -> Entry {
+            return Entry(itemID: itemID, amount: amount, isFulfilled: isFulfilled)
         }
         #endif
 
@@ -198,7 +198,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     let table: TypedDocumentReference<Table>
     let placedBy: TypedDocumentReference<Restaurant.Employee>
     let createdAt: Date
-    let parts: [OrderPart]
+    let parts: [Part]
 
     func total(using menu: MenuManager.Menu) -> Currency {
         return parts.map { part in part.subtotal(using: menu) }.sum()
@@ -219,7 +219,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         json.userInfo[RestaurantOrder.orderEntryUsedLegacyEncoding] = { () -> () in
             usedLegacyEncoding = true
         }
-        var parts = (snapshot[.parts] as! [Any]).map { part -> OrderPart in
+        var parts = (snapshot[.parts] as! [Any]).map { part -> Part in
             // FIXME[pn 2021-07-20]: Normally every part should be a binary,
             // but since the Firestore Web UI doesn't support entering binary
             // data manually, until we have a CLI or some other way to submit
@@ -233,7 +233,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
                 fatalError("FIXME Unknown part format for order \(snapshot.documentID)")
             }
 
-            return try! json.decode(OrderPart.self, from: partData)
+            return try! json.decode(Part.self, from: partData)
         }
         if usedLegacyEncoding {
             parts.indices.forEach { index in
@@ -253,7 +253,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     #if DEBUG
     private let _tableFullID: Table.FullID?
     init(restaurantID: Restaurant.ID, id: ID, state: OrderState, table: Table.FullID,
-         placedBy: Restaurant.Employee.ID, createdAt: Date, parts: [OrderPart]) {
+         placedBy: Restaurant.Employee.ID, createdAt: Date, parts: [Part]) {
         self.restaurantID = restaurantID
         self.id = id
         self.state = state
@@ -280,8 +280,8 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     static func create(under restaurant: Restaurant,
                        placedBy user: Restaurant.Employee,
                        forTable table: Table,
-                       withEntries entries: [OrderEntry]) -> AnyPublisher<RestaurantOrder, Error> {
-        let part = OrderPart(index: 0, entries: entries)
+                       withEntries entries: [Entry]) -> AnyPublisher<RestaurantOrder, Error> {
+        let part = Part(index: 0, entries: entries)
         let parts: [Any]
 
         do {
@@ -317,12 +317,12 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             .eraseToAnyPublisher()
     }
 
-    func addPart(withEntries entries: [OrderEntry]) -> AnyPublisher<RestaurantOrder, Error> {
+    func addPart(withEntries entries: [Entry]) -> AnyPublisher<RestaurantOrder, Error> {
         // NOTE[pn]: FieldValue.arrayUnion is explicitly used here so that we
         // avoid a potential race condition if two parties were to add a new
         // OrderPart to the same Order without either knowing about the other's
         // changes.
-        let newPart = OrderPart(index: parts.count, entries: entries)
+        let newPart = Part(index: parts.count, entries: entries)
         return firestoreReference
             .updateData([
                 .parts: FieldValue.arrayUnion([
