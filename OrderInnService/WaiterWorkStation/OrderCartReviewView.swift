@@ -90,7 +90,7 @@ struct OrderCartReviewView: View {
                     if presentationMode.isPresented {
                         presentationMode.dismiss()
                         NotificationCenter.default.post(
-                            name: OrderTabView.switchToActiveOrdersFlow,
+                            name: WaiterTabView.switchToActiveOrdersFlow,
                             object: nil)
                     }
                 })

@@ -215,12 +215,12 @@ struct MenuView: View {
     @State var alertTemplate: Alerts.Template?
     @State var showOrderCart = false
 
-    // HACK[pn 2021-08-02]: Similarly to OrderTabView, there appear to be
+    // HACK[pn 2021-08-02]: Similarly to WaiterTabView, there appear to be
     // problems with accessing EnvironmentObjects within init, and given the
     // way Context is implemented, we cannot build a new PendingOrderPart here
     // because MenuManager is not yet available. Therefore we require it to be
     // passed into init from wherever this view is being constructed, similar to
-    // OrderTabView.
+    // WaiterTabView.
     fileprivate init(menuManager: MenuManager, context: Context) {
         self.menuManager = menuManager
         self.context = context

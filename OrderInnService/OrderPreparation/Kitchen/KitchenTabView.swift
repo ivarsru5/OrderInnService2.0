@@ -20,9 +20,11 @@ struct KitchenTabView: View {
         self._orderManager = StateObject(wrappedValue: OrderManager(for: restaurant, scope: .all))
     }
     struct Wrapper: View {
-        @Environment(\.currentRestaurant) var restaurant: Restaurant!
+        @Environment(\.currentRestaurant) var restaurant: Restaurant?
         var body: some View {
-            KitchenTabView(restaurant: restaurant)
+            IfLet(restaurant) { restaurant in
+                KitchenTabView(restaurant: restaurant)
+            }
         }
     }
 

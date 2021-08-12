@@ -19,9 +19,9 @@ struct AdminGeneralSelection: View {
         NavigationView {
             List {
                 Section(header: Text("Manage Personnel")) {
-                    navigationLink(destination: AddPersonel(),
+                    navigationLink(destination: AddPersonnelView(),
                                    label: Text("Add Member"))
-                    navigationLink(destination: RemoveMember(),
+                    navigationLink(destination: RemovePersonnelView(),
                         label: Text("Revoke Access to Member"))
                 }
                 

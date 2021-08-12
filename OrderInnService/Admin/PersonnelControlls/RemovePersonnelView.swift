@@ -1,5 +1,5 @@
 //
-//  RemoveMember.swift
+//  RemovePersonnelView.swift
 //  OrderInnService
 //
 //  Created by Ivars Ruģelis on 19/07/2021.
@@ -7,11 +7,8 @@
 
 import SwiftUI
 import Combine
-#if DEBUG
-import Dispatch
-#endif
 
-struct RemoveMember: View {
+struct RemovePersonnelView: View {
     @EnvironmentObject var authManager: AuthManager
     @State var users: [Restaurant.Employee]? = nil
 
@@ -40,16 +37,27 @@ struct RemoveMember: View {
         guard let user = userToRemove else { return }
         guard let index = users?.firstIndex(where: { $0.id == user.id }) else { return }
 
+        // TODO[pn 2021-08-12]: This should probably go through AuthManager
+        // instead.
         #if DEBUG
-        if mockRemoval {
+        guard !mockRemoval else {
             isUserBeingRemoved = true
-            DispatchQueue.main.asyncAfter(deadline: .now().advanced(by: .seconds(3))) {
-                withAnimation {
-                    userToRemove = nil
-                    isUserBeingRemoved = false
-                    users!.remove(at: index)
+
+            var sub: AnyCancellable?
+            sub = Just(())
+                .delay(for: .seconds(3), scheduler: RunLoop.main)
+                .map {
+                    withAnimation {
+                        userToRemove = nil
+                        isUserBeingRemoved = false
+                        users!.remove(at: index)
+                    }
                 }
-            }
+                .sink {
+                    if let _ = sub {
+                        sub = nil
+                    }
+                }
             return
         }
         #endif
@@ -170,9 +178,9 @@ struct RemoveMember_Previews: PreviewProvider {
         let _ = authManager.setAuthState(.authenticatedAdmin(restaurantID: restaurant.id, admin: ""))
 
         Group {
-            RemoveMember(users: [])
+            RemovePersonnelView(users: [])
 
-            RemoveMember(users: users,
+            RemovePersonnelView(users: users,
                          mockRemoval: true)
         }
         .environmentObject(authManager)

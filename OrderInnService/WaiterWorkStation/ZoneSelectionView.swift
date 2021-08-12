@@ -1,5 +1,5 @@
 //
-//  ZoneSelection.swift
+//  ZoneSelectionView.swift
 //  OrderInnService
 //
 //  Created by Ivars Ruģelis on 19/04/2021.
@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 
-struct ZoneSelection: View {
+struct ZoneSelectionView: View {
     @Environment(\.currentLayout) @Binding var layout: Layout
     @EnvironmentObject var authManager: AuthManager
     @EnvironmentObject var menuManager: MenuManager
@@ -57,7 +57,7 @@ struct ZoneSelection: View {
 
     @State var hasNavigated = false
     @State var dismissNotificationPublisher = NotificationCenter.default.publisher(
-        for: OrderTabView.switchToActiveOrdersFlow, object: nil)
+        for: WaiterTabView.switchToActiveOrdersFlow, object: nil)
 
     var body: some View {
         List(cells, children: \.descendants) { cell in

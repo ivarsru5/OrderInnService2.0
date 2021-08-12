@@ -13,8 +13,10 @@ struct ManagerView: View {
     }
 }
 
+#if DEBUG
 struct ManagerView_Previews: PreviewProvider {
     static var previews: some View {
         ManagerView()
     }
 }
+#endif

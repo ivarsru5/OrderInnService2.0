@@ -1,5 +1,5 @@
 //
-//  AddPersonel.swift
+//  AddPersonnelView.swift
 //  OrderInnService
 //
 //  Created by Ivars Ruģelis on 16/07/2021.
@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 
-struct AddPersonel: View {
+struct AddPersonnelView: View {
     @EnvironmentObject var authManager: AuthManager
     @State var firstName = ""
     @State var lastName = ""
@@ -72,7 +72,7 @@ struct AddPersonel: View {
 #if DEBUG
 struct AddPersonel_Previews: PreviewProvider {
     static var previews: some View {
-        AddPersonel()
+        AddPersonnelView()
     }
 }
 #endif

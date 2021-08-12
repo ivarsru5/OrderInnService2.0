@@ -8,7 +8,7 @@
 import Combine
 import SwiftUI
 
-struct OrderTabView: View {
+struct WaiterTabView: View {
     static let switchToActiveOrdersFlow = Notification.Name("O6N.waiter.switchToActiveOrdersFlow")
 
     enum Selection: Hashable {
@@ -23,7 +23,7 @@ struct OrderTabView: View {
     @StateObject var menuManager: MenuManager
     @StateObject var orderManager: OrderManager
     @State var notificationPublisher = NotificationCenter.default.publisher(
-        for: OrderTabView.switchToActiveOrdersFlow, object: nil)
+        for: WaiterTabView.switchToActiveOrdersFlow, object: nil)
     @State var selectedTab: Selection = .placeOrder
 
     fileprivate init(restaurant: Restaurant, waiter: Restaurant.Employee) {
@@ -39,7 +39,7 @@ struct OrderTabView: View {
 
         var body: some View {
             IfLet(restaurant.zip(waiter)) { (restaurant, waiter) in
-                OrderTabView(restaurant: restaurant, waiter: waiter)
+                WaiterTabView(restaurant: restaurant, waiter: waiter)
             }
         }
     }
@@ -51,7 +51,7 @@ struct OrderTabView: View {
             } else {
                 TabView(selection: $selectedTab) {
                     NavigationView {
-                        ZoneSelection()
+                        ZoneSelectionView()
                     }
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
