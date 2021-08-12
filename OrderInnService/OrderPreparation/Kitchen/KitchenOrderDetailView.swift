@@ -99,15 +99,15 @@ struct KitchenOrderDetailView_Previews: PreviewProvider {
         restaurantID: restaurant.id, id: "O", state: .open, table: table.fullID,
         placedBy: "E", createdAt: Date(),
         parts: [
-            Part(entries: [
+            Part(index: 0, entries: [
                 Entry(itemID: ItemID(category: "C", item: "I1"), amount: 5),
                 Entry(itemID: ItemID(category: "C", item: "I2"), amount: 4),
             ]),
-            Part(entries: [
+            Part(index: 1, entries: [
                 Entry(itemID: ItemID(category: "C", item: "I1"), amount: 3),
                 Entry(itemID: ItemID(category: "C", item: "I2"), amount: 2),
             ]),
-            Part(entries: [
+            Part(index: 2, entries: [
                 Entry(itemID: ItemID(category: "C", item: "I1"), amount: 1),
                 Entry(itemID: ItemID(category: "C", item: "I2"), amount: 1),
             ]),

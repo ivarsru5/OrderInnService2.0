@@ -31,8 +31,8 @@ struct ActiveOrderDetailView: View {
     }
 
     func submitExtraPart() {
-        let part = extraPart.asOrderPart()
-        submittingExtraPartCancellable = orderManager.addPart(part, to: order)
+        submittingExtraPartCancellable = orderManager
+            .addPart(withEntries: extraPart.entries, to: order)
             .mapError { error in
                 // TODO[pn 2021-08-06]
                 fatalError("FIXME Failed to add new order part: \(String(describing: error))")
@@ -95,7 +95,7 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
 
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let menuManager = MenuView_Previews.menuManager
-    static let part = Part(entries: [
+    static let part = Part(index: 0, entries: [
         Entry(itemID: ID(category: "breakfast", item: "1"), amount: 2),
         Entry(itemID: ID(category: "breakfast", item: "2"), amount: 3),
         Entry(itemID: ID(category: "drinks", item: "1"), amount: 1),

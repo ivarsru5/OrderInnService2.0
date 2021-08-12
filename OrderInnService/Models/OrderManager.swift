@@ -118,9 +118,9 @@ class OrderManager: ObservableObject {
             .eraseToAnyPublisher()
     }
 
-    func addPart(_ part: RestaurantOrder.OrderPart, to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
+    func addPart(withEntries entries: [RestaurantOrder.OrderEntry], to order: RestaurantOrder) -> AnyPublisher<RestaurantOrder, Error> {
         updatingOrders.insert(order.id)
-        return order.addPart(part)
+        return order.addPart(withEntries: entries)
             .map { [unowned self] order in
                 if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
                     self.orders[index] = order

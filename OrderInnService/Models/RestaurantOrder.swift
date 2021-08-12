@@ -14,6 +14,9 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
     static let firestoreCollection = "Orders"
 
+    private static let orderEntryUsedLegacyEncoding = CodingUserInfoKey(
+        rawValue: "O6N.coding.order.entryUsedLegacyEncoding")!
+
     enum OrderState: String, Equatable, Comparable, Codable {
         /// Order is submitted and hasn't been seen.
         case new = "new"
@@ -79,18 +82,49 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     }
 
     struct OrderPart: Codable {
+        let index: Int
         let entries: [OrderEntry]
 
-        init(entries: [OrderEntry]) {
+        init(index: Int, entries: [OrderEntry]) {
+            self.index = index
             self.entries = entries
         }
 
+        enum Key: String, CodingKey {
+            case index = "i"
+            case entries = "e"
+        }
+
+        private init(legacyFrom decoder: Decoder) throws {
+            self.index = -1
+            self.entries = try [OrderEntry](from: decoder)
+        }
+
+        private init(modernFrom decoder: Decoder) throws {
+            let container = try decoder.container(keyedBy: Key.self)
+            index = try container.decode(Int.self, forKey: .index)
+            entries = try container.decode([OrderEntry].self, forKey: .entries)
+        }
+
         init(from decoder: Decoder) throws {
-            entries = try [OrderEntry](from: decoder)
+            do {
+                try self.init(modernFrom: decoder)
+            } catch {
+                try self.init(legacyFrom: decoder)
+                if let callback = decoder.userInfo[RestaurantOrder.orderEntryUsedLegacyEncoding] as? (() -> ()) {
+                    callback()
+                }
+            }
+        }
+
+        fileprivate func with(index: Int) -> OrderPart {
+            return OrderPart(index: index, entries: self.entries)
         }
 
         func encode(to encoder: Encoder) throws {
-            try entries.encode(to: encoder)
+            var container = encoder.container(keyedBy: Key.self)
+            try container.encode(index, forKey: .index)
+            try container.encode(entries, forKey: .entries)
         }
 
         func subtotal(using menu: MenuManager.Menu) -> Currency {
@@ -129,21 +163,21 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             return item.price * amount
         }
 
-        enum EntryCodingKey: String, CodingKey {
+        enum Key: String, CodingKey {
             case itemID = "id"
             case amount = "amt"
             case isFulfilled = "done"
         }
 
         init(from decoder: Decoder) throws {
-            let container = try decoder.container(keyedBy: EntryCodingKey.self)
+            let container = try decoder.container(keyedBy: Key.self)
             itemID = try container.decode(MenuItem.FullID.self, forKey: .itemID)
             amount = try container.decode(Int.self, forKey: .amount)
             isFulfilled = try container.decodeIfPresent(Bool.self, forKey: .isFulfilled) ?? false
         }
 
         func encode(to encoder: Encoder) throws {
-            var container = encoder.container(keyedBy: EntryCodingKey.self)
+            var container = encoder.container(keyedBy: Key.self)
             try container.encode(itemID, forKey: .itemID)
             try container.encode(amount, forKey: .amount)
             try container.encode(isFulfilled, forKey: .isFulfilled)
@@ -180,9 +214,12 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         let restaurant = snapshot.reference.parentDocument(ofKind: Restaurant.self)
         restaurantID = restaurant.documentID
 
-        let parts = snapshot[.parts] as! [Any]
         let json = JSONDecoder()
-        self.parts = parts.map { part in
+        var usedLegacyEncoding = false
+        json.userInfo[RestaurantOrder.orderEntryUsedLegacyEncoding] = { () -> () in
+            usedLegacyEncoding = true
+        }
+        var parts = (snapshot[.parts] as! [Any]).map { part -> OrderPart in
             // FIXME[pn 2021-07-20]: Normally every part should be a binary,
             // but since the Firestore Web UI doesn't support entering binary
             // data manually, until we have a CLI or some other way to submit
@@ -198,6 +235,15 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
 
             return try! json.decode(OrderPart.self, from: partData)
         }
+        if usedLegacyEncoding {
+            parts.indices.forEach { index in
+                let part = parts[index]
+                if part.index == -1 {
+                    parts[index] = part.with(index: index)
+                }
+            }
+        }
+        self.parts = parts
 
         #if DEBUG
         self._tableFullID = nil
@@ -235,7 +281,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
                        placedBy user: Restaurant.Employee,
                        forTable table: Table,
                        withEntries entries: [OrderEntry]) -> AnyPublisher<RestaurantOrder, Error> {
-        let part = OrderPart(entries: entries)
+        let part = OrderPart(index: 0, entries: entries)
         let parts: [Any]
 
         do {
@@ -271,11 +317,12 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             .eraseToAnyPublisher()
     }
 
-    func addPart(_ newPart: OrderPart) -> AnyPublisher<RestaurantOrder, Error> {
+    func addPart(withEntries entries: [OrderEntry]) -> AnyPublisher<RestaurantOrder, Error> {
         // NOTE[pn]: FieldValue.arrayUnion is explicitly used here so that we
         // avoid a potential race condition if two parties were to add a new
         // OrderPart to the same Order without either knowing about the other's
         // changes.
+        let newPart = OrderPart(index: parts.count, entries: entries)
         return firestoreReference
             .updateData([
                 .parts: FieldValue.arrayUnion([

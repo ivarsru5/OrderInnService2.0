@@ -63,8 +63,8 @@ struct MenuView: View {
 
         var subtotal: Currency { entries.map { $0.subtotal(using: menuManager!.menu) }.sum() }
 
-        func asOrderPart() -> RestaurantOrder.OrderPart {
-            return RestaurantOrder.OrderPart(entries: entries)
+        func asOrderPart(withIndex index: Int) -> RestaurantOrder.OrderPart {
+            return RestaurantOrder.OrderPart(index: index, entries: entries)
         }
     }
 

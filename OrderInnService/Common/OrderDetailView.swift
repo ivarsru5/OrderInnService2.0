@@ -213,8 +213,8 @@ struct OrderDetailView_Previews: PreviewProvider {
         }
     static var order: Order {
         let parts = [
-            Part(entries: entries),
-            Part(entries: entries.map { $0.with(isFulfilled: true) }),
+            Part(index: 0, entries: entries),
+            Part(index: 1, entries: entries.map { $0.with(isFulfilled: true) }),
         ]
 
         return Order(restaurantID: restaurant.id, id: "O", state: .open,
