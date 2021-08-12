@@ -14,10 +14,16 @@ struct KitchenTabView: View {
     let restaurant: Restaurant
 
     // HACK[pn 2021-08-03]: See Waiter/TabView.
-    init(restaurant: Restaurant) {
+    fileprivate init(restaurant: Restaurant) {
         self.restaurant = restaurant
         self._menuManager = StateObject(wrappedValue: MenuManager(for: restaurant))
         self._orderManager = StateObject(wrappedValue: OrderManager(for: restaurant, scope: .all))
+    }
+    struct Wrapper: View {
+        @Environment(\.currentRestaurant) var restaurant: Restaurant!
+        var body: some View {
+            KitchenTabView(restaurant: restaurant)
+        }
     }
 
     var body: some View {
@@ -46,7 +52,6 @@ struct KitchenTabView: View {
                 #endif
             }
         }
-        .environment(\.currentRestaurant, restaurant)
         .environmentObject(menuManager)
         .environmentObject(orderManager)
     }

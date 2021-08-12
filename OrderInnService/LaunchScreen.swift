@@ -10,19 +10,24 @@ import SwiftUI
 struct LaunchScreen: View {
     @EnvironmentObject var authManager: AuthManager
     
-    var body: some View {
+    @ViewBuilder var innerBody: some View {
         switch authManager.authState {
         case .loading:
             Spinner()
         case .unauthenticated, .authenticatedWaiterUnknownID(restaurantID: _):
             LoginScreen()
         case .authenticatedWaiter(restaurantID: _, employeeID: _):
-            OrderTabView(authManager: authManager)
+            OrderTabView.Wrapper()
         case .authenticatedKitchen(restaurantID: _, kitchen: _):
-            KitchenTabView(restaurant: authManager.restaurant)
+            KitchenTabView.Wrapper()
         case .authenticatedAdmin(restaurantID: _, admin: _):
             AdminGeneralSelection()
         }
+    }
+    var body: some View {
+        innerBody
+            .environment(\.currentRestaurant, authManager.restaurant)
+            .environment(\.currentEmployee, authManager.waiter)
     }
 }
 

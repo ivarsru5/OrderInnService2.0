@@ -26,19 +26,20 @@ struct OrderTabView: View {
         for: OrderTabView.switchToActiveOrdersFlow, object: nil)
     @State var selectedTab: Selection = .placeOrder
 
-    // HACK[pn 2021-07-30]: Due to Swift's strict but sensible initialisation
-    // rules, it's nigh impossible for us to obtain a reference to the
-    // AuthManager from environment in order to initialise MenuManager with
-    // the restaurant therein, therefore we require the restaurant to be passed
-    // into here explicitly.
-    init(authManager: AuthManager) {
-        let restaurant = authManager.restaurant!
+    fileprivate init(restaurant: Restaurant, waiter: Restaurant.Employee) {
         self.restaurant = restaurant
         _menuManager = StateObject(wrappedValue: MenuManager(for: restaurant))
 
-        let employee = authManager.waiter!
-        let subscriptionScope = OrderManager.SubscriptionScope(defaultFor: employee)
+        let subscriptionScope = OrderManager.SubscriptionScope(defaultFor: waiter)
         _orderManager = StateObject(wrappedValue: OrderManager(for: restaurant, scope: subscriptionScope))
+    }
+    struct Wrapper: View {
+        @Environment(\.currentRestaurant) var restaurant: Restaurant!
+        @Environment(\.currentEmployee) var waiter: Restaurant.Employee!
+
+        var body: some View {
+            OrderTabView(restaurant: restaurant, waiter: waiter)
+        }
     }
 
     var body: some View {
@@ -76,7 +77,6 @@ struct OrderTabView: View {
                 .environmentObject(orderManager)
             }
         }
-        .environment(\.currentRestaurant, restaurant)
         .onReceive(notificationPublisher) { _ in
             withAnimation {
                 selectedTab = .activeOrders
