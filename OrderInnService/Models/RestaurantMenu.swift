@@ -39,18 +39,22 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
         }
     }
 
+    enum Key: String, CodingKey {
+        case name = "name"
+        case type = "type"
+    }
+
     let restaurantID: Restaurant.ID
     let id: ID
     let name: String
     let type: CategoryType
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
-        id = snapshot.documentID
-        name = snapshot["name"] as! String
-        type = try! CategoryType(from: snapshot["type"] as! String)
+    init(from snapshot: KeyedDocumentSnapshot<MenuCategory>) {
+        self.id = snapshot.documentID
+        self.name = snapshot[.name] as! String
+        self.type = try! CategoryType(from: snapshot[.type] as! String)
 
-        let restaurant = snapshot.reference.parent.parent!
+        let restaurant = snapshot.reference.parentDocument(ofKind: Restaurant.self)
         restaurantID = restaurant.documentID
     }
 
@@ -64,21 +68,19 @@ struct MenuCategory: Identifiable, Hashable, FirestoreInitiable {
     #endif
 
     var firestoreReference: TypedDocumentReference<MenuCategory> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(restaurantID)
-            .collection(MenuCategory.firestoreCollection)
+            .collection(of: MenuCategory.self)
             .document(id)
-        return TypedDocumentReference(ref)
     }
 
     static func create(under restaurant: Restaurant,
                        name: String, type: CategoryType) -> AnyPublisher<MenuCategory, Error> {
         restaurant.firestoreReference
-            .collection(self.firestoreCollection, of: MenuCategory.self)
+            .collection(of: MenuCategory.self)
             .addDocument(data: [
-                "name": name,
-                "type": type.rawValue,
+                .name: name,
+                .type: type.rawValue,
             ])
             .get()
     }
@@ -158,6 +160,16 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
         }
     }
 
+    enum Key: String, CodingKey {
+        case name = "name"
+        case price = "price"
+        case destination = "destination"
+        case isAvailable = "isAvailable"
+
+        @available(*, deprecated)
+        case old_isAvailable = "available"
+    }
+
     let restaurantID: Restaurant.ID
     let categoryID: MenuCategory.ID
     let id: ID
@@ -166,26 +178,16 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
     let isAvailable: Bool
     let destination: Destination
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
-        id = snapshot.documentID
-        name = snapshot["name"] as! String
-        price = snapshot["price"] as! Double
-        destination = try! Destination(from: snapshot["destination"] as! String)
+    init(from snapshot: KeyedDocumentSnapshot<MenuItem>) {
+        self.id = snapshot.documentID
+        self.name = snapshot[.name] as! String
+        self.price = snapshot[.price] as! Double
+        self.destination = try! Destination(from: snapshot[.destination] as! String)
+        self.isAvailable = snapshot[.isAvailable, fallback: .old_isAvailable] as! Bool
 
-        if let isAvailable = snapshot["isAvailable"] as? Bool {
-            self.isAvailable = isAvailable
-        } else if let isAvailable = snapshot["available"] as? Bool {
-            // TODO[pn 2021-07-16]: Remove old key name once it's no longer
-            // present on any documents in Firestore.
-            self.isAvailable = isAvailable
-        } else {
-            fatalError("FIXME No valid isAvailable key name found for MenuItem: \(snapshot.reference.path)")
-        }
-
-        let category = snapshot.reference.parent.parent!
+        let category = snapshot.reference.parentDocument(ofKind: MenuCategory.self)
         categoryID = category.documentID
-        let restaurant = category.parent.parent!
+        let restaurant = category.parentDocument(ofKind: Restaurant.self)
         restaurantID = restaurant.documentID
     }
 
@@ -208,14 +210,12 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
     }
 
     var firestoreReference: TypedDocumentReference<MenuItem> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(restaurantID)
-            .collection(MenuCategory.firestoreCollection)
+            .collection(of: MenuCategory.self)
             .document(categoryID)
-            .collection(MenuItem.firestoreCollection)
+            .collection(of: MenuItem.self)
             .document(id)
-        return TypedDocumentReference(ref)
     }
 
     static func create(in category: MenuCategory,
@@ -224,17 +224,17 @@ struct MenuItem: Identifiable, Hashable, FirestoreInitiable {
         category.firestoreReference
             .collection(of: MenuItem.self)
             .addDocument(data: [
-                "name": name,
-                "price": price,
-                "isAvailable": isAvailable,
-                "destination": destination.rawValue,
+                .name: name,
+                .price: price,
+                .isAvailable: isAvailable,
+                .destination: destination.rawValue,
             ])
             .get()
     }
 
     func update(isAvailable: Bool) -> AnyPublisher<MenuItem, Error> {
         self.firestoreReference
-            .updateData(["isAvailable": isAvailable])
+            .updateData([.isAvailable: isAvailable])
             .flatMap { ref in ref.get() }
             .eraseToAnyPublisher()
     }

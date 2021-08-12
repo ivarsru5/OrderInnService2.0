@@ -206,7 +206,7 @@ class AuthManager: ObservableObject {
         }
 
         return waiter!.firestoreReference
-            .updateData(["isActive": true])
+            .updateData([.isActive: true])
             .map { [unowned self] _ in
                 self.waiter = nil
             }
@@ -225,7 +225,7 @@ class AuthManager: ObservableObject {
         // TODO[pn 2021-07-09]: Is there a strategy for marking users as
         // available to use afterwards?
         return user.firestoreReference
-            .updateData(["isActive": false])
+            .updateData([.isActive: false])
             .flatMap { ref in ref.get() }
             .map { [unowned self] user in
                 self.waiter = user

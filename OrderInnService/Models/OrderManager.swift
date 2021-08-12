@@ -24,7 +24,7 @@ class OrderManager: ObservableObject {
         case all
 
         init(defaultFor employee: Restaurant.Employee) {
-            if employee.manager {
+            if employee.isManager {
                 self = .all
             } else {
                 self = .onlyPlacedBy(employee: employee)
@@ -37,10 +37,10 @@ class OrderManager: ObservableObject {
                 .query
 
             if case let .onlyPlacedBy(employee) = self {
-                query = query.whereField("placedBy", isEqualTo: employee.firestoreReference.untyped)
+                query = query.whereField(.placedBy, isEqualTo: employee.firestoreReference.untyped)
             }
 
-            query = query.order(by: "createdAt", descending: true)
+            query = query.order(by: .createdAt, descending: true)
 
             return query
         }

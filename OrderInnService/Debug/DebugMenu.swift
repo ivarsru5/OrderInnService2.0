@@ -76,7 +76,7 @@ struct DebugMenu: View {
             return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
         }
         return waiter.firestoreReference
-            .updateData(["isActive": true])
+            .updateData([.isActive: true])
             .map { _ in }
             .eraseToAnyPublisher()
     }

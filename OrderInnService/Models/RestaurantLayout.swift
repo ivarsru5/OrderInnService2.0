@@ -14,17 +14,20 @@ struct Zone: FirestoreInitiable, Identifiable {
     // TODO[pn 2021-07-13]: Pluralisation typo.
     static let firestoreCollection = "Zone"
 
+    enum Key: String, CodingKey {
+        case location = "location"
+    }
+
     let restaurantID: Restaurant.ID
     let id: ID
     let location: String
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
-        id = snapshot.documentID
-        location = snapshot["location"] as! String
+    init(from snapshot: KeyedDocumentSnapshot<Zone>) {
+        self.id = snapshot.documentID
+        self.location = snapshot[.location] as! String
 
-        let restaurant = snapshot.reference.parent.parent!
-        restaurantID = restaurant.documentID
+        let restaurant = snapshot.reference.parentDocument(ofKind: Restaurant.self)
+        self.restaurantID = restaurant.documentID
     }
 
     #if DEBUG
@@ -36,12 +39,10 @@ struct Zone: FirestoreInitiable, Identifiable {
     #endif
 
     var firestoreReference: TypedDocumentReference<Zone> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(restaurantID)
-            .collection(Zone.firestoreCollection)
+            .collection(of: Zone.self)
             .document(id)
-        return TypedDocumentReference(ref)
     }
 }
 
@@ -57,28 +58,26 @@ struct Table: FirestoreInitiable, Identifiable {
 
     static let firestoreCollection = "Tables"
 
+    enum Key: String, CodingKey {
+        case name = "name"
+
+        @available(*, deprecated)
+        case old_name = "table"
+    }
+
     let restaurantID: Restaurant.ID
     let zoneID: Zone.ID
     let id: ID
     let name: String
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
-        id = snapshot.documentID
-        if let name = snapshot["name"] as? String {
-            self.name = name
-        } else if let name = snapshot["table"] as? String {
-            // TODO[pn 2021-07-16]: Remove old key name once it's no longer
-            // present on any documents in Firestore.
-            self.name = name
-        } else {
-            fatalError("FIXME No valid isAvailable key name found for LayoutTable: \(snapshot.reference.path)")
-        }
+    init(from snapshot: KeyedDocumentSnapshot<Table>) {
+        self.id = snapshot.documentID
+        self.name = snapshot[.name, fallback: .old_name] as! String
 
-        let zone = snapshot.reference.parent.parent!
-        zoneID = zone.documentID
-        let restaurant = zone.parent.parent!
-        restaurantID = restaurant.documentID
+        let zone = snapshot.reference.parentDocument(ofKind: Zone.self)
+        self.zoneID = zone.documentID
+        let restaurant = zone.parentDocument(ofKind: Restaurant.self)
+        self.restaurantID = restaurant.documentID
     }
 
     #if DEBUG
@@ -95,23 +94,16 @@ struct Table: FirestoreInitiable, Identifiable {
     }
 
     var firestoreReference: TypedDocumentReference<Table> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
-            .document(restaurantID)
-            .collection(Zone.firestoreCollection)
-            .document(zoneID)
-            .collection(Table.firestoreCollection)
-            .document(id)
-        return TypedDocumentReference(ref)
+        return zoneReference
+            .collection(of: Table.self)
+            .document(self.id)
     }
 
     var zoneReference: TypedDocumentReference<Zone> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(restaurantID)
-            .collection(Zone.firestoreCollection)
+            .collection(of: Zone.self)
             .document(zoneID)
-        return TypedDocumentReference(ref)
     }
 }
 

@@ -46,3 +46,18 @@ extension Array {
         self.insert(element, at: index)
     }
 }
+
+extension Dictionary {
+    /// Creates a new dictionary whose keys are mapped from the current one using `transform`.
+    ///
+    /// If `transform` returns the same key for multiple pairs, only one value will remain in the mapped
+    /// dictionary, though the exact choice of value is undefined and depends on the key hash ordering.
+    func mapKeys<NewKey: Hashable>(_ transform: (Element) throws -> NewKey) rethrows -> [NewKey: Value] {
+        var newDict = Dictionary<NewKey, Value>(minimumCapacity: self.count)
+        try self.forEach { element in
+            let newKey = try transform(element)
+            newDict[newKey] = element.value
+        }
+        return newDict
+    }
+}

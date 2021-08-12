@@ -17,11 +17,15 @@ struct Restaurant: Identifiable, FirestoreInitiable {
     let name: String
     let subscriptionPaid: Bool
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
+    enum Key: String, CodingKey {
+        case name = "name"
+        case subscriptionPaid = "subscriptionPaid"
+    }
+
+    init(from snapshot: KeyedDocumentSnapshot<Restaurant>) {
         self.id = snapshot.documentID
-        self.name = snapshot["name"] as! String
-        self.subscriptionPaid = snapshot["subscriptionPaid"] as! Bool
+        self.name = snapshot[.name] as! String
+        self.subscriptionPaid = snapshot[.subscriptionPaid] as! Bool
     }
 
     #if DEBUG
@@ -33,30 +37,24 @@ struct Restaurant: Identifiable, FirestoreInitiable {
     #endif
 
     static func load(withID id: String) -> AnyPublisher<Restaurant, Error> {
-        return Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(id)
-            .getDocumentFuture()
-            .map { snapshot in
-                return Restaurant(from: snapshot)
-            }
-            .eraseToAnyPublisher()
+            .get()
     }
 
     var firestoreReference: TypedDocumentReference<Restaurant> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(id)
-        return TypedDocumentReference(ref)
     }
 
     var users: TypedCollectionReference<Employee> {
-        firestoreReference.collection(Employee.firestoreCollection, of: Employee.self)
+        firestoreReference.collection(of: Employee.self)
     }
     var orders: TypedCollectionReference<RestaurantOrder> {
         firestoreReference.collection(of: RestaurantOrder.self)
     }
 
+    @available(*, deprecated, message: "Call get() on .users instead")
     func loadUsers() -> AnyPublisher<[Employee], Error> {
         return users
             .get()
@@ -72,63 +70,95 @@ struct Restaurant: Identifiable, FirestoreInitiable {
 
         let restaurantID: Restaurant.ID
         let id: ID
-        // TODO[pn 2021-07-09]: Is there a reason we're storing first and last
-        // names separately and they instead couldn't be stored in a single
-        // field?
-        let name: String
-        let lastName: String
-        let manager: Bool
+        let fullName: String
+        let isManager: Bool
         let isActive: Bool
 
-        var fullName: String {
-            "\(name) \(lastName)"
+        @available(*, deprecated, message: "Use firstName or fullName instead")
+        var name: String { firstName }
+        var firstName: String {
+            var parts = fullName.split(separator: " ")
+            _ = parts.popLast()
+            return parts.joined(separator: " ")
+        }
+        var lastName: String {
+            let parts = fullName.split(separator: " ")
+            return String(parts.last!)
         }
 
-        init(from snapshot: DocumentSnapshot) {
-            precondition(snapshot.exists)
-            self.id = snapshot.documentID
-            self.name = snapshot["name"] as! String
-            self.lastName = snapshot["lastName"] as! String
-            self.isActive = snapshot["isActive"] as! Bool
-            self.manager = snapshot["manager"] as! Bool
+        enum Key: String, CodingKey {
+            case fullName = "fullName"
+            case isActive = "isActive"
+            case isManager = "isManager"
 
-            let restaurant = snapshot.reference.parent.parent!
+            case old_firstName = "name"
+            case old_lastName = "lastName"
+            case old_isManager = "manager"
+        }
+
+        init(from snapshot: KeyedDocumentSnapshot<Employee>) {
+            self.id = snapshot.documentID
+
+            if let fullName = snapshot[.fullName] as? String {
+                self.fullName = fullName
+            } else if let firstName = snapshot[.old_firstName] as? String,
+                      let lastName = snapshot[.old_lastName] as? String {
+                self.fullName = "\(firstName) \(lastName)"
+            } else {
+                fatalError("Unknown document format: Users/\(snapshot.documentID) has no valid name format")
+            }
+
+            self.isActive = snapshot[.isActive] as! Bool
+            self.isManager = snapshot[.isManager, fallback: .old_isManager] as! Bool
+
+            let restaurant = snapshot.reference.parentDocument(ofKind: Restaurant.self)
             self.restaurantID = restaurant.documentID
         }
 
         #if DEBUG
+        @available(*, deprecated, message: "Use init(restaurantID: id: fullName: isManager: isActive:) instead")
         init(restaurantID: Restaurant.ID, id: ID, name: String, lastName: String,
              manager: Bool, isActive: Bool) {
+            self.init(restaurantID: restaurantID, id: id,
+                      fullName: "\(name) \(lastName)", isManager: manager,
+                      isActive: isActive)
+        }
+
+        init(restaurantID: Restaurant.ID, id: ID, fullName: String,
+             isManager: Bool, isActive: Bool) {
             self.restaurantID = restaurantID
             self.id = id
-            self.name = name
-            self.lastName = lastName
-            self.manager = manager
+            self.fullName = fullName
+            self.isManager = isManager
             self.isActive = isActive
         }
         #endif
 
+        @available(*, deprecated, message: "Use init(under: fullName: isManager: isActive:) instead")
         static func create(under restaurant: Restaurant,
                            name: String, lastName: String, manager: Bool,
                            isActive: Bool = true) -> AnyPublisher<Employee, Error> {
+            return self.create(under: restaurant, fullName: "\(name) \(lastName)",
+                               isManager: manager, isActive: isActive)
+        }
+
+        static func create(under restaurant: Restaurant, fullName: String,
+                           isManager: Bool, isActive: Bool = true) -> AnyPublisher<Employee, Error> {
             return restaurant.users
                 .addDocumentAndCommit(data: [
-                    "name": name,
-                    "lastName": lastName,
-                    "manager": manager,
-                    "isActive": isActive,
+                    .fullName: fullName,
+                    .isManager: isManager,
+                    .isActive: isActive,
                 ])
                 .flatMap { ref in ref.get() }
                 .eraseToAnyPublisher()
         }
 
         var firestoreReference: TypedDocumentReference<Employee> {
-            let ref = Firestore.firestore()
-                .collection(Restaurant.firestoreCollection)
+            TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
                 .document(restaurantID)
-                .collection(Employee.firestoreCollection)
+                .collection(of: Employee.self)
                 .document(id)
-            return TypedDocumentReference(ref)
         }
 
         func delete() -> AnyPublisher<Void, Error> {
@@ -139,14 +169,21 @@ struct Restaurant: Identifiable, FirestoreInitiable {
 
 #if canImport(SwiftUI)
 import SwiftUI
+
 struct CurrentRestaurant: EnvironmentKey {
-    typealias Value = Restaurant?
     static var defaultValue: Restaurant? = nil
+}
+struct CurrentEmployee: EnvironmentKey {
+    static var defaultValue: Restaurant.Employee? = nil
 }
 extension EnvironmentValues {
     var currentRestaurant: Restaurant? {
         get { self[CurrentRestaurant.self] }
         set { self[CurrentRestaurant.self] = newValue }
+    }
+    var currentEmployee: Restaurant.Employee? {
+        get { self[CurrentEmployee.self] }
+        set { self[CurrentEmployee.self] = newValue }
     }
 }
 #endif

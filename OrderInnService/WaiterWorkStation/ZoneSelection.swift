@@ -73,7 +73,7 @@ struct ZoneSelection: View {
         .listStyle(InsetGroupedListStyle())
         .navigationTitle(Text("Zones"))
         .navigationBarItems(trailing: HStack {
-            if authManager.waiter?.manager ?? false {
+            if authManager.waiter?.isManager ?? false {
                 NavigationLink(destination: Text("Hello world! (Please replace with manager view)")) {
                     Image(systemName: "folder")
                         .foregroundColor(.link)

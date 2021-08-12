@@ -150,6 +150,14 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         }
     }
 
+    enum Key: String, CodingKey {
+        case state = "state"
+        case table = "table"
+        case placedBy = "placedBy"
+        case createdAt = "createdAt"
+        case parts = "parts"
+    }
+
     let restaurantID: Restaurant.ID
     let id: ID
     let state: OrderState
@@ -162,18 +170,17 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         return parts.map { part in part.subtotal(using: menu) }.sum()
     }
 
-    init(from snapshot: DocumentSnapshot) {
-        precondition(snapshot.exists)
+    init(from snapshot: KeyedDocumentSnapshot<RestaurantOrder>) {
         id = snapshot.documentID
-        state = try! OrderState(from: snapshot["state"] as! String)
-        table = .init(snapshot["table"] as! DocumentReference)
-        placedBy = .init(snapshot["placedBy"] as! DocumentReference)
-        createdAt = ISO8601DateFormatter().date(from: snapshot["createdAt"] as! String)!
+        state = try! OrderState(from: snapshot[.state] as! String)
+        table = .init(snapshot[.table] as! DocumentReference)
+        placedBy = .init(snapshot[.placedBy] as! DocumentReference)
+        createdAt = ISO8601DateFormatter().date(from: snapshot[.createdAt] as! String)!
 
-        let restaurant = snapshot.reference.parent.parent!
+        let restaurant = snapshot.reference.parentDocument(ofKind: Restaurant.self)
         restaurantID = restaurant.documentID
 
-        let parts = snapshot["parts"] as! [Any]
+        let parts = snapshot[.parts] as! [Any]
         let json = JSONDecoder()
         self.parts = parts.map { part in
             // FIXME[pn 2021-07-20]: Normally every part should be a binary,
@@ -238,29 +245,28 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         }
 
         return restaurant.firestoreReference
-            .collection(self.firestoreCollection, of: RestaurantOrder.self)
-            .addDocument(data: [
-                "state": OrderState.new.rawValue,
-                "table": table.firestoreReference.untyped,
-                "placedBy": user.firestoreReference.untyped,
-                "createdAt": ISO8601DateFormatter().string(from: Date()),
-                "parts": parts,
+            .collection(of: RestaurantOrder.self)
+            .addDocumentAndCommit(data: [
+                .state: OrderState.new.rawValue,
+                .table: table.firestoreReference.untyped,
+                .placedBy: user.firestoreReference.untyped,
+                .createdAt: ISO8601DateFormatter().string(from: Date()),
+                .parts: parts,
             ])
-            .get()
+            .flatMap { ref in ref.get() }
+            .eraseToAnyPublisher()
     }
 
     var firestoreReference: TypedDocumentReference<RestaurantOrder> {
-        let ref = Firestore.firestore()
-            .collection(Restaurant.firestoreCollection)
+        TypedCollectionReference.root(Firestore.firestore(), of: Restaurant.self)
             .document(restaurantID)
-            .collection(RestaurantOrder.firestoreCollection)
+            .collection(of: RestaurantOrder.self)
             .document(id)
-        return TypedDocumentReference(ref)
     }
 
     func updateState(_ newState: OrderState) -> AnyPublisher<RestaurantOrder, Error> {
         return firestoreReference
-            .updateData(["state": newState.rawValue])
+            .updateData([.state: newState.rawValue])
             .flatMap { ref in ref.get() }
             .eraseToAnyPublisher()
     }
@@ -272,7 +278,7 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         // changes.
         return firestoreReference
             .updateData([
-                "parts": FieldValue.arrayUnion([
+                .parts: FieldValue.arrayUnion([
                     try! JSONEncoder().encode(newPart),
                 ]),
             ])
