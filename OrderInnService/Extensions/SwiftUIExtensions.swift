@@ -33,7 +33,7 @@ extension Color {
 // https://stackoverflow.com/a/60203901
 // Required as long as base supported version is iOS 14. Swift 5.4 allows
 // `if let` in result builders, rendering this unnecessary.
-struct IfLet<Value, Content, NilContent>: View where Content: View, NilContent: View {
+struct IfLet<Value, Content: View, NilContent: View>: View {
     typealias ContentBuilder = (Value) -> Content
     typealias NilContentBuilder = () -> NilContent
 
@@ -51,6 +51,12 @@ struct IfLet<Value, Content, NilContent>: View where Content: View, NilContent: 
         self.nilContentBuilder = nilContentBuilder
     }
 
+    init(_ value: Value?,
+         @ViewBuilder whenPresent contentBuilder: @escaping ContentBuilder
+    ) where NilContent == EmptyView {
+        self.init(value, whenPresent: contentBuilder, whenAbsent: { EmptyView() })
+    }
+
     var body: some View {
         Group {
             if value != nil {
@@ -59,12 +65,6 @@ struct IfLet<Value, Content, NilContent>: View where Content: View, NilContent: 
                 nilContentBuilder()
             }
         }
-    }
-}
-
-extension IfLet where NilContent == EmptyView {
-    init(_ value: Value?, @ViewBuilder whenPresent contentBuilder: @escaping ContentBuilder) {
-        self.init(value, whenPresent: contentBuilder, whenAbsent: { EmptyView() })
     }
 }
 

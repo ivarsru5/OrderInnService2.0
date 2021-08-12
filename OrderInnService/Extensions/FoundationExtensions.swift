@@ -61,3 +61,13 @@ extension Dictionary {
         return newDict
     }
 }
+
+extension Optional {
+    /// Zip two optional values into a tuple that's present if and only if both optional values were present.
+    func zip<T>(_ opt1: T?) -> (Wrapped, T)? {
+        guard let val0 = self, let val1 = opt1 else {
+            return nil
+        }
+        return (val0, val1)
+    }
+}

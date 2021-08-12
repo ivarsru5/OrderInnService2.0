@@ -34,11 +34,13 @@ struct OrderTabView: View {
         _orderManager = StateObject(wrappedValue: OrderManager(for: restaurant, scope: subscriptionScope))
     }
     struct Wrapper: View {
-        @Environment(\.currentRestaurant) var restaurant: Restaurant!
-        @Environment(\.currentEmployee) var waiter: Restaurant.Employee!
+        @Environment(\.currentRestaurant) var restaurant: Restaurant?
+        @Environment(\.currentEmployee) var waiter: Restaurant.Employee?
 
         var body: some View {
-            OrderTabView(restaurant: restaurant, waiter: waiter)
+            IfLet(restaurant.zip(waiter)) { (restaurant, waiter) in
+                OrderTabView(restaurant: restaurant, waiter: waiter)
+            }
         }
     }
 
