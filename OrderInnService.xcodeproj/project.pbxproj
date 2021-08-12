@@ -11,12 +11,10 @@
 		5801CC3626A5756200DD3DEC /* RestaurantActiveOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3526A5756200DD3DEC /* RestaurantActiveOrders.swift */; };
 		5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3826A5774D00DD3DEC /* ActiveOrders.swift */; };
 		5801CC3C26A580EC00DD3DEC /* ActiveOrderInfoView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3B26A580EC00DD3DEC /* ActiveOrderInfoView.swift */; };
-		5801CC4026A588A300DD3DEC /* PreperedOrderView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC3F26A588A300DD3DEC /* PreperedOrderView.swift */; };
 		5801CC4426A59F2C00DD3DEC /* PreperedOrderInfo.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5801CC4326A59F2C00DD3DEC /* PreperedOrderInfo.swift */; };
 		580506F526296723007CF39B /* Restaurant.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580506F426296723007CF39B /* Restaurant.swift */; };
 		580E1E232636D5AA00A16228 /* TabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E1E222636D5AA00A16228 /* TabView.swift */; };
 		580E1E2D2636D61300A16228 /* ActiveOrderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580E1E2C2636D61300A16228 /* ActiveOrderListView.swift */; };
-		580F92B52639D30E00E710A0 /* ExtraItemCategoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */; };
 		580FEE3D26412C07006ED835 /* KitchenOrderListView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 580FEE3C26412C07006ED835 /* KitchenOrderListView.swift */; };
 		5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F942262DE4EA00050F2C /* UserDefaultsExtension.swift */; };
 		5811F946262DE53000050F2C /* LaunchScreen.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5811F945262DE53000050F2C /* LaunchScreen.swift */; };
@@ -28,12 +26,10 @@
 		582066DC2628129400D3BCCA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DB2628129400D3BCCA /* Assets.xcassets */; };
 		582066DF2628129400D3BCCA /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 582066DE2628129400D3BCCA /* Preview Assets.xcassets */; };
 		582066E92628166900D3BCCA /* GoogleService-Info.plist in Resources */ = {isa = PBXBuildFile; fileRef = 582066E82628166900D3BCCA /* GoogleService-Info.plist */; };
-		583FCE38269D9C48006F64ED /* ManagerAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583FCE37269D9C48006F64ED /* ManagerAccess.swift */; };
 		583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 583FCE39269D9CCD006F64ED /* ManagerView.swift */; };
 		585231E5262DA90100826BBC /* ZoneSelection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 585231E4262DA90100826BBC /* ZoneSelection.swift */; };
 		5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */; };
 		58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58B5D4B32630267E00FC9223 /* TableSelectionView.swift */; };
-		58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */; };
 		58F07AA22628218400574D4F /* QRScannerViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA12628218400574D4F /* QRScannerViewController.swift */; };
 		58F07AA52628255200574D4F /* QRScannerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA42628255200574D4F /* QRScannerView.swift */; };
 		58F07AA92628274700574D4F /* AlertItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 58F07AA82628274700574D4F /* AlertItem.swift */; };
@@ -102,12 +98,10 @@
 		5801CC3526A5756200DD3DEC /* RestaurantActiveOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantActiveOrders.swift; sourceTree = "<group>"; };
 		5801CC3826A5774D00DD3DEC /* ActiveOrders.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrders.swift; sourceTree = "<group>"; };
 		5801CC3B26A580EC00DD3DEC /* ActiveOrderInfoView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderInfoView.swift; sourceTree = "<group>"; };
-		5801CC3F26A588A300DD3DEC /* PreperedOrderView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreperedOrderView.swift; sourceTree = "<group>"; };
 		5801CC4326A59F2C00DD3DEC /* PreperedOrderInfo.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PreperedOrderInfo.swift; sourceTree = "<group>"; };
 		580506F426296723007CF39B /* Restaurant.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Restaurant.swift; sourceTree = "<group>"; };
 		580E1E222636D5AA00A16228 /* TabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabView.swift; sourceTree = "<group>"; };
 		580E1E2C2636D61300A16228 /* ActiveOrderListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderListView.swift; sourceTree = "<group>"; };
-		580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ExtraItemCategoryView.swift; sourceTree = "<group>"; };
 		580FEE3C26412C07006ED835 /* KitchenOrderListView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KitchenOrderListView.swift; sourceTree = "<group>"; };
 		5811F942262DE4EA00050F2C /* UserDefaultsExtension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UserDefaultsExtension.swift; sourceTree = "<group>"; };
 		5811F945262DE53000050F2C /* LaunchScreen.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LaunchScreen.swift; sourceTree = "<group>"; };
@@ -121,12 +115,10 @@
 		582066DE2628129400D3BCCA /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		582066E02628129400D3BCCA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		582066E82628166900D3BCCA /* GoogleService-Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = "GoogleService-Info.plist"; sourceTree = "<group>"; };
-		583FCE37269D9C48006F64ED /* ManagerAccess.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerAccess.swift; sourceTree = "<group>"; };
 		583FCE39269D9CCD006F64ED /* ManagerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ManagerView.swift; sourceTree = "<group>"; };
 		585231E4262DA90100826BBC /* ZoneSelection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ZoneSelection.swift; sourceTree = "<group>"; };
 		5852BCD02631A4C700E8DC1F /* RestaurantOrder.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RestaurantOrder.swift; sourceTree = "<group>"; };
 		58B5D4B32630267E00FC9223 /* TableSelectionView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TableSelectionView.swift; sourceTree = "<group>"; };
-		58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ActiveOrderOverviewWork.swift; sourceTree = "<group>"; };
 		58F07AA12628218400574D4F /* QRScannerViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerViewController.swift; sourceTree = "<group>"; };
 		58F07AA42628255200574D4F /* QRScannerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QRScannerView.swift; sourceTree = "<group>"; };
 		58F07AA82628274700574D4F /* AlertItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AlertItem.swift; sourceTree = "<group>"; };
@@ -221,14 +213,6 @@
 			path = ClosedOrders;
 			sourceTree = "<group>";
 		};
-		5801CC3E26A5885000DD3DEC /* PreperedOrders */ = {
-			isa = PBXGroup;
-			children = (
-				5801CC3F26A588A300DD3DEC /* PreperedOrderView.swift */,
-			);
-			path = PreperedOrders;
-			sourceTree = "<group>";
-		};
 		580506F32629670B007CF39B /* Models */ = {
 			isa = PBXGroup;
 			children = (
@@ -265,8 +249,7 @@
 				5813CC5526309EB700924ED9 /* MenuView.swift */,
 				58F0D7402632E51F0093B6EA /* OrderCartReviewView.swift */,
 				580E1E2C2636D61300A16228 /* ActiveOrderListView.swift */,
-				58F2895926384E3C00C973DB /* ActiveOrderOverview */,
-				5801CC3E26A5885000DD3DEC /* PreperedOrders */,
+				58F2895A26384E6200C973DB /* ActiveOrderDetailView.swift */,
 				583FCE36269D9BFC006F64ED /* ManagerControls */,
 			);
 			path = WaiterWorkStation;
@@ -364,7 +347,6 @@
 		583FCE36269D9BFC006F64ED /* ManagerControls */ = {
 			isa = PBXGroup;
 			children = (
-				583FCE37269D9C48006F64ED /* ManagerAccess.swift */,
 				583FCE39269D9CCD006F64ED /* ManagerView.swift */,
 			);
 			path = ManagerControls;
@@ -390,16 +372,6 @@
 				695C3DD6269DD9600084E449 /* FoundationExtensions.swift */,
 			);
 			path = Extensions;
-			sourceTree = "<group>";
-		};
-		58F2895926384E3C00C973DB /* ActiveOrderOverview */ = {
-			isa = PBXGroup;
-			children = (
-				58E6111F263888C600BE159D /* ActiveOrderOverviewWork.swift */,
-				58F2895A26384E6200C973DB /* ActiveOrderDetailView.swift */,
-				580F92B42639D30E00E710A0 /* ExtraItemCategoryView.swift */,
-			);
-			path = ActiveOrderOverview;
 			sourceTree = "<group>";
 		};
 		58FF99B326A1688400A99F38 /* PersonelControlls */ = {
@@ -623,7 +595,6 @@
 				5813CC5626309EB700924ED9 /* MenuView.swift in Sources */,
 				69766FCD26B993E900DBD18C /* OrderManager.swift in Sources */,
 				580E1E232636D5AA00A16228 /* TabView.swift in Sources */,
-				58E61120263888C600BE159D /* ActiveOrderOverviewWork.swift in Sources */,
 				5801CC3626A5756200DD3DEC /* RestaurantActiveOrders.swift in Sources */,
 				5818DF90262DA50000352CE9 /* ActivityIndicatior.swift in Sources */,
 				58F07AA22628218400574D4F /* QRScannerViewController.swift in Sources */,
@@ -638,7 +609,6 @@
 				695C3DDB269DE8D90084E449 /* RestaurantMenu.swift in Sources */,
 				69142D44269740E20044D34F /* DebugMenu.swift in Sources */,
 				58F07AB726284ED500574D4F /* HalfModalView.swift in Sources */,
-				5801CC4026A588A300DD3DEC /* PreperedOrderView.swift in Sources */,
 				5801CC3926A5774D00DD3DEC /* ActiveOrders.swift in Sources */,
 				69FA30EF26C54A360078FD89 /* FirestoreSnapshotPublisher.swift in Sources */,
 				5811F946262DE53000050F2C /* LaunchScreen.swift in Sources */,
@@ -651,7 +621,6 @@
 				5801CC3C26A580EC00DD3DEC /* ActiveOrderInfoView.swift in Sources */,
 				580E1E2D2636D61300A16228 /* ActiveOrderListView.swift in Sources */,
 				5852BCD12631A4C700E8DC1F /* RestaurantOrder.swift in Sources */,
-				583FCE38269D9C48006F64ED /* ManagerAccess.swift in Sources */,
 				695C3DD1269CA6660084E449 /* CombineExtensions.swift in Sources */,
 				58B5D4B42630267E00FC9223 /* TableSelectionView.swift in Sources */,
 				58FF99B726A168B700A99F38 /* AddPersonel.swift in Sources */,
@@ -661,7 +630,6 @@
 				58F2895B26384E6200C973DB /* ActiveOrderDetailView.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,
 				58F07AA92628274700574D4F /* AlertItem.swift in Sources */,
-				580F92B52639D30E00E710A0 /* ExtraItemCategoryView.swift in Sources */,
 				58F07AB3262830D400574D4F /* BlurEffect.swift in Sources */,
 				58FF99B226A158C400A99F38 /* AdminGeneralSelection.swift in Sources */,
 				580FEE3D26412C07006ED835 /* KitchenOrderListView.swift in Sources */,
