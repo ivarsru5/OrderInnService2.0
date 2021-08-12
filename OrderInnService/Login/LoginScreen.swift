@@ -125,7 +125,7 @@ struct EmployeeList: View {
                             .font(.custom("SF Symbols", size: 20))
                             .padding(.all, 5)
 
-                        Text("\(user.name) \(user.lastName)")
+                        Text(user.fullName)
                             .foregroundColor(Color(UIColor.label))
                             .padding(.all, 10)
                     }

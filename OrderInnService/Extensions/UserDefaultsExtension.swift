@@ -77,20 +77,4 @@ extension UserDefaults {
             UserDefaults.standard.removeObject(forKey: key.key)
         }
     }
-
-    // HACK[pn 2021-07-09]: This is to preserve compatibility with as-of-yet
-    // unrewritten parts of the codebase that rely on this to fetch documents
-    // directly from Firebase instead of using the model objects. Remove as
-    // soon as it's not referenced anywhere.
-    var wiaterQrStringKey: String {
-        return restaurantID!
-    }
-    var kitchenQrStringKey: String {
-        return restaurantID!
-    }
-    var currentUser: String {
-        get { return _userDefaults_hack_currentUser }
-        set { _userDefaults_hack_currentUser = newValue }
-    }
 }
-fileprivate var _userDefaults_hack_currentUser = ""

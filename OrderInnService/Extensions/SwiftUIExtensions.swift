@@ -104,9 +104,4 @@ extension View {
     func bodyFont(size: CGFloat, weight: Font.Weight) -> some View {
         modifier(BodyFont(size: size, weight: weight))
     }
-
-    @available(*, deprecated, message: "Use bodyFont(size:) instead")
-    func symbolSize(_ size: CGFloat) -> some View {
-        bodyFont(size: size)
-    }
 }

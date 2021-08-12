@@ -12,7 +12,7 @@ struct AddPersonel: View {
     @EnvironmentObject var authManager: AuthManager
     @State var firstName = ""
     @State var lastName = ""
-    @State var manager = false
+    @State var isManager = false
     @State var sendingQuery = false
     
     func addPersonel() {
@@ -20,7 +20,8 @@ struct AddPersonel: View {
 
         var sub: AnyCancellable?
         sub = Restaurant.Employee.create(under: authManager.restaurant,
-                                         name: firstName, lastName: lastName, manager: manager)
+                                         fullName: "\(firstName) \(lastName)",
+                                         isManager: isManager)
             .mapError { error in
                 // TODO[pn 2021-07-29]
                 fatalError("FIXME Failed to create employee: \(String(describing: error))")
@@ -31,7 +32,7 @@ struct AddPersonel: View {
                 }
                 firstName = ""
                 lastName = ""
-                manager = false
+                isManager = false
                 sendingQuery = false
             }
     }
@@ -48,7 +49,7 @@ struct AddPersonel: View {
                     TextField("Last Name", text: $lastName)
                 }
 
-                Toggle(isOn: $manager, label: {
+                Toggle(isOn: $isManager, label: {
                     Text("Enable Manager Status")
                 })
             }

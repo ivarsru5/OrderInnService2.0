@@ -121,8 +121,8 @@ struct OrderCartReviewView_Previews: PreviewProvider {
 
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let employee = Restaurant.Employee(restaurantID: restaurant.id, id: "E",
-                                              name: "Test", lastName: "Employee",
-                                              manager: false, isActive: false)
+                                              fullName: "Test Employee",
+                                              isManager: false, isActive: false)
 
     static let layout = Layout(autoZones: [
         Zone(id: "Z", location: "Test Zone", restaurantID: restaurant.id),

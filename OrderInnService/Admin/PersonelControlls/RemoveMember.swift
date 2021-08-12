@@ -21,7 +21,7 @@ struct RemoveMember: View {
 
     func loadUsers() {
         var sub: AnyCancellable?
-        sub = authManager.restaurant.loadUsers()
+        sub = authManager.restaurant.users.get().collect()
             .mapError { error in
                 // TODO
                 fatalError("FIXME Failed to load users for deletion: \(String(describing: error))")
@@ -67,7 +67,10 @@ struct RemoveMember: View {
                     isUserBeingRemoved = false
                     users!.remove(at: index)
                 }
-                return authManager.restaurant.loadUsers()
+                return authManager.restaurant.users
+                    .get()
+                    .collect()
+                    .eraseToAnyPublisher()
             }
             .mapError { error in
                 // TODO[pn 2021-07-29]
@@ -158,9 +161,9 @@ struct RemoveMember_Previews: PreviewProvider {
     static let restaurant = Restaurant(id: "R", name: "Test Restaurant", subscriptionPaid: true)
     static let authManager = AuthManager(debugWithRestaurant: restaurant, waiter: nil, kitchen: nil)
     static let users: [Restaurant.Employee] = [
-        .init(restaurantID: restaurant.id, id: "E1", name: "Testuser", lastName: "1", manager: false, isActive: true),
-        .init(restaurantID: restaurant.id, id: "E2", name: "Testuser", lastName: "2", manager: false, isActive: true),
-        .init(restaurantID: restaurant.id, id: "E3", name: "Testuser", lastName: "3", manager: false, isActive: true),
+        .init(restaurantID: restaurant.id, id: "E1", fullName: "Test User 1", isManager: false, isActive: true),
+        .init(restaurantID: restaurant.id, id: "E2", fullName: "Test User 2", isManager: false, isActive: true),
+        .init(restaurantID: restaurant.id, id: "E3", fullName: "Test User 3", isManager: false, isActive: true),
     ]
 
     static var previews: some View {

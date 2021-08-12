@@ -56,13 +56,7 @@ class AuthManager: ObservableObject {
     }
 
     var restaurant: Restaurant!
-    var waiter: Restaurant.Employee? {
-         didSet {
-             if let waiter = self.waiter {
-                 UserDefaults.standard.currentUser = "\(waiter.name) \(waiter.lastName)"
-             }
-         }
-     }
+    var waiter: Restaurant.Employee?
     private(set) var kitchen: String?
 
     init() {
@@ -252,9 +246,6 @@ class AuthManager: ObservableObject {
         case .authenticatedWaiter(restaurantID: let _restaurantID, employeeID: let _userID):
             restaurantID = _restaurantID
             userID = _userID
-
-            // HACK[pn]: Please see UserDefaultsExtension. 
-            UserDefaults.standard.currentUser = "\(waiter!.name) \(waiter!.lastName)"
         case .authenticatedKitchen(restaurantID: let _restaurantID, kitchen: _):
             restaurantID = _restaurantID
             userID = nil

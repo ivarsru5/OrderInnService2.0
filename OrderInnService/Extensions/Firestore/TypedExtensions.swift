@@ -113,10 +113,6 @@ struct TypedDocumentReference<Document> where Document : FirestoreInitiable {
         return TypedDocumentReference<Parent>(untyped.parent.parent!)
     }
 
-    @available(*, deprecated, message: "Use collection(of:) instead of specifying the path manually")
-    func collection<Child>(_ path: String, of: Child.Type) -> TypedCollectionReference<Child> where Child : FirestoreInitiable {
-        TypedCollectionReference(untyped.collection(path))
-    }
     func collection<Child>(of: Child.Type) -> TypedCollectionReference<Child> where Child : FirestoreInitiable {
         TypedCollectionReference(untyped.collection(Child.firestoreCollection))
     }
