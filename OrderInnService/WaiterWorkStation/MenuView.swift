@@ -209,7 +209,8 @@ struct MenuView: View {
 
     let menuManager: MenuManager
     @StateObject var part: PendingOrderPart
-    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
+    @Environment(\.o6nIsPresented) var isPresented: Bool
+    @Environment(\.o6nDismiss) var dismiss: DismissAction
 
     let context: Context
     @State var alertTemplate: Alerts.Template?
@@ -244,7 +245,7 @@ struct MenuView: View {
         @EnvironmentObject var menuManager: MenuManager
         let context: MenuView.Context
 
-        var body: MenuView {
+        var body: some View {
             MenuView(menuManager: menuManager, context: context)
         }
     }
@@ -274,8 +275,8 @@ struct MenuView: View {
             }
         case .appendedOrder(part: _):
             Button(action: {
-                if presentationMode.isPresented {
-                    presentationMode.dismiss()
+                if isPresented {
+                    dismiss()
                 }
             }, label: {
                 Text("Done")

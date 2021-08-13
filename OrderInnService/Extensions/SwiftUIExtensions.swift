@@ -105,3 +105,66 @@ extension View {
         modifier(BodyFont(size: size, weight: weight))
     }
 }
+
+enum DismissAction {
+    case noop
+    case custom(action: () -> ())
+    case wrapping(presentationMode: Binding<PresentationMode>)
+
+    @available(iOS 15.0, *)
+    init(wrapping dismissAction: SwiftUI.DismissAction) {
+        self = .custom(action: dismissAction.callAsFunction)
+    }
+
+    func callAsFunction() {
+        switch self {
+        case .noop: break
+        case .custom(let action): action()
+        case .wrapping(let presentationMode): presentationMode.wrappedValue.dismiss()
+        }
+    }
+}
+struct DismissActionKey: EnvironmentKey {
+    static let defaultValue = DismissAction.noop
+}
+struct IsPresentedKey: EnvironmentKey {
+    static let defaultValue = false
+}
+
+extension EnvironmentValues {
+    var o6nDismiss: DismissAction {
+        get {
+            guard case .noop = self[DismissActionKey.self] else {
+                return self[DismissActionKey.self]
+            }
+
+            if #available(iOS 15.0, *) {
+                if self.isPresented {
+                    return DismissAction(wrapping: self.dismiss)
+                } else {
+                    return DismissAction.noop
+                }
+            } else {
+                return DismissAction.wrapping(presentationMode: self.presentationMode)
+            }
+        }
+        set {
+            self[DismissActionKey.self] = newValue
+        }
+    }
+
+    var o6nIsPresented: Bool {
+        get {
+            var isPresented = self[IsPresentedKey.self]
+            if #available(iOS 15.0, *) {
+                isPresented = isPresented || self.isPresented
+            } else {
+                isPresented = isPresented || self.presentationMode.wrappedValue.isPresented
+            }
+            return isPresented
+        }
+        set {
+            self[IsPresentedKey.self] = newValue
+        }
+    }
+}

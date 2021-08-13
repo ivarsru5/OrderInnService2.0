@@ -77,6 +77,7 @@
 		69FA30EF26C54A360078FD89 /* FirestoreSnapshotPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30EE26C54A360078FD89 /* FirestoreSnapshotPublisher.swift */; };
 		69FA30F126C54A7D0078FD89 /* FutureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30F026C54A7D0078FD89 /* FutureExtensions.swift */; };
 		69FA30F326C54AA30078FD89 /* TypedExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30F226C54AA30078FD89 /* TypedExtensions.swift */; };
+		69FA30F626C5B6130078FD89 /* PopoverHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30F526C5B6130078FD89 /* PopoverHost.swift */; };
 		8D81E1853CD596EA1AD61F7F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
 		B64BE591241ED14AE64DDE46 /* Pods_OrderInnServiceTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AC7AE4945C1CF960FDF68DCB /* Pods_OrderInnServiceTests.framework */; };
 		FD19E44F74DCADA16DCE6ADF /* Pods_OrderInnService.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */; };
@@ -148,6 +149,7 @@
 		69FA30EE26C54A360078FD89 /* FirestoreSnapshotPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreSnapshotPublisher.swift; sourceTree = "<group>"; };
 		69FA30F026C54A7D0078FD89 /* FutureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensions.swift; sourceTree = "<group>"; };
 		69FA30F226C54AA30078FD89 /* TypedExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TypedExtensions.swift; sourceTree = "<group>"; };
+		69FA30F526C5B6130078FD89 /* PopoverHost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PopoverHost.swift; sourceTree = "<group>"; };
 		79E3E77C8AD17E641637F661 /* Pods-OrderInnServiceTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.release.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.release.xcconfig"; sourceTree = "<group>"; };
 		991BDBB5F4F5DB2C244FC62A /* Pods-OrderInnServiceTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OrderInnServiceTests.debug.xcconfig"; path = "Target Support Files/Pods-OrderInnServiceTests/Pods-OrderInnServiceTests.debug.xcconfig"; sourceTree = "<group>"; };
 		9FD8B1A86FB954770527DB16 /* Pods_OrderInnService.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_OrderInnService.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -313,6 +315,7 @@
 				580E1E312636DBC300A16228 /* WaiterWorkStation */,
 				580FEE3B26412BF3006ED835 /* OrderPreparation */,
 				58F07AAE26282FC300574D4F /* Extensions */,
+				69FA30F426C5B5FC0078FD89 /* Hacks */,
 				582066DB2628129400D3BCCA /* Assets.xcassets */,
 				582066E02628129400D3BCCA /* Info.plist */,
 				582066E82628166900D3BCCA /* GoogleService-Info.plist */,
@@ -416,6 +419,14 @@
 				69FA30F226C54AA30078FD89 /* TypedExtensions.swift */,
 			);
 			path = Firestore;
+			sourceTree = "<group>";
+		};
+		69FA30F426C5B5FC0078FD89 /* Hacks */ = {
+			isa = PBXGroup;
+			children = (
+				69FA30F526C5B6130078FD89 /* PopoverHost.swift */,
+			);
+			path = Hacks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -622,6 +633,7 @@
 				58FF99B726A168B700A99F38 /* AddPersonnelView.swift in Sources */,
 				58F91D74265FC3000059E71A /* ItemAvailabilityView.swift in Sources */,
 				69FA30F326C54AA30078FD89 /* TypedExtensions.swift in Sources */,
+				69FA30F626C5B6130078FD89 /* PopoverHost.swift in Sources */,
 				58F0D7412632E51F0093B6EA /* OrderCartReviewView.swift in Sources */,
 				58F2895B26384E6200C973DB /* ActiveOrderDetailView.swift in Sources */,
 				5811F943262DE4EA00050F2C /* UserDefaultsExtension.swift in Sources */,

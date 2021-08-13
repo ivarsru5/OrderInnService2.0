@@ -9,6 +9,7 @@ import Combine
 import SwiftUI
 
 struct ActiveOrderDetailView: View {
+    @EnvironmentObject var menuManager: MenuManager
     @EnvironmentObject var orderManager: OrderManager
     let order: RestaurantOrder
     @StateObject var extraPart: MenuView.PendingOrderPart
@@ -57,33 +58,35 @@ struct ActiveOrderDetailView: View {
     var body: some View {
         let isSubmitting = submittingExtraPartCancellable != nil
 
-        OrderDetailView.Wrapper(order: order, extraPart: extraPart, buttons: {
-            if order.state.isOpen {
-                Button(action: {
-                    showPickerOverlay = true
-                }, label: {
-                    Text("Add Items to Order")
-                })
-                .buttonStyle(O6NButtonStyle())
-            }
+        PopoverHost(baseContent: {
+            OrderDetailView.Wrapper(order: order, extraPart: extraPart, buttons: {
+                if order.state.isOpen {
+                    Button(action: {
+                        showPickerOverlay = true
+                    }, label: {
+                        Text("Add Items to Order")
+                    })
+                    .buttonStyle(O6NButtonStyle())
+                }
 
-            if !extraPart.entries.isEmpty {
-                Button(action: submitExtraPart, label: {
-                    Text("Submit Extra Part")
-                })
-                .buttonStyle(O6NButtonStyle(isLoading: isSubmitting))
+                if !extraPart.entries.isEmpty {
+                    Button(action: submitExtraPart, label: {
+                        Text("Submit Extra Part")
+                    })
+                    .buttonStyle(O6NButtonStyle(isLoading: isSubmitting))
+                }
+            })
+        }, popover: {
+            NavigationView {
+                MenuView.Wrapper(context: .appendedOrder(part: extraPart))
+                    .environmentObject(menuManager)
             }
-        })
+        }, popoverPresented: $showPickerOverlay)
         .disabled(isSubmitting)
         .opacity(isSubmitting ? 0.7 : 1.0)
         .animation(.default, value: isSubmitting)
         .overlay(submittingExtraPartOverlay)
         .navigationTitle("Review Order")
-        .popover(isPresented: $showPickerOverlay) {
-            NavigationView {
-                MenuView.Wrapper(context: .appendedOrder(part: extraPart))
-            }
-        }
     }
 }
 
