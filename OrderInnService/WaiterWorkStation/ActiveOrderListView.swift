@@ -11,20 +11,33 @@ import SwiftUI
 struct ActiveOrderListView: View {
     @EnvironmentObject var orderManager: OrderManager
     @Environment(\.currentLayout) @Binding var layout: Layout
+    @Environment(\.currentEmployee) var employee: Restaurant.Employee?
 
+    var orders: [RestaurantOrder] {
+        get {
+            // In manager mode, the OrderManager adds a subscription to all
+            // orders, including those from other waiters. This tab only lists
+            // the orders placed by the current user, whereas others are
+            // displayed within the manager controls section.
+            var orders = orderManager.orders
+            if let employee = self.employee, employee.isManager {
+                orders = orders.filter({ $0.placedBy == employee.firestoreReference })
+            }
+            return orders
+        }
+    }
     var body: some View {
         Group {
             if !orderManager.hasData {
                 Spinner()
-            } else if orderManager.orders.isEmpty {
+            } else if orders.isEmpty {
                 Text("There are currently no active orders.")
-                    .font(.headline)
-                    .foregroundColor(.label)
+                    .foregroundColor(.secondaryLabel)
                     .multilineTextAlignment(.center)
                     .padding()
             } else {
                 List {
-                    ForEach(orderManager.orders) { order in
+                    ForEach(orders) { order in
                         NavigationLink(destination: ActiveOrderDetailView.Wrapper(order: order)) {
                             OrderListCell(order: order)
                         }

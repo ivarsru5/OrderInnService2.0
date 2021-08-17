@@ -59,7 +59,7 @@ extension FirebaseFirestore.DocumentSnapshot {
     }
 }
 
-struct TypedDocumentReference<Document> where Document : FirestoreInitiable {
+struct TypedDocumentReference<Document: FirestoreInitiable>: Equatable {
     #if DEBUG
     let rawUntyped: DocumentReference?
     var untyped: DocumentReference {
@@ -116,9 +116,13 @@ struct TypedDocumentReference<Document> where Document : FirestoreInitiable {
     func collection<Child>(of: Child.Type) -> TypedCollectionReference<Child> where Child : FirestoreInitiable {
         TypedCollectionReference(untyped.collection(Child.firestoreCollection))
     }
+
+    static func == (_ lhs: TypedDocumentReference, _ rhs: TypedDocumentReference) -> Bool {
+        return lhs.untyped.path == rhs.untyped.path
+    }
 }
 
-struct TypedCollectionReference<Document> where Document : FirestoreInitiable {
+struct TypedCollectionReference<Document: FirestoreInitiable>: Equatable {
     let untyped: CollectionReference
 
     init(_ reference: CollectionReference) {
@@ -171,6 +175,10 @@ struct TypedCollectionReference<Document> where Document : FirestoreInitiable {
         return untyped.addDocumentFuture(data: mappedData)
             .map { ref in TypedDocumentReference<Document>(ref) }
             .eraseToAnyPublisher()
+    }
+
+    static func == (_ lhs: TypedCollectionReference, _ rhs: TypedCollectionReference) -> Bool {
+        return lhs.untyped.path == rhs.untyped.path
     }
 }
 
