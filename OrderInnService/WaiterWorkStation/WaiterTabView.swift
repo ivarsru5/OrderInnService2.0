@@ -14,12 +14,14 @@ struct WaiterTabView: View {
     enum Selection: Hashable {
         case placeOrder
         case activeOrders
+        case managerView
         #if DEBUG
         case debugMenu
         #endif
     }
 
-    let restaurant: Restaurant
+    @Environment(\.currentRestaurant) var restaurant: Restaurant!
+    @Environment(\.currentEmployee) var employee: Restaurant.Employee!
     @StateObject var menuManager: MenuManager
     @StateObject var orderManager: OrderManager
     @State var notificationPublisher = NotificationCenter.default.publisher(
@@ -27,7 +29,6 @@ struct WaiterTabView: View {
     @State var selectedTab: Selection = .placeOrder
 
     fileprivate init(restaurant: Restaurant, waiter: Restaurant.Employee) {
-        self.restaurant = restaurant
         _menuManager = StateObject(wrappedValue: MenuManager(for: restaurant))
 
         let subscriptionScope = OrderManager.SubscriptionScope(defaultFor: waiter)
@@ -55,8 +56,7 @@ struct WaiterTabView: View {
                     }
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
-                        Image(systemName: "tray")
-                        Text("Place Order")
+                        Label("Place Order", systemImage: "tray")
                     }
                     .tag(Selection.placeOrder)
 
@@ -65,10 +65,20 @@ struct WaiterTabView: View {
                     }
                     .navigationViewStyle(StackNavigationViewStyle())
                     .tabItem {
-                        Image(systemName: "scroll")
-                        Text("Active Orders")
+                        Label("Active Orders", systemImage: "scroll")
                     }
                     .tag(Selection.activeOrders)
+
+                    if employee.isManager {
+                        NavigationView {
+                            ManagerView()
+                        }
+                        .navigationViewStyle(StackNavigationViewStyle())
+                        .tabItem {
+                            Label("Manager Controls", systemImage: "folder")
+                        }
+                        .tag(Selection.managerView)
+                    }
 
                     #if DEBUG
                     DebugMenu.withTabItem

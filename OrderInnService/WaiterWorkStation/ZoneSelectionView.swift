@@ -72,14 +72,6 @@ struct ZoneSelectionView: View {
         }
         .listStyle(InsetGroupedListStyle())
         .navigationTitle(Text("Zones"))
-        .navigationBarItems(trailing: HStack {
-            if authManager.waiter?.isManager ?? false {
-                NavigationLink(destination: Text("Hello world! (Please replace with manager view)")) {
-                    Image(systemName: "folder")
-                        .foregroundColor(.link)
-                }
-            }
-        })
         .onReceive(dismissNotificationPublisher) { _ in
             hasNavigated = false
         }
