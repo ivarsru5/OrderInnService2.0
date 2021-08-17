@@ -184,6 +184,11 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
         }
     }
 
+    struct EntryReference: Hashable, Equatable {
+        let part: Array<Part>.Index
+        let entry: Array<Entry>.Index
+    }
+
     enum Key: String, CodingKey {
         case state = "state"
         case table = "table"
@@ -328,6 +333,17 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
                 .parts: FieldValue.arrayUnion([
                     try! JSONEncoder().encode(newPart),
                 ]),
+            ])
+            .flatMap { ref in ref.get() }
+            .eraseToAnyPublisher()
+    }
+
+    @available(*, deprecated, message: "Usage of this method can cause data loss (see issue #11)")
+    func replaceParts(with parts: [Part]) -> AnyPublisher<RestaurantOrder, Error> {
+        let json = JSONEncoder()
+        return firestoreReference
+            .updateData([
+                .parts: parts.map { part in try! json.encode(part) }
             ])
             .flatMap { ref in ref.get() }
             .eraseToAnyPublisher()

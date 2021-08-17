@@ -5,8 +5,17 @@
 //  Created by paulsnar on 7/29/21.
 //
 
+import Combine
 import Foundation
 import SwiftUI
+
+struct O6NMutedButtonStyle: ButtonStyle {
+    func makeBody(configuration: Configuration) -> some View {
+        let mod = O6NButtonStyle.Modifier(bg: .tertiarySystemBackground, fg: .label)
+        return configuration.label
+            .modifier(mod)
+    }
+}
 
 struct O6NButtonStyle: ButtonStyle {
     let isLoading: Bool
@@ -19,7 +28,7 @@ struct O6NButtonStyle: ButtonStyle {
 
     static let transitionAnimation = Animation.easeOut(duration: 0.2)
 
-    private struct Modifier: ViewModifier {
+    fileprivate struct Modifier: ViewModifier {
         let bg: Color
         let fg: Color
 
@@ -29,6 +38,7 @@ struct O6NButtonStyle: ButtonStyle {
             // If you're thinking of changing it, please make sure
             // no usage of this button style breaks as a result.
             content
+                .multilineTextAlignment(.center)
                 .font(.body.bold())
                 .foregroundColor(fg)
                 .frame(maxWidth: .infinity, minHeight: 54)
@@ -65,18 +75,25 @@ struct O6NButtonStylePreviews: PreviewProvider {
                 isLoading = true
             }
 
-            DispatchQueue.main.asyncAfter(deadline: .now().advanced(by: .seconds(3))) {
-                withAnimation(O6NButtonStyle.transitionAnimation) {
-                    isLoading = false
-                }
-            }
+            var sub: AnyCancellable?
+            sub = Just(())
+                .delay(for: .seconds(3), scheduler: RunLoop.main)
+                .ignoreOutput()
+                .sink(receiveCompletion: { _ in
+                    withAnimation(O6NButtonStyle.transitionAnimation) {
+                        isLoading = false
+                    }
+                    if let _ = sub {
+                        sub = nil
+                    }
+                })
         }
 
         var body: some View {
             Button(action: load, label: {
                 Text("Tap To Load")
             })
-                .buttonStyle(O6NButtonStyle(isLoading: isLoading))
+            .buttonStyle(O6NButtonStyle(isLoading: isLoading))
         }
     }
 
@@ -85,19 +102,24 @@ struct O6NButtonStylePreviews: PreviewProvider {
             Button(action: noop, label: {
                 Text("Test Button")
             })
-                .buttonStyle(O6NButtonStyle())
+            .buttonStyle(O6NButtonStyle())
 
             Button(action: noop, label: {
                 Text("Loading Button")
             })
-                .buttonStyle(O6NButtonStyle(isLoading: true))
+            .buttonStyle(O6NButtonStyle(isLoading: true))
 
             Button(action: noop, label: {
                 Text("Disabled Button")
             })
-                .buttonStyle(O6NButtonStyle(isEnabled: false))
+            .buttonStyle(O6NButtonStyle(isEnabled: false))
 
             TestButton()
+
+            Button(action: noop, label: {
+                Text("Muted Button")
+            })
+            .buttonStyle(O6NMutedButtonStyle())
         }
     }
 

@@ -102,17 +102,21 @@ class OrderManager: ObservableObject {
         self.orders = orders
     }
 
+    private func finishUpdating(order: RestaurantOrder) {
+        if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
+            orders[index] = order
+        } else {
+            orders.append(order)
+        }
+        orders.sort(by: OrderManager.orderComparator)
+        updatingOrders.remove(order.id)
+    }
+
     func update(order: RestaurantOrder, setState state: RestaurantOrder.OrderState) -> AnyPublisher<RestaurantOrder, Error> {
         updatingOrders.insert(order.id)
         return order.updateState(state)
             .map { [unowned self] order in
-                if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
-                    self.orders[index] = order
-                } else {
-                    self.orders.append(order)
-                }
-                self.orders.sort(by: OrderManager.orderComparator)
-                self.updatingOrders.remove(order.id)
+                self.finishUpdating(order: order)
                 return order
             }
             .eraseToAnyPublisher()
@@ -122,13 +126,26 @@ class OrderManager: ObservableObject {
         updatingOrders.insert(order.id)
         return order.addPart(withEntries: entries)
             .map { [unowned self] order in
-                if let index = self.orders.firstIndex(where: { $0.id == order.id }) {
-                    self.orders[index] = order
-                } else {
-                    self.orders.append(order)
-                }
-                self.orders.sort(by: OrderManager.orderComparator)
-                self.updatingOrders.remove(order.id)
+                self.finishUpdating(order: order)
+                return order
+            }
+            .eraseToAnyPublisher()
+    }
+
+    func update(order: RestaurantOrder, markFulfilled refs: [RestaurantOrder.EntryReference]) -> AnyPublisher<RestaurantOrder, Error> {
+        updatingOrders.insert(order.id)
+
+        var parts = order.parts
+        refs.forEach { ref in
+            let part = parts[ref.part]
+            var entries = part.entries
+            entries[ref.entry] = entries[ref.entry].with(isFulfilled: true)
+            parts[ref.part] = RestaurantOrder.Part(index: part.index, entries: entries)
+        }
+
+        return order.replaceParts(with: parts)
+            .map { [unowned self] order in
+                self.finishUpdating(order: order)
                 return order
             }
             .eraseToAnyPublisher()

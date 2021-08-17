@@ -59,7 +59,8 @@ struct OrderDetailView<Buttons: View>: View {
 
         var body: some View {
             OrderDetailView(layout: layout, menuManager: menuManager,
-                            order: order, extraPart: part, buttons: buttons)
+                            order: order, extraPart: part,
+                            buttons: buttons)
         }
     }
 
