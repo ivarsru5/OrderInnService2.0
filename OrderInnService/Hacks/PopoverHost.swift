@@ -72,6 +72,11 @@ struct PopoverHost<BaseContent: View, Popover: View>: UIViewControllerRepresenta
     }
 
     func updateUIViewController(_ vc: UIViewControllerType, context: Context) {
+        vc.rootView = baseContent()
+        if let popover = vc.presentedViewController as? UIHostingController<Popover> {
+            popover.rootView = self.popover()
+        }
+
         let shouldDisplayPopover = popoverPresented.wrappedValue
         let isPopoverPresented = vc.presentedViewController != nil
         if shouldDisplayPopover && !isPopoverPresented {

@@ -155,8 +155,22 @@ struct KitchenOrderDetailView: View {
         }
     }
     var body: some View {
-        OrderDetailView.Wrapper(order: order, extraPart: nil,
-                                buttons: { self.buttons })
+        VStack {
+            OrderLocationView(order: order)
+
+            List {
+                ForEach(order.parts, id: \.index) { part in
+                    OrderPartListing(part: part, removeEntry: nil)
+                }
+            }
+            .listStyle(InsetGroupedListStyle())
+
+            OrderTotalView(order: order, extraPart: nil)
+
+            HStack {
+                buttons
+            }
+        }
         .fullScreenCover(isPresented: $selectionEnabled) {
             FulfilledSelectionView(order: order)
         }

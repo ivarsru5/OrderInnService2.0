@@ -82,7 +82,8 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
     }
 
     struct Part: Codable {
-        let index: Int
+        typealias Index = Int
+        let index: Index
         let entries: [Entry]
 
         init(index: Int, entries: [Entry]) {
@@ -348,4 +349,9 @@ struct RestaurantOrder: Identifiable, FirestoreInitiable {
             .flatMap { ref in ref.get() }
             .eraseToAnyPublisher()
     }
+}
+
+extension RestaurantOrder.Part.Index {
+    static let IMAGINARY = -1
+    static let INITIAL = 0
 }

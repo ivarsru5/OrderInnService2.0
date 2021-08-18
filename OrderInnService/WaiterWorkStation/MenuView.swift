@@ -16,13 +16,8 @@ struct MenuView: View {
 
     class PendingOrderPart: ObservableObject {
         @Published var entries: [RestaurantOrder.Entry] = []
-        weak var menuManager: MenuManager?
 
         var isEmpty: Bool { entries.isEmpty }
-
-        init(menuManager: MenuManager) {
-            self.menuManager = menuManager
-        }
 
         func amount(ofItemWithID itemID: MenuItem.FullID) -> Int {
             if let entry = entries.first(where: { $0.itemID == itemID }) {
@@ -61,10 +56,13 @@ struct MenuView: View {
             entries.removeAll()
         }
 
-        var subtotal: Currency { entries.map { $0.subtotal(using: menuManager!.menu) }.sum() }
+        func subtotal(using menu: MenuManager.Menu) -> Currency {
+            return entries.map { $0.subtotal(using: menu) }.sum()
+        }
 
-        func asOrderPart(withIndex index: Int) -> RestaurantOrder.Part {
-            return RestaurantOrder.Part(index: index, entries: entries)
+        var asOrderPart: RestaurantOrder.Part {
+            return RestaurantOrder.Part(
+                index: RestaurantOrder.Part.Index.IMAGINARY, entries: entries)
         }
     }
 
@@ -229,7 +227,7 @@ struct MenuView: View {
         if case .appendedOrder(part: let part) = context {
             self._part = StateObject(wrappedValue: part)
         } else {
-            self._part = StateObject(wrappedValue: PendingOrderPart(menuManager: menuManager))
+            self._part = StateObject(wrappedValue: PendingOrderPart())
         }
     }
 
@@ -262,8 +260,8 @@ struct MenuView: View {
             HStack {
                 Image(systemName: "cart")
 
-                Text("\(part.subtotal, specifier: "%.2f") EUR")
-                    .bold()
+                let subtotal = part.subtotal(using: menuManager.menu)
+                Text("EUR \(subtotal, specifier: "%.2f")").bold()
             }
             .foregroundColor(part.isEmpty ? .secondary : .link)
             .onTapGesture {
@@ -334,7 +332,7 @@ struct MenuView_Previews: PreviewProvider {
         "dinner": MenuCategory(id: "dinner", name: "Dinner", type: .food, restaurantID: "R"),
         "drinks": MenuCategory(id: "drinks", name: "Drinks", type: .drink, restaurantID: "R"),
     ])
-    static let part = MenuView.PendingOrderPart(menuManager: menuManager)
+    static let part = MenuView.PendingOrderPart()
 
     struct Wrapper: View {
         @EnvironmentObject var menuManager: MenuManager
@@ -350,8 +348,9 @@ struct MenuView_Previews: PreviewProvider {
                     Text("(DEBUG) Total:")
                         .foregroundColor(.secondary)
                     Spacer()
-                    Text("EUR \(part.subtotal, specifier: "%.2f")")
-                        .bold()
+
+                    let subtotal = part.subtotal(using: menuManager.menu)
+                    Text("EUR \(subtotal, specifier: "%.2f")").bold()
                 }
                 .padding()
             }

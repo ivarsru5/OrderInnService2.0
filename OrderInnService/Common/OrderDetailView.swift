@@ -9,61 +9,90 @@ import Combine
 import Foundation
 import SwiftUI
 
-struct OrderDetailView<Buttons: View>: View {
+struct OrderLocationView: View {
+    private enum Data {
+        case order(RestaurantOrder)
+        case location(Zone?, Table)
+    }
+
+    @Environment(\.currentLayout) @Binding var layout: Layout
+    private let data: Data
+
+    init(order: RestaurantOrder) {
+        self.data = .order(order)
+    }
+    init(zone: Zone?, table: Table) {
+        self.data = .location(zone, table)
+    }
+
+    private var zone: Zone {
+        switch self.data {
+        case .order(let order): return layout.zones[order.tableFullID.zone]!
+        case .location(let maybeZone, let table):
+            if let zone = maybeZone {
+                return zone
+            } else {
+                return layout.zones[table.zoneID]!
+            }
+        }
+    }
+    private var table: Table {
+        switch self.data {
+        case .order(let order): return layout.tables[order.tableFullID]!
+        case .location(_, let table): return table
+        }
+    }
+
+    var body: some View {
+        HStack {
+            Text("Zone: ").bold() + Text(zone.location)
+            Spacer()
+            Text("Table: ").bold() + Text(table.name)
+        }
+        .padding([.leading, .trailing])
+    }
+}
+
+struct OrderTotalView: View {
     @EnvironmentObject var menuManager: MenuManager
-
-    let order: RestaurantOrder
-    @ObservedObject var extraPart: MenuView.PendingOrderPart
-    let buttons: () -> Buttons
-
-    private let zone: Zone
-    private let table: Table
-
-    fileprivate init(layout: Layout, menuManager: MenuManager,
-                     order: RestaurantOrder, extraPart: MenuView.PendingOrderPart,
-                     buttons: @escaping () -> Buttons) {
-        self.order = order
-        self.buttons = buttons
-        self._extraPart = ObservedObject(wrappedValue: extraPart)
-
-        let table = layout.tables[order.tableFullID]!
-        let zone = layout.zones[table.zoneID]!
-
-        self.zone = zone
-        self.table = table
+    let order: RestaurantOrder?
+    let extraPart: RestaurantOrder.Part?
+    private var newTotal: Currency? {
+        guard order != nil, let part = extraPart, !part.entries.isEmpty else {
+            return nil
+        }
+        return baseTotal + part.subtotal(using: menuManager.menu)
     }
-    struct Wrapper: View {
-        @Environment(\.currentLayout) @Binding var layout: Layout
-        @EnvironmentObject var menuManager: MenuManager
-
-        let order: RestaurantOrder
-        let extraPart: MenuView.PendingOrderPart?
-        let buttons: () -> Buttons
-
-        init(order: RestaurantOrder,
-             extraPart: MenuView.PendingOrderPart? = nil) where Buttons == EmptyView {
-            self.init(order: order, extraPart: extraPart,
-                      buttons: { EmptyView() })
+    private var baseTotal: Currency {
+        var total = Currency(0)
+        if let order = self.order {
+            total += order.total(using: menuManager.menu)
+        } else if let part = extraPart {
+            total += part.subtotal(using: menuManager.menu)
         }
-        init(order: RestaurantOrder,
-             extraPart: MenuView.PendingOrderPart? = nil,
-             @ViewBuilder buttons: @escaping () -> Buttons) {
-            self.order = order
-            self.extraPart = extraPart
-            self.buttons = buttons
-        }
-
-        var part: MenuView.PendingOrderPart {
-            extraPart ?? MenuView.PendingOrderPart(menuManager: menuManager)
-        }
-
-        var body: some View {
-            OrderDetailView(layout: layout, menuManager: menuManager,
-                            order: order, extraPart: part,
-                            buttons: buttons)
-        }
+        return total
     }
 
+    var body: some View {
+        HStack {
+            Text("Total Order Amount:").foregroundColor(.secondaryLabel)
+            Spacer()
+            IfLet(newTotal, whenPresent: { newTotal in
+                Group {
+                    Text("EUR \(baseTotal, specifier: "%.2f")")
+                    Image(systemName: "arrow.right")
+                }
+                .foregroundColor(.secondary)
+                Text("EUR \(newTotal, specifier: "%.2f")").bold()
+            }, whenAbsent: {
+                Text("EUR \(baseTotal, specifier: "%.2f")").bold()
+            })
+        }
+        .padding([.leading, .trailing])
+    }
+}
+
+struct OrderPartListing: View {
     struct EntryCell: View {
         let item: MenuItem
         let entry: RestaurantOrder.Entry
@@ -102,94 +131,38 @@ struct OrderDetailView<Buttons: View>: View {
         }
     }
 
+    typealias PartIndex = RestaurantOrder.Part.Index
+    typealias EntryIndex = Array<RestaurantOrder.Entry>.Index
+    @EnvironmentObject var menuManager: MenuManager
+    let part: RestaurantOrder.Part
+    let removeEntry: ((EntryIndex) -> ())?
+
+    func bindRemover(for entry: EntryIndex) -> (() -> ())? {
+        guard let removeEntry = self.removeEntry else { return nil }
+        return { removeEntry(entry) }
+    }
+
+    private var header: Text {
+        switch part.index {
+        case PartIndex.IMAGINARY: return Text("Selected Items")
+        case PartIndex.INITIAL: return Text("Initial Order")
+        default: return Text("Extra Order \(part.index)")
+        }
+    }
     var body: some View {
-        VStack {
-            #if DEBUG
-            Text("ID: \(order.id)").foregroundColor(.secondary)
-            #endif
-
-            HStack {
-                Text("Zone: ").bold() + Text(zone.location)
-                Spacer()
-                Text("Table: ").bold() + Text(table.name)
-            }
-            .padding([.leading, .trailing])
-
-            List {
-                if !extraPart.entries.isEmpty {
-                    Section(header: Text("Selected Items")) {
-                        // HACK[pn]: Though it may seem more idiomatic to
-                        // iterate over the indices instead of the entries
-                        // themselves, apparently that's dangerous because any
-                        // shift in the index range can cause the subscript
-                        // operation to fail because SwiftUI tries to render
-                        // from stale data? Which leads to an assertion failure
-                        // and a crash.
-                        // Therefore we iterate over the entries themselves
-                        // under the invariant that each item ID appears in only
-                        // one entry in this section.
-                        // (Followup [pn]: Appears that, indeed, passing a
-                        // range to ForEach implies that the range is constant
-                        // and so SwiftUI won't check if the range ever changes.
-                        // Which is exactly what we don't want. So we iterate
-                        // over a dynamic entry list instead. Thanks, SwiftUI!)
-                        ForEach(extraPart.entries, id: \.itemID) { entry in
-                            let item = menuManager.menu[entry.itemID]!
-                            EntryCell(item: item, entry: entry, remove: {
-                                withAnimation {
-                                    extraPart.setAmount(0, forItemWithID: entry.itemID)
-                                }
-                            })
-                        }
-                    }
-                }
-
-                let partIndices = Array(order.parts.indices)
-                ForEach(partIndices, id: \.self) { index in
-                    let part = order.parts[index]
-                    let header = index == 0 ? Text("Initial Order") : Text("Extra Order \(index)")
-                    Section(header: header) {
-                        ForEach(part.entries, id: \.itemID) { entry in
-                            let item = menuManager.menu[entry.itemID]!
-                            EntryCell(item: item, entry: entry)
-                        }
-                    }
-                }
-            }
-            .listStyle(InsetGroupedListStyle())
-
-            HStack {
-                Text("Total Order Amount:").foregroundColor(.secondary)
-                Spacer()
-                if extraPart.entries.isEmpty {
-                    let total = order.total(using: menuManager.menu)
-                    Text("EUR \(total, specifier: "%.2f")").bold()
-                } else if order.parts.isEmpty {
-                    Text("EUR \(extraPart.subtotal, specifier: "%.2f")").bold()
-                } else {
-                    let oldTotal = order.total(using: menuManager.menu)
-                    let newTotal = oldTotal + extraPart.subtotal
-
-                    Group {
-                        Text("EUR \(oldTotal, specifier: "%.2f")")
-                        Image(systemName: "arrow.right")
-                    }
-                    .foregroundColor(.secondaryLabel)
-                    Text("EUR \(newTotal, specifier: "%.2f")").bold()
-                }
-            }
-            .padding()
-
-            if Buttons.self != EmptyView.self {
-                HStack {
-                    buttons()
-                }
+        Section(header: header) {
+            let entries = Array(part.entries.enumerated())
+            ForEach(entries, id: \.element.itemID) { enumEntry in
+                let entry = enumEntry.element
+                let item = menuManager.menu[entry.itemID]!
+                let remove = bindRemover(for: enumEntry.offset)
+                EntryCell(item: item, entry: entry, remove: remove)
             }
         }
     }
 }
 
-#if DEBUG
+#if DEBUG && false
 struct OrderDetailView_Previews: PreviewProvider {
     typealias Order = RestaurantOrder
     typealias Part = Order.Part

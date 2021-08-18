@@ -38,11 +38,13 @@ struct ActiveOrderListView: View {
             } else {
                 List {
                     ForEach(orders) { order in
-                        NavigationLink(destination: ActiveOrderDetailView.Wrapper(order: order)) {
+                        NavigationLink(destination: ActiveOrderDetailView(order: order)) {
                             OrderListCell(order: order)
                         }
                     }
                 }
+                .animation(.default, value: orders.count)
+                .listStyle(InsetGroupedListStyle())
             }
         }
         .navigationBarTitle("Active Orders")

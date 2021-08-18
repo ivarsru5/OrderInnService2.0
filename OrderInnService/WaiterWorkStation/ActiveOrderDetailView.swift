@@ -11,25 +11,13 @@ import SwiftUI
 struct ActiveOrderDetailView: View {
     @EnvironmentObject var menuManager: MenuManager
     @EnvironmentObject var orderManager: OrderManager
+    @Environment(\.currentLayout) @Binding var layout: Layout
+
     let order: RestaurantOrder
-    @StateObject var extraPart: MenuView.PendingOrderPart
+
     @State var showPickerOverlay = false
     @State var submittingExtraPartCancellable: AnyCancellable?
-
-    fileprivate init(menuManager: MenuManager, order: RestaurantOrder) {
-        self.order = order
-
-        self._extraPart = StateObject(
-            wrappedValue: MenuView.PendingOrderPart(menuManager: menuManager))
-    }
-    struct Wrapper: View {
-        @EnvironmentObject var menuManager: MenuManager
-        let order: RestaurantOrder
-
-        var body: ActiveOrderDetailView {
-            ActiveOrderDetailView(menuManager: menuManager, order: order)
-        }
-    }
+    @StateObject var extraPart = MenuView.PendingOrderPart()
 
     func submitExtraPart() {
         submittingExtraPartCancellable = orderManager
@@ -55,27 +43,58 @@ struct ActiveOrderDetailView: View {
         }
     }
 
+    private var extraPartValue: Int {
+        if extraPart.isEmpty {
+            return 0
+        } else {
+            return 1
+        }
+    }
     var body: some View {
         let isSubmitting = submittingExtraPartCancellable != nil
 
         PopoverHost(baseContent: {
-            OrderDetailView.Wrapper(order: order, extraPart: extraPart, buttons: {
-                if order.state.isOpen {
-                    Button(action: {
-                        showPickerOverlay = true
-                    }, label: {
-                        Text("Add Items to Order")
-                    })
-                    .buttonStyle(O6NButtonStyle())
-                }
+            VStack {
+                OrderLocationView(order: order)
 
-                if !extraPart.entries.isEmpty {
-                    Button(action: submitExtraPart, label: {
-                        Text("Submit Extra Part")
-                    })
-                    .buttonStyle(O6NButtonStyle(isLoading: isSubmitting))
+                List {
+                    if !extraPart.isEmpty {
+                        let remove = { (index: OrderPartListing.EntryIndex) in
+                            _ = extraPart.entries.remove(at: index)
+                        }
+                        OrderPartListing(part: extraPart.asOrderPart,
+                                         removeEntry: remove)
+                    }
+
+                    ForEach(order.parts, id: \.index) { part in
+                        OrderPartListing(part: part, removeEntry: nil)
+                    }
                 }
-            })
+                .animation(.default, value: extraPart.entries.count)
+                .animation(.default, value: order.parts.count)
+                .listStyle(InsetGroupedListStyle())
+
+                OrderTotalView(order: order, extraPart: extraPart.asOrderPart)
+
+                HStack {
+                    if order.state.isOpen {
+                        Button(action: {
+                            showPickerOverlay = true
+                        }, label: {
+                            Text("Add Items to Order")
+                        })
+                        .buttonStyle(O6NButtonStyle())
+                    }
+
+                    if !extraPart.isEmpty {
+                        Button(action: submitExtraPart, label: {
+                            Text("Submit Extra Part")
+                        })
+                        .buttonStyle(O6NButtonStyle(isLoading: isSubmitting))
+                    }
+                }
+                .animation(.default, value: !extraPart.isEmpty)
+            }
         }, popover: {
             NavigationView {
                 MenuView.Wrapper(context: .appendedOrder(part: extraPart))
@@ -114,7 +133,7 @@ struct ActiveOrderOverview_Previews: PreviewProvider {
 
     static var previews: some View {
         NavigationView {
-            ActiveOrderDetailView.Wrapper(order: order)
+            ActiveOrderDetailView(order: order)
                 .environment(\.currentLayout, .constant(layout))
                 .environmentObject(menuManager)
         }

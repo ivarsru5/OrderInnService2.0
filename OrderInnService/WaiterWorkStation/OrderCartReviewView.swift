@@ -8,9 +8,6 @@
 import Combine
 import SwiftUI
 
-// TODO[pn 2021-07-20]: This is similar enough to ActiveOrderDetailView such
-// that I reckon they can be merged into one view struct to simplify
-// maintenance.
 struct OrderCartReviewView: View {
     typealias PendingOrderPart = MenuView.PendingOrderPart
 
@@ -46,28 +43,7 @@ struct OrderCartReviewView: View {
     @EnvironmentObject var authManager: AuthManager
     let table: Table
     @Environment(\.currentRestaurant) var restaurant: Restaurant!
-
-    #if DEBUG
-    @StateObject var model: Model
-    #else
     @StateObject var model = Model()
-    #endif
-
-    init(part: PendingOrderPart, table: Table) {
-        self._part = ObservedObject(wrappedValue: part)
-        self.table = table
-        #if DEBUG
-        self._model = StateObject(wrappedValue: Model())
-        #endif
-    }
-
-    #if DEBUG
-    init(part: PendingOrderPart, table: Table, model: Model) {
-        self._part = ObservedObject(wrappedValue: part)
-        self.table = table
-        self._model = StateObject(wrappedValue: model)
-    }
-    #endif
 
     @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
 
@@ -79,12 +55,22 @@ struct OrderCartReviewView: View {
         }
     }
     var body: some View {
-        let dummyOrder = RestaurantOrder(
-            restaurantID: restaurant.id, id: "(dummy)", state: .open,
-            table: table.fullID, placedBy: authManager.waiter!.id,
-            createdAt: Date(), parts: [])
+        VStack {
+            OrderLocationView(zone: nil, table: table)
 
-        OrderDetailView.Wrapper(order: dummyOrder, extraPart: part, buttons: {
+            List {
+                OrderPartListing(part: part.asOrderPart, removeEntry: { index in
+                    part.entries.remove(at: index)
+                    if part.entries.isEmpty && presentationMode.isPresented {
+                        presentationMode.dismiss()
+                    }
+                })
+            }
+            .animation(.default, value: part.entries.count)
+            .listStyle(InsetGroupedListStyle())
+
+            OrderTotalView(order: nil, extraPart: part.asOrderPart)
+
             Button(action: {
                 model.sendOrder(for: table, from: part, dismiss: {
                     if presentationMode.isPresented {
@@ -97,12 +83,11 @@ struct OrderCartReviewView: View {
             }, label: {
                 Text("Send Order")
             })
-            .buttonStyle(O6NButtonStyle())
-        })
-        .opacity(model.isSending ? 0.7 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: model.isSending)
-        .overlay(sendingOverlay)
-        .navigationBarTitle("Order", displayMode: .large)
+            .buttonStyle(O6NButtonStyle(isLoading: model.isSending))
+        }
+        .disabled(model.isSending)
+        .navigationTitle("Review Order")
+        .navigationBarTitleDisplayMode(.inline)
     }
 }
 
@@ -147,7 +132,7 @@ struct OrderCartReviewView_Previews: PreviewProvider {
     static let model = MockModel()
 
     static var part: MenuView.PendingOrderPart {
-        let part = MenuView.PendingOrderPart(menuManager: menuManager)
+        let part = MenuView.PendingOrderPart()
         part.entries = [
             Entry(itemID: ID(string: "C/I1")!, amount: 2),
             Entry(itemID: ID(string: "C/I2")!, amount: 3),
