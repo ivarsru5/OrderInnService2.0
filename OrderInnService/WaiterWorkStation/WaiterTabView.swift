@@ -9,6 +9,14 @@ import Combine
 import SwiftUI
 
 struct WaiterTabView: View {
+    /// This notification is sent from OrderCartReviewView via the default notification center when an
+    /// order has been submitted and should be displayed in the active order list.
+    ///
+    /// The expected action to be taken is to:
+    /// - return the "Place Order" tab to its initial state, that is, collapse all zones and exit from the menu view;
+    /// - return the "Active Orders" tab to its topmost position, that is, close the detail view;
+    /// - the "Active Orders" tab should be activated.
+    /// The last of those is performed here; the rest should be done in the respective views.
     static let switchToActiveOrdersFlow = Notification.Name("O6N.waiter.switchToActiveOrdersFlow")
 
     enum Selection: Hashable {

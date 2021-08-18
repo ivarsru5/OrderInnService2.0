@@ -12,6 +12,9 @@ struct ActiveOrderDetailView: View {
     @EnvironmentObject var menuManager: MenuManager
     @EnvironmentObject var orderManager: OrderManager
     @Environment(\.currentLayout) @Binding var layout: Layout
+    @Environment(\.presentationMode) @Binding var presentationMode: PresentationMode
+    @State var shouldCloseNotificationPublisher = NotificationCenter.default
+        .publisher(for: WaiterTabView.switchToActiveOrdersFlow, object: nil)
 
     let order: RestaurantOrder
 
@@ -106,6 +109,11 @@ struct ActiveOrderDetailView: View {
         .animation(.default, value: isSubmitting)
         .overlay(submittingExtraPartOverlay)
         .navigationTitle("Review Order")
+        .onReceive(shouldCloseNotificationPublisher) { _ in
+            if presentationMode.isPresented {
+                presentationMode.dismiss()
+            }
+        }
     }
 }
 

@@ -27,6 +27,7 @@ struct KitchenOrderListView: View {
                     }
                 }
                 .listStyle(InsetGroupedListStyle())
+                .animation(.default, value: orderManager.orders.count)
             }
         }
         .navigationTitle("Orders")

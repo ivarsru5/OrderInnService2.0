@@ -42,15 +42,26 @@ struct KitchenOrderDetailView: View {
 
             var body: some View {
                 HStack {
-                    Image(systemName: entry.isFulfilled || included ? "checkmark.circle.fill" : "circle")
-                        .foregroundColor(.link)
-                        .bodyFont(size: 20)
+                    if included {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.link)
+                            .bodyFont(size: 20)
+                    } else if entry.isFulfilled {
+                        Image(systemName: "checkmark.circle.fill")
+                            .foregroundColor(.secondary)
+                            .bodyFont(size: 20)
+                    } else {
+                        Image(systemName: "circle")
+                            .foregroundColor(.link)
+                            .bodyFont(size: 20)
+                    }
                     Text(item.name).bold()
                     Text(" ×\(entry.amount)").foregroundColor(.secondary)
                     Spacer()
                 }
+                .animation(.linear(duration: 0.05), value: included)
                 .disabled(entry.isFulfilled)
-                .opacity(entry.isFulfilled ? 0.75 : 1.0)
+                .opacity(entry.isFulfilled ? 0.5 : 1.0)
                 .contentShape(Rectangle())
                 .onTapGesture {
                     if !entry.isFulfilled {
@@ -139,13 +150,18 @@ struct KitchenOrderDetailView: View {
                     .disabled(selection.isEmpty)
                     .buttonStyle(O6NButtonStyle(isLoading: updatingCancellable != nil,
                                                 isEnabled: !selection.isEmpty))
+                    .animation(O6NButtonStyle.transitionAnimation, value: selection.isEmpty)
+                    .animation(O6NButtonStyle.transitionAnimation, value: updatingCancellable != nil)
                 }
             }
         }
     }
 
+    var canMarkItemsAsComplete: Bool {
+        return order.state.isOpen && !order.parts.allSatisfy({ $0.isFulfilled })
+    }
     @ViewBuilder var buttons: some View {
-        if order.state.isOpen && !order.parts.allSatisfy({ $0.isFulfilled }) {
+        if canMarkItemsAsComplete {
             Button(action: {
                 selectionEnabled = true
             }, label: {
@@ -166,6 +182,7 @@ struct KitchenOrderDetailView: View {
             .listStyle(InsetGroupedListStyle())
 
             OrderTotalView(order: order, extraPart: nil)
+                .padding(canMarkItemsAsComplete ? [] : [.bottom])
 
             HStack {
                 buttons
