@@ -61,12 +61,12 @@ struct DebugMenu: View {
     }
 
     func dumpUserDefaultsToConsole() {
-        print("=== Begin user defaults dump.")
+        debug_print("DebugMenu", "Begin user defaults dump.")
         UserDefaults.standard.dictionaryRepresentation().forEach {
             key, value in
-            print("[UserDefaults] \(key): \(String(describing: value))")
+            debug_print("UserDefaults", "\(key): \(String(describing: value))")
         }
-        print("=== End user defaults dump.")
+        debug_print("DebugMenu", "End user defaults dump.")
 
         userDefaultsDumped = true
     }
@@ -122,16 +122,15 @@ struct DebugMenu: View {
         var sub: AnyCancellable?
         sub = logout()
             .flatMap { _ in self.clearFirestorePersistence() }
-            .catch { error -> Empty<Void, Never> in
-                print("[Debug] Failed to reset app data: \(String(describing: error))")
-                return Empty()
+            .mapError { error in
+                fatalError("FIXME Failed to reset app data: \(String(describing: error))")
             }
             .sink {
                 if let _ = sub {
                     sub = nil
                 }
 
-                print("=== [Debug] Resetting user defaults and quitting.")
+                debug_print("DebugMenu", "Resetting user defaults and quitting.")
                 UserDefaults.deleteAllValues()
                 exit(0)
             }
