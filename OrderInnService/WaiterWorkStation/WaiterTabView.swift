@@ -20,8 +20,8 @@ struct WaiterTabView: View {
         #endif
     }
 
-    @Environment(\.currentRestaurant) var restaurant: Restaurant!
-    @Environment(\.currentEmployee) var employee: Restaurant.Employee!
+    @Environment(\.currentRestaurant) var restaurant: Restaurant?
+    @Environment(\.currentEmployee) var employee: Restaurant.Employee?
     @StateObject var menuManager: MenuManager
     @StateObject var orderManager: OrderManager
     @State var notificationPublisher = NotificationCenter.default.publisher(
@@ -46,49 +46,55 @@ struct WaiterTabView: View {
     }
 
     var body: some View {
-        RestaurantLayoutLoader(restaurant: restaurant) {
-            if !menuManager.hasData {
-                Spinner()
-            } else {
-                TabView(selection: $selectedTab) {
-                    NavigationView {
-                        ZoneSelectionView()
-                    }
-                    .navigationViewStyle(StackNavigationViewStyle())
-                    .tabItem {
-                        Label("Place Order", systemImage: "tray")
-                    }
-                    .tag(Selection.placeOrder)
-
-                    NavigationView {
-                        ActiveOrderListView()
-                    }
-                    .navigationViewStyle(StackNavigationViewStyle())
-                    .tabItem {
-                        Label("Active Orders", systemImage: "scroll")
-                    }
-                    .tag(Selection.activeOrders)
-
-                    if employee.isManager {
-                        NavigationView {
-                            ManagerView()
-                        }
-                        .navigationViewStyle(StackNavigationViewStyle())
-                        .tabItem {
-                            Label("Manager Controls", systemImage: "folder")
-                        }
-                        .tag(Selection.managerView)
-                    }
-
-                    #if DEBUG
-                    DebugMenu.withTabItem
-                        .tag(Selection.debugMenu)
-                    #endif
+        IfLet(restaurant.zip(employee)) { (restaurant, _) in
+            RestaurantLayoutLoader(restaurant: restaurant) {
+                if menuManager.hasData {
+                    _body
+                } else {
+                    Spinner()
                 }
-                .environmentObject(menuManager)
-                .environmentObject(orderManager)
             }
         }
+    }
+
+    private var _body: some View {
+        TabView(selection: $selectedTab) {
+            NavigationView {
+                ZoneSelectionView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem {
+                Label("Place Order", systemImage: "tray")
+            }
+            .tag(Selection.placeOrder)
+
+            NavigationView {
+                ActiveOrderListView()
+            }
+            .navigationViewStyle(StackNavigationViewStyle())
+            .tabItem {
+                Label("Active Orders", systemImage: "scroll")
+            }
+            .tag(Selection.activeOrders)
+
+            if employee!.isManager {
+                NavigationView {
+                    ManagerView()
+                }
+                .navigationViewStyle(StackNavigationViewStyle())
+                .tabItem {
+                    Label("Manager Controls", systemImage: "folder")
+                }
+                .tag(Selection.managerView)
+            }
+
+            #if DEBUG
+            DebugMenu.withTabItem
+                .tag(Selection.debugMenu)
+            #endif
+        }
+        .environmentObject(menuManager)
+        .environmentObject(orderManager)
         .onReceive(notificationPublisher) { _ in
             withAnimation {
                 selectedTab = .activeOrders
