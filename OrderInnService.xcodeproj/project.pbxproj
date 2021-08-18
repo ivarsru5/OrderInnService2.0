@@ -73,6 +73,7 @@
 		69766FF526B9A57400DBD18C /* AuthManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4B2698966E0044D34F /* AuthManager.swift */; };
 		69766FF726B9A78800DBD18C /* LoginQRCode.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69142D4D2698995E0044D34F /* LoginQRCode.swift */; };
 		69766FFA26BC140200DBD18C /* OrderListCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69766FF926BC140100DBD18C /* OrderListCell.swift */; };
+		69E0439926CC0731002369FA /* DebugPrint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69E0439826CC0731002369FA /* DebugPrint.swift */; };
 		69FA30EC26C2BF810078FD89 /* OrderDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30EB26C2BF810078FD89 /* OrderDetailView.swift */; };
 		69FA30EF26C54A360078FD89 /* FirestoreSnapshotPublisher.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30EE26C54A360078FD89 /* FirestoreSnapshotPublisher.swift */; };
 		69FA30F126C54A7D0078FD89 /* FutureExtensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 69FA30F026C54A7D0078FD89 /* FutureExtensions.swift */; };
@@ -145,6 +146,7 @@
 		69766FCE26B999BC00DBD18C /* TestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = TestPlan.xctestplan; sourceTree = "<group>"; };
 		69766FD726B99C3B00DBD18C /* OrderInnServiceTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = OrderInnServiceTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		69766FF926BC140100DBD18C /* OrderListCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderListCell.swift; sourceTree = "<group>"; };
+		69E0439826CC0731002369FA /* DebugPrint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugPrint.swift; sourceTree = "<group>"; };
 		69FA30EB26C2BF810078FD89 /* OrderDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OrderDetailView.swift; sourceTree = "<group>"; };
 		69FA30EE26C54A360078FD89 /* FirestoreSnapshotPublisher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirestoreSnapshotPublisher.swift; sourceTree = "<group>"; };
 		69FA30F026C54A7D0078FD89 /* FutureExtensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FutureExtensions.swift; sourceTree = "<group>"; };
@@ -407,6 +409,7 @@
 			isa = PBXGroup;
 			children = (
 				69142D43269740E20044D34F /* DebugMenu.swift */,
+				69E0439826CC0731002369FA /* DebugPrint.swift */,
 			);
 			path = Debug;
 			sourceTree = "<group>";
@@ -612,6 +615,7 @@
 				583FCE3A269D9CCD006F64ED /* ManagerView.swift in Sources */,
 				69766FFA26BC140200DBD18C /* OrderListCell.swift in Sources */,
 				5801CC3426A5557E00DD3DEC /* RemovePersonnelView.swift in Sources */,
+				69E0439926CC0731002369FA /* DebugPrint.swift in Sources */,
 				585231E5262DA90100826BBC /* ZoneSelectionView.swift in Sources */,
 				695C3DD9269DE8980084E449 /* RestaurantLayout.swift in Sources */,
 				695C3DDB269DE8D90084E449 /* RestaurantMenu.swift in Sources */,

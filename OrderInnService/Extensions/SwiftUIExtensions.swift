@@ -168,3 +168,17 @@ extension EnvironmentValues {
         }
     }
 }
+
+struct WhenRendered<Content: View>: View {
+    let callback: () -> ()
+    let content: () -> Content
+    init(call callback: @escaping () -> (), content: @escaping () -> Content) {
+        self.callback = callback
+        self.content = content
+    }
+
+    var body: Content {
+        let _ = callback()
+        return content()
+    }
+}
